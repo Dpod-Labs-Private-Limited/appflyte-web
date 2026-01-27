@@ -1,0 +1,7 @@
+.user_settings svg {
+    stroke: #000;
+}
+
+.user_settings_active svg {
+    stroke: #0B51C5;
+}

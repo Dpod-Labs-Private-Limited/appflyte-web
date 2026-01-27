@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Invoice",
+        "value": "invoice"
+    },
+    {
+        "name": "Contracts",
+        "value": "contract"
+    },
+    {
+        "name": "Purchase Orders",
+        "value": "purchase_order"
+    },
+    {
+        "name": "Product Specifications",
+        "value": "product_specification"
+    }
+]

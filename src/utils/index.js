@@ -1,0 +1,88 @@
+import { jwtDecode } from "jwt-decode";
+import HmacSHA256 from "crypto-js/hmac-sha256";
+import Hex from "crypto-js/enc-hex";
+import { getSessionData } from "./sessionDataHandle";
+import agentApiTokenManager from "./AgentApiToken/getAgentAdminToken";
+
+const SECRET_KEY = "DPOD_AMEYA_2.0_AUTH_KEY";
+
+export const formatLabel = (label) => {
+    if (typeof label !== 'string') return '';
+    return label.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+export const checkProject = async (project_id) => {
+    try {
+        const service_token = JSON.parse(localStorage.getItem('service-agent-user-token')) ?? null;
+        if (service_token) {
+            const token = jwtDecode(service_token);
+            const token_project_id = token?.project_id ?? null;
+            if (token_project_id === project_id) {
+                return;
+            } else {
+                localStorage.removeItem("service-agent-user-token")
+                localStorage.removeItem("agent-user-token")
+                localStorage.removeItem("analytics_base_url")
+            }
+            return
+        }
+        return
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getAgentApiToken = async () => {
+    const currentProject = getSessionData("selected_project")
+    if (currentProject) {
+        const token = await agentApiTokenManager.getAgentAdminToken();
+        return token ?? null
+    }
+    return null
+}
+
+export function decodeParamToken(fileId, documentType) {
+    const data = `${fileId}${documentType}`;
+    const token = HmacSHA256(data, SECRET_KEY).toString(Hex);
+    return token;
+}
+
+export async function lowercaseStrings(jsonInput) {
+    const processValue = (value) => {
+        if (typeof value === 'string') {
+            return value.toLowerCase();
+        }
+        if (Array.isArray(value)) {
+            return value.map(item => processValue(item));
+        }
+        if (typeof value === 'object' && value !== null) {
+            return processObject(value);
+        }
+        return value;
+    };
+
+    const processObject = (obj) => {
+        const result = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                result[key] = processValue(obj[key]);
+            }
+        }
+        return result;
+    };
+
+    return processObject(jsonInput);
+}
+
+export async function checkCredit(credit) {
+
+    if (process.env.REACT_APP_IS_SFS_INSTANCE === "true") {
+        return false
+    }
+
+    if (credit <= 0.5) {
+        return true
+    }
+    return false
+
+}

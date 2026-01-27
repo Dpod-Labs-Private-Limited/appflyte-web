@@ -1,0 +1,60 @@
+{
+    "colors": {
+        "primary": "#2D4385",
+        "secondary": "#64B22C",
+        "tertiary": "#FFFFFF",
+        "background": "#F5F5F5",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#000000",
+        "trowHover": "#F2F3F5",
+        "heading": "#244C59",
+
+        "btnPrimary": "#64b22c",
+        "btnPrimaryText": "#FFFFFF",
+        "btnPrimaryBorder": "#FFFFFF",
+        "btnPrimaryHover": "#FFFFFF",
+        "btnPrimaryHoverText": "#64b22c",
+        "btnPrimaryHoverBorder": "#64b22c",
+
+        "btnSecondary": "#DEDEDE",
+        "btnSecondaryText": "#404040",
+        "btnSecondaryBorder": "#000000",
+        "btnSecondaryHover": "#404040",
+        "btnSecondaryHoverText": "#DEDEDE",
+        "btnSecondaryHoverBorder": "#DEDEDE",
+
+        "btnTertiary": "#7DC25E",
+        "btnTertiaryText": "#FFFFFF",
+        "btnTertiaryBorder": "#FFFFFF",
+        "btnTertiaryHover": "#FFFFFF",
+        "btnTertiaryHoverText": "#7DC25E",
+        "btnTertiaryHoverBorder": "#7DC25E"
+    },
+    "fonts": {
+        "font_family": "./css/Fonts/Inter-Regular.ttf",
+        "size": {
+            "small": "14px",
+            "medium": "15px",
+            "normal": "16px",
+            "large": "18px"
+        },
+        "weight": {
+            "small": "400",
+            "medium": "500",
+            "large": "600"
+        }
+    },
+    "fallbackfont": {
+        "font_family": "./css/Fonts/c-Regular.ttf"
+    },
+    "icons": {
+        "color": {
+            "iconHover": "#3AB197"
+        }
+    },
+    "searchBox": {
+        "color": {
+            "searchBoxHoverBackground": "#FFFFFF"
+        }
+    }
+}

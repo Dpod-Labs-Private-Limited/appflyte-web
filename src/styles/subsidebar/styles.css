@@ -1,0 +1,15 @@
+.sidebar_icon svg {
+    color: #2a2525;
+    stroke: #2a2525;
+    transition: color 0.3s ease, stroke 0.3s ease;
+}
+
+.sidebar_icon:hover svg {
+    color: #2a2525;
+    stroke: #2a2525;
+}
+
+.sidebar_icon.active svg {
+    color: #2a2525;
+    font-weight: bold;
+}

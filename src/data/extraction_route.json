@@ -1,0 +1,20 @@
+{
+    "engine_name": "extraction_agent",
+    "engine_config": {
+        "sidebar_items": {
+            "service_home": [],
+            "document_types": [],
+            "settings": [
+                "general",
+                "api_keys",
+                "extraction_analytics"
+            ],
+            "all_documents": [],
+            "connectors": [
+                "connector_lists",
+                "integrations",
+                "triggers"
+            ]
+        }
+    }
+}

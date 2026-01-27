@@ -1,0 +1,99 @@
+.menu {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cfcfcf #1a1a1a;
+}
+
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu::-webkit-scrollbar-track {
+  background: #111;
+}
+
+.menu::-webkit-scrollbar-thumb {
+  background: #d6d6d6;
+  border-radius: 8px;
+}
+
+.menu::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+
+.menu::-webkit-scrollbar-thumb:active {
+  background: #e6e6e6;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  margin: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item .icon,
+.menu-item .label {
+  color: #ffffff;
+  transition: color 0.3s ease;
+  text-align: center;
+  font-size: 10px;
+}
+
+.menu-item:hover {
+  margin: 8px;
+  border-radius: 10px;
+  background-color: #0B51C5;
+}
+
+.menu-item:hover .icon,
+.menu-item:hover .label {
+  color: #ffffff;
+}
+
+.menu-item.active {
+  background-color: #007bff;
+  border-radius: 10px;
+}
+
+.menu-item.active .icon,
+.menu-item.active .label {
+  color: #ffffff;
+}
+
+.menu-item.active:hover {
+  background-color: #007bff;
+}
+
+.menu-item.active:hover .icon,
+.menu-item.active:hover .label {
+  color: #ffffff;
+}
+
+.subsidebar_icon svg {
+  color: white;
+  stroke: #FFFFFF;
+  transition: color 0.3s ease, stroke 0.3s ease;
+}
+
+.subsidebar_icon:hover svg {
+  color: #FFFFFF;
+  stroke: #FFFFFF;
+}
+
+.subsidebar_icon.active svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+.subsidebar_icon.active:hover svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}

@@ -1,0 +1,23 @@
+.delete_icon svg {
+    color: #C30E2E;
+    stroke: #C30E2E;
+    transition: color 0.3s ease, stroke 0.3s ease;
+    cursor: pointer;
+}
+
+.delete_icon:hover svg {
+    color: #6b0316;
+    stroke: #6b0316;
+}
+
+.edit_icon svg {
+    color: #000000;
+    stroke: #000000;
+    transition: color 0.3s ease, stroke 0.3s ease;
+    cursor: pointer;
+}
+
+.edit_icon:hover svg {
+    color: #a45f5f;
+    stroke: #a45f5f;
+}

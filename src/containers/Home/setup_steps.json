@@ -1,0 +1,46 @@
+[
+    {
+        "service_name": "Ameya Extract",
+        "service_type": "extraction_agent",
+        "service_label": "EXTRACT",
+        "status_data": [
+            {
+                "type": "extraction_init_status",
+                "label": "Spinning up extraction service",
+                "status": "init"
+            },
+            {
+                "type": "extraction_space_project_status",
+                "label": "Allocating workspace and projects",
+                "status": "init"
+            },
+            {
+                "type": "extraction_doctype_schema_status",
+                "label": "Linking document types and schema",
+                "status": "init"
+            }
+        ]
+    },
+    {
+        "service_name": "Ameya Analyst",
+        "service_type": "analytics_tool",
+        "service_label": "ANALYST",
+        "status_data": [
+            {
+                "type": "analytics_init_status",
+                "label": "Initializing analyst service",
+                "status": "init"
+            },
+            {
+                "type": "analytics_data_source_status",
+                "label": "Establishing data connections",
+                "status": "init"
+            },
+            {
+                "type": "analytics_dataset_app_status",
+                "label": "Linking datasets and apps",
+                "status": "init"
+            }
+        ]
+    }
+]

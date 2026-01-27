@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter_Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.sidebar_icon svg {
+  color: #2a2525;
+  stroke: #2a2525;
+  transition: color 0.3s ease, stroke 0.3s ease;
+}
+
+.sidebar_icon:hover svg {
+  color: #2a2525;
+  stroke: #2a2525;
+}
+
+.sidebar_icon.active svg {
+  color: #2a2525;
+  font-weight: bold;
+}
