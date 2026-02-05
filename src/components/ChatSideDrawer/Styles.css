@@ -1,0 +1,25 @@
+.thumbsup_icon svg {
+    color: #ffffff;
+    transition: color 0.3s ease;
+    stroke: #ffffff;
+    transition: stroke 0.3s ease;
+}
+
+.thumbsup_icon:hover svg {
+    color: #ffffff;
+    stroke: #ffffff;
+}
+
+.thumbsdown_icon svg {
+    color: #ffffff;
+    transition: color 0.3s ease;
+    fill: #ffffff;
+    stroke: #ffffff;
+    transition: stroke 0.3s ease;
+}
+
+.thumbsdown_icon:hover svg {
+    color: #0B51C5;
+    stroke: #0B51C5;
+    fill: #0B51C5;
+}

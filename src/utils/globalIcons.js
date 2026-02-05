@@ -109,6 +109,9 @@ import chatlaunch4Icon from "../images/icons/chatlaunch-4.svg";
 import errorDataIcon from "../images/icons/error_data.svg";
 import statusLoadingIcon from "../images/icons/status_loading.svg";
 import initStatusIcon from "../images/icons/init_status.svg";
+import collectionIcon from "../images/icons/collections.svg";
+import collectionTypeIcon from "../images/icons/collection_types.svg";
+import mediaIcon from "../images/icons/media.svg";
 
 export const IconSvg = {
     spaceIcon,
@@ -220,5 +223,8 @@ export const IconSvg = {
     chatlaunch4Icon,
     errorDataIcon,
     statusLoadingIcon,
-    initStatusIcon
+    initStatusIcon,
+    collectionIcon,
+    collectionTypeIcon,
+    mediaIcon
 };

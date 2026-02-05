@@ -1,0 +1,10 @@
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+	<title>flag_black_24dp-svg</title>
+	<style>
+		tspan { white-space:pre }
+		.shp0 { fill: none } 
+		.shp1 { fill: #0091ff } 
+	</style>
+	<path id="Layer" class="shp0" d="M0 0L24 0L24 24L0 24L0 0Z" />
+	<path id="Layer" fill-rule="evenodd" class="shp1" d="M14.4 6L20 6L20 16L13 16L12.6 14L7 14L7 21L5 21L5 4L14 4L14.4 6ZM7 6L7 12L14.24 12L14.64 14L18 14L18 8L12.76 8L12.36 6L7 6Z" />
+</svg>

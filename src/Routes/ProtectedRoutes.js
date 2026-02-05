@@ -1,13 +1,15 @@
 import React from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { routesConfig } from './Routes';
-import { useAppContext } from '../context/AppContext';
 
-function ProtectedRoutes({ isAuthenticated }) {
+function ProtectedRoutes(props) {
+
+    const { isAuthenticated, centralLoadingFlags, tostAlert, selectedUser, emailVerified, collectionTypeList, fetchCollectionTypes,
+        fetchPublishedCollection, fieldSetList, fetchFieldSets, fieldSetListPublished, collectionPublishedList, setLoading, staffList, open, setOpen } = props;
+
     const location = useLocation();
     const navigate = useNavigate();
     const currentPath = location.pathname;
-    const { selectedOrganization, selectedService } = useAppContext();
 
     const jwtIdToken = localStorage.getItem('dpod-token');
     if (!jwtIdToken) {
@@ -23,30 +25,31 @@ function ProtectedRoutes({ isAuthenticated }) {
     };
 
     const currentRoute = routesConfig.find(matchRoute)
-
-    // if (currentRoute.path !== "/" && currentRoute.path !== "/organizations" &&
-    //     currentRoute.path !== "/user/settings" && currentRoute.path !== "/user/billing") {
-    //     if (!selectedOrganization) {
-    //         navigate("/")
-    //     }
-    // }
-
-    // if (currentRoute.path !== "/" &&
-    //     currentRoute.path !== "/organizations" &&
-    //     currentRoute.path !== "/organization/:orgId/services" &&
-    //     currentRoute.path !== "/organization/:orgId/services/add-service" &&
-    //     currentRoute.path !== "/service-list" &&
-    //     currentRoute.path !== "/user/settings" &&
-    //     currentRoute.path !== "/user/billing" &&
-    //     currentRoute.path !== "/organization/:orgId/api-keys"
-    // ) {
-    //     if (!selectedService) {
-    //         navigate("/")
-    //     }
-    // }
-
     if (currentRoute) {
-        return <Outlet context={{ isAuthenticated }} />;
+        return <Outlet context={{
+            isAuthenticated,
+
+            centralLoadingFlags,
+            tostAlert,
+            selectedUser,
+            emailVerified,
+            location,
+            navigate,
+
+            collectionTypeList,
+            fetchCollectionTypes,
+            fetchPublishedCollection,
+
+            fieldSetList,
+            fetchFieldSets,
+            fieldSetListPublished,
+            collectionPublishedList,
+            setLoading,
+            staffList,
+
+            open,
+            setOpen
+        }} />;
     }
 }
 

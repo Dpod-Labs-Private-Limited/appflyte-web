@@ -16,31 +16,28 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from "@mui/material";
 import { AppProvider } from './context/AppContext';
 import { CreditProvider } from './context/CreditContext';
-// import ErrorBoundary, { setupGlobalErrorHandlers } from './context/ErrorBoundary';
-
-
-// setupGlobalErrorHandlers();
+import { CollectionProvider } from './context/CollectionContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const locale = DEFAULT_LOCALE;
 
 root.render(
-  // <ErrorBoundary>
   <AppProvider>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <CreditProvider>
-          <Provider store={store}>
-            <CssBaseline />
-            <IntlProvider locale={locale} messages={messages[locale]} defaultLocale="en">
-              <App />
-            </IntlProvider>
-          </Provider>
+          <CollectionProvider>
+            <Provider store={store}>
+              <CssBaseline />
+              <IntlProvider locale={locale} messages={messages[locale]} defaultLocale="en">
+                <App />
+              </IntlProvider>
+            </Provider>
+          </CollectionProvider>
         </CreditProvider>
       </ThemeProvider>
     </BrowserRouter>
   </AppProvider>
-  // </ErrorBoundary>
 );
 
 // If you want to start measuring performance in your app, pass a function

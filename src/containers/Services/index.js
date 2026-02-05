@@ -113,66 +113,69 @@ function ServicesList() {
                             alignItems: 'stretch'
                         }}
                     >
+
                         {(appflyteEngines || [])?.length > 0 ? (
-                            appflyteEngines.map((item, index) => (
-                                <Box key={index}
-                                    sx={{
-                                        position: 'relative', display: 'flex', flexDirection: 'column',
-                                        cursor: 'pointer',
-                                    }}>
-                                    <Box
-                                        component="span"
+                            appflyteEngines
+                                .filter(item => item?.payload?.name === "appflyte_agent")
+                                .map((item, index) => (
+                                    <Box key={index}
                                         sx={{
-                                            position: 'absolute',
-                                            top: '-12px',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                            backgroundColor: '#fff',
-                                            padding: '0',
-                                            zIndex: 1
-                                        }}
-                                    >
-                                        <Button sx={styles.serviceBtn}>
-                                            <Typography sx={{ fontSize: '10px', fontWeight: '600' }}>
-                                                {checkServiceName[item?.payload?.name || 'Unknown']}
-                                            </Typography>
-                                        </Button>
-                                    </Box>
-
-                                    <Box
-                                        sx={{
-                                            padding: '20px 15px',
-                                            bgcolor: '#FFFFFF',
-                                            borderRadius: '5px',
-                                            border: '2px solid #DEDEDE',
-                                            width: '300px',
-                                            flexGrow: 1,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            '&:hover': { border: '2px solid #0B51C5' }
-                                        }}
-                                        onClick={() => handleServiceSelection(item)}
-                                    >
-                                        <ReactSVG
-                                            src={{
-                                                analytics_tool: IconSvg.analysisIcon,
-                                                extraction_agent: IconSvg.extarctionIcon,
-                                                appflyte_agent: IconSvg.aiQmsIcon
-                                            }[item?.payload?.name] || IconSvg.filesIcon}
-                                            beforeInjection={(svg) => {
-                                                svg.setAttribute('style', 'width:48px; height:48px; display:block;');
+                                            position: 'relative', display: 'flex', flexDirection: 'column',
+                                            cursor: 'pointer',
+                                        }}>
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                position: 'absolute',
+                                                top: '-12px',
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                backgroundColor: '#fff',
+                                                padding: '0',
+                                                zIndex: 1
                                             }}
-                                        />
+                                        >
+                                            <Button sx={styles.serviceBtn}>
+                                                <Typography sx={{ fontSize: '10px', fontWeight: '600' }}>
+                                                    {checkServiceName[item?.payload?.name || 'Unknown']}
+                                                </Typography>
+                                            </Button>
+                                        </Box>
 
-                                        <Box marginTop="20px" textAlign="start" sx={{ flexGrow: 1 }}>
-                                            <Typography sx={styles.cardHeadingText}>{item?.payload?.label}</Typography>
-                                            <Typography sx={{ ...styles.cardDescriptionText, marginTop: '10px' }}>
-                                                {item?.payload?.description}
-                                            </Typography>
+                                        <Box
+                                            sx={{
+                                                padding: '30px 15px',
+                                                bgcolor: '#FFFFFF',
+                                                borderRadius: '5px',
+                                                border: '2px solid #DEDEDE',
+                                                width: '300px',
+                                                flexGrow: 1,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                '&:hover': { border: '2px solid #0B51C5' }
+                                            }}
+                                            onClick={() => handleServiceSelection(item)}
+                                        >
+                                            <ReactSVG
+                                                src={{
+                                                    analytics_tool: IconSvg.analysisIcon,
+                                                    extraction_agent: IconSvg.extarctionIcon,
+                                                    appflyte_agent: IconSvg.aiQmsIcon
+                                                }[item?.payload?.name] || IconSvg.filesIcon}
+                                                beforeInjection={(svg) => {
+                                                    svg.setAttribute('style', 'width:48px; height:48px; display:block;');
+                                                }}
+                                            />
+
+                                            <Box marginTop="20px" textAlign="start" sx={{ flexGrow: 1 }}>
+                                                <Typography sx={styles.cardHeadingText}>{item?.payload?.label}</Typography>
+                                                <Typography sx={{ ...styles.cardDescriptionText, marginTop: '10px' }}>
+                                                    {item?.payload?.description}
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     </Box>
-                                </Box>
-                            ))
+                                ))
                         ) : (
                             (appflyteEngines || [])?.length === 0 && !dataLoading && !loading && (
                                 <Box sx={styles.noRecord}>

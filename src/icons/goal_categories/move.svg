@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>steps</title>
+    <desc>Created with Sketch.</desc>
+    <g id="steps" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#FFFFFF" opacity="0" x="0" y="0" width="48" height="48"></rect>
+        <g id="directions_run-24px">
+            <polygon id="Path" points="0 0 48 0 48 48 0 48"></polygon>
+        </g>
+        <g id="noun_steps_87667" transform="translate(6.000000, 4.000000)" fill="#000000" fill-rule="nonzero">
+            <g id="Group">
+                <path d="M10.503,31.747 C7.484,32.557 4.5765,31.4975 5.512,34.984 C6.447,38.4705 9.6525,40.6405 12.6715,39.8305 C15.6905,39.0205 17.3795,35.538 16.444,32.0515 C15.509,28.565 13.522,30.937 10.503,31.747 Z" id="Path"></path>
+                <path d="M9.9165,29.5935 C15.591,28.0715 14.117,26.156 14.7425,22.357 C15.329,18.795 10.2855,7.8725 4.506,9.423 C-1.2735,10.9735 -0.1345,22.9225 2.117,25.744 C4.612,28.871 4.2415,31.116 9.9165,29.5935 Z" id="Path"></path>
+                <path d="M24.497,22.4735 C21.478,21.6635 19.491,19.2915 18.556,22.778 C17.621,26.2645 19.31,29.7475 22.3285,30.557 C25.3475,31.367 28.5525,29.197 29.488,25.7105 C30.423,22.224 27.5155,23.283 24.497,22.4735 Z" id="Path"></path>
+                <path d="M30.4945,0.1495 C24.715,-1.4005 19.6715,9.522 20.258,13.0835 C20.8835,16.8825 19.4095,18.7975 25.084,20.32 C30.7585,21.842 30.3885,19.5975 32.884,16.4705 C35.135,13.649 36.274,1.7 30.4945,0.1495 Z" id="Path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

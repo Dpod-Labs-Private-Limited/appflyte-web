@@ -1,0 +1,16 @@
+#collectionListingTableDarkDraft .MuiTableSortLabel-icon,
+#collectionListingTableDarkDraft .MuiTableSortLabel-root,
+#collectionListingTableDark .MuiTableSortLabel-icon,
+#collectionListingTableDark .MuiTableSortLabel-root {
+    color: #FFFFFF !important;
+}
+
+#collectionListingTableDarkDraft th .MuiCheckbox-root,
+#collectionListingTableDark th .MuiCheckbox-root {
+    color: #FFFFFF !important;
+}
+
+#collectionListingTableDarkDraft th .MuiCheckbox-colorPrimary.Mui-checked,
+#collectionListingTableDark th .MuiCheckbox-colorPrimary.Mui-checked {
+    color: #FFFFFF !important;
+}

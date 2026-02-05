@@ -1,6 +1,6 @@
 import HomeLayout from "../containers/HomeLayout";
 import MainHome from "../containers/Home/MainHome";
-import ExternalSignup from "../containers/Home/ExternalSignup";
+import UserSetup from '../containers/Home/UserSetup';
 import Organizations from "../containers/Organizations";
 import Services from "../containers/Services";
 import ServiceAdd from "../containers/ServiceAdd";
@@ -10,28 +10,18 @@ import Projects from "../containers/Projects/index";
 import AddProject from "../containers/ProjectAdd/index";
 
 import SettingsHome from "../containers/Settings/SettingsHome";
-import UserManagement from "../pages/UserManagement";
-
-import ExtractionHome from "../containers/Extraction/Home";
-import ExtractionDocumentTypes from "../containers/Extraction/DocumentTypes";
-import AddDocumentTypes from "../containers/Extraction/DocumentTypes/AddDocumentTypes";
-import DocumentLists from "../containers/Extraction/DocumentTypes/DocumentLists";
-import ExtractionDocuments from "../containers/Extraction/Documents";
-import ViewDocument from "../containers/Extraction/Documents/ViewDocument";
-import ExtractionConnectors from "../containers/Extraction/Connectors";
-
-import AnalyticsHome from "../containers/Analytics/Home";
-import DataSource from "../containers/Analytics/DataSource";
-import Datasets from "../containers/Analytics/Datasets/DatasetList";
-import SourceLists from "../containers/Analytics/Datasets/SourceLists";
-import DatasetAdd from "../containers/Analytics/Datasets/DatasetConfig/add";
-import DatasetEdit from "../containers/Analytics/Datasets/DatasetConfig/edit";
-import AiApps from "../containers/Analytics/AiApps";
-import AddChatbot from "../containers/Analytics/Chatbot/AddChatbot";
-import EditChatbot from "../containers/Analytics/Chatbot/EditChatbot";
-import ApiKeys from "../pages/ApiKeys";
 import BilingHome from "../pages/Billing";
-import UserSetup from '../containers/Home/UserSetup';
+
+import CollectionTypesList from "../containers/collection_definition/CollectionTypesList";
+import { CollectionTypeAdd } from "../containers/collection_definition/CollectionTypeAdd";
+import { CollectionTypeConfView } from "../containers/collection_definition/CollectionTypeConfView";
+import { CollectionTypeAddFieldSet } from "../containers/collection_definition/CollectionTypeAddFieldSet";
+
+import { FilesListing } from "../containers/files/FilesListing";
+import { FilesRecycleBin } from "../containers/files/FilesRecycleBin";
+import { SharedFilesListing } from "../containers/files/SharedFilesListing";
+import { FileUpload } from "../containers/files/FileUpload";
+import { CollectionsLayout } from "../containers/collection_item/CollectionsLayout";
 
 export const routesConfig = [
     {
@@ -85,25 +75,99 @@ export const routesConfig = [
         component: 'projects'
     },
 
+    // Collection Definitions
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types',
+        element: <CollectionTypesList />,
+        component: 'collection_types'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/add',
+        element: <CollectionTypeAdd />,
+        component: 'collection_types'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/edit',
+        element: <CollectionTypeAdd />,
+        component: 'collection_types'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/edit/configure',
+        element: <CollectionTypeConfView />,
+        component: 'collection_types'
+    },
 
+    // Collection Fieldset
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/field-set/add',
+        element: <CollectionTypeAddFieldSet />,
+        component: 'collection_types'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/field-set/edit',
+        element: <CollectionTypeAddFieldSet />,
+        component: 'collection_types'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/field-set/edit/configure',
+        element: <CollectionTypeConfView />,
+        component: 'collection_types'
+    },
+
+    // Collection Items
+    {
+        path: '/workspace/:space_id/project/:project_id/collections',
+        element: <CollectionsLayout />,
+        component: 'collections'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collections/:collection_id',
+        element: <CollectionsLayout />,
+        component: 'collections'
+    },
+
+    // Media Files
+    {
+        path: '/workspace/:space_id/project/:project_id/files',
+        element: <FilesListing />,
+        component: 'files'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/files/*',
+        element: <FilesListing />,
+        component: 'files'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/files/recyclebin',
+        element: <FilesRecycleBin />,
+        component: 'files'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/files/shared-with-me',
+        element: <SharedFilesListing />,
+        component: 'files'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/files/upload',
+        element: <FileUpload />,
+        component: 'files'
+    },
+    {
+        path: '/spaces/:space_id/projects/:project_id/files/:folder_id/upload',
+        element: <FileUpload />,
+        component: 'files'
+    },
+
+    //Others 
     {
         path: '/settings/*',
         element: <SettingsHome />,
         component: 'settings'
     },
     {
-        path: '/user/settings',
-        element: <UserManagement />,
-        component: 'Users'
-    },
-    {
-        path: '/organization/:orgId/api-keys',
-        element: <ApiKeys />,
-        component: 'Users'
-    },
-    {
         path: '/user/billing',
         element: <BilingHome />,
         component: 'Users'
     }
+
 ];

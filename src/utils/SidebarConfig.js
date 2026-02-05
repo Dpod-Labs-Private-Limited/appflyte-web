@@ -1,6 +1,6 @@
-export const handleSidebarConfig = async (selected_project, navigate, authData) => {
+export const handleSidebarConfig = async (selectedWorkspace, selectedProject, navigate) => {
 
-    const sidebar_config_order = selected_project?.payload?.configuration?.engine_config?.sidebar_items ?? [];
+    const sidebar_config_order = selectedProject?.payload?.configuration?.engine_config?.sidebar_items ?? [];
     const main_sidebar_order = ['service_home'];
 
     const sidebar_order = [...Object?.keys(sidebar_config_order)];
@@ -11,26 +11,15 @@ export const handleSidebarConfig = async (selected_project, navigate, authData) 
         return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
     });
 
-    const engine_name = selected_project?.payload?.configuration?.engine_name ?? null;
+    const workspace_id = selectedWorkspace?.payload?.__auto_id__ ?? null;
+    const project_id = selectedProject?.payload?.__auto_id__ ?? null;
 
     switch (sortSidebarItems?.[0]) {
         case 'service_home':
-            switch (engine_name) {
-                case "extraction_agent":
-                    const requestType = authData?.request_type ?? null;
-                    navigate((requestType === "ext_existing_user" || requestType === "ext_user_singin") ? "/document-types" : "/extraction-home");
-                    break;
-
-                case "analytics_tool":
-                    navigate('/analytics-home');
-                    break;
-
-                default: navigate("/")
-            }
+            navigate(`/workspace/${workspace_id}/project/${project_id}/collection-types`)
             break;
-
         default:
-            return
+            navigate(`/workspace/${workspace_id}/project/${project_id}/collection-types`)
     }
     return
 }

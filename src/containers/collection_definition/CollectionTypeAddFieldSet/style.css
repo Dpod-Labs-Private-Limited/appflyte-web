@@ -1,0 +1,12 @@
+#fieldListFieldSetDark .MuiTableSortLabel-icon,
+#fieldListFieldSetDark .MuiTableSortLabel-root {
+    color: #FFFFFF !important;
+}
+
+#fieldListFieldSetDark th .MuiCheckbox-root {
+    color: #FFFFFF !important;
+}
+
+#fieldListFieldSetDark th .MuiCheckbox-colorPrimary.Mui-checked {
+    color: #FFFFFF !important;
+}

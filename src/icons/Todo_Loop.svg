@@ -1,0 +1,10 @@
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+	<title>icons8-repeat-24</title>
+	<defs>
+		<image  width="20" height="22" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAWBAMAAAAyb6E1AAAAAXNSR0IB2cksfwAAABJQTFRFAJH/AJH/AJH/AJH/AJH/AJH/ffhcpQAAAAZ0Uk5TAIj/f4B3m3qpigAAAElJREFUeJxjYIACAQY4UEQwlQQYlGBAEcFUZlCCKTCAM5UZ4EwHBJMBF5OANJDJgmA6wZkscJsZnODuYQhCMFmRDAlCMGGGMQAASBQJOp/9r3kAAAAASUVORK5CYII="/>
+	</defs>
+	<style>
+		tspan { white-space:pre }
+	</style>
+	<use id="Background" href="#img1" x="2" y="1" />
+</svg>

@@ -155,7 +155,7 @@ function ViewProjects() {
 
     const handleProjectSelection = async (item) => {
         setSelectedProject(item)
-        await handleSidebarConfig(item, navigate, authData)
+        await handleSidebarConfig(selectedWorkspace, item, navigate)
     }
 
     const handleSpaceNavigation = () => {

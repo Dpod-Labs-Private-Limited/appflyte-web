@@ -1,0 +1,16 @@
+#collectionTypeDarkTable .MuiTableSortLabel-icon,
+#collectionTypeDarkTable .MuiTableSortLabel-root,
+#fieldSetDarkTable .MuiTableSortLabel-icon,
+#fieldSetDarkTable .MuiTableSortLabel-root {
+    color: #FFFFFF !important;
+}
+
+#collectionTypeDarkTable th>.MuiCheckbox-root,
+#fieldSetDarkTable th>.MuiCheckbox-root {
+    color: #FFFFFF !important;
+}
+
+#collectionTypeDarkTable th>.MuiCheckbox-colorPrimary.Mui-checked,
+#fieldSetDarkTable th>.MuiCheckbox-colorPrimary.Mui-checked {
+    color: #FFFFFF !important;
+}
