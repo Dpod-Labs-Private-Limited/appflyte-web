@@ -435,9 +435,11 @@ export function CollectionTypeAdd() {
   const publishCollectionType = (collID) => {
     SetLoading(true)
     topbar.show()
+
     const accID = selectedUser.root_account_id
     const subscriberId = selectedUser.subscriber_id
     const subscriptionId = selectedUser.subscription_id
+
     CollectionTypesService
       .publishCollectionType(accID, subscriptionId, subscriberId, collID)
       .then(res => {
@@ -448,7 +450,7 @@ export function CollectionTypeAdd() {
         const currentPath = location.pathname
         if (currentPath.charAt(currentPath.length - 1) === '/') {
           navigate(
-            currentPath + "edit/configure",
+            currentPath + "configure",
             {
               state: {
                 context: 'collectionType',
@@ -461,7 +463,7 @@ export function CollectionTypeAdd() {
             })
         } else {
           navigate(
-            currentPath + "/edit/configure",
+            currentPath + "/configure",
             {
               state: {
                 context: 'collectionType',

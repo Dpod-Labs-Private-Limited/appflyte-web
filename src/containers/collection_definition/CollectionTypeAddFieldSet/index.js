@@ -28,6 +28,7 @@ import topbar from 'topbar';
 import { styled } from '@mui/system';
 import EnhancedCustomTable from '../../../components/EnhancedCustomTable';
 import { useOutletContext } from 'react-router-dom';
+import { useAppContext } from '../../../context/AppContext';
 
 
 // const StyledEditRow = styled(MTableEditRow)(({ theme }) => ({
@@ -44,6 +45,7 @@ export function CollectionTypeAddFieldSet() {
   const classes = styles;
   const { centralLoadingFlags, tostAlert, selectedUser, location, navigate, collectionTypeList, fetchCollectionTypes,
     fetchPublishedCollection, fieldSetList, fetchFieldSets, emailVerified, fieldSetListPublished } = useOutletContext();
+  const { selectedProject } = useAppContext();
 
   const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox sx={classes.actionIconAdd} {...props} ref={ref} />),
@@ -317,13 +319,19 @@ export function CollectionTypeAddFieldSet() {
   }
 
   const createCollectionType = (callbackFnc) => {
-    if (validate() === false)
+
+    if (validate() === false) {
       return false
+    }
+
     SetLoading(true)
     topbar.show()
-    const accID = selectedUser.root_account_id
-    const subscriberId = selectedUser.subscriber_id
-    const subscriptionId = selectedUser.subscription_id
+
+    const accID = selectedUser.root_account_id;
+    const subscriberId = selectedUser.subscriber_id;
+    const subscriptionId = selectedUser.subscription_id;
+    const schemaId = selectedProject.payload.__auto_id__;
+
     const resObj = {
       is_new: true,
       account_id: accID,
@@ -332,9 +340,11 @@ export function CollectionTypeAddFieldSet() {
         is_public: true,
         is_predefined: true,
         enable_localization: isLocalEnable,
-        localized_texts: { en: collectionTypeName }
+        localized_texts: { en: collectionTypeName },
+        schema_id: schemaId
       }
     }
+
     CollectionTypesService
       .createNewCollectionFieldSet(accID, subscriptionId, subscriberId, resObj)
       .then(res => {
@@ -356,19 +366,19 @@ export function CollectionTypeAddFieldSet() {
         SetLoading(false)
         topbar.hide()
       })
+
   }
 
   const updateCollectionFields = (callbackFnc, collID) => {
     SetLoading(true)
     topbar.show()
+
     const accID = selectedUser.root_account_id
     const subscriberId = selectedUser.subscriber_id
     const subscriptionId = selectedUser.subscription_id
     const resObj = computeAddUpdateDelete()
-    // resObj.request_parameters = {
-    //   name: collectionTypeName
-    // }
     const savedID = collID ?? savedCollTypeId
+
     CollectionTypesService
       .updateFieldSetFields(accID, subscriptionId, subscriberId, savedID, resObj)
       .then(res => {
@@ -392,29 +402,35 @@ export function CollectionTypeAddFieldSet() {
           topbar.hide()
         }
       })
+
   }
 
   const publishCollectionType = (collID) => {
     SetLoading(true)
     topbar.show()
+
     const accID = selectedUser.root_account_id
     const subscriberId = selectedUser.subscriber_id
     const subscriptionId = selectedUser.subscription_id
+
     CollectionTypesService
       .publishFieldSet(accID, subscriptionId, subscriberId, collID)
       .then(res => {
+
+        console.log("res", res)
+
         setSaveFlag(false)
         fetchFieldSets()
         tostAlert(<FormattedMessage {...messages.successfullypublished} />, 'success')
-        const currentPath = location.pathname
+        const currentPath = location.pathname;
         if (currentPath.charAt(currentPath.length - 1) === '/') {
           navigate(
             currentPath + "configure",
             {
               state: {
                 context: 'fieldSet',
-                publishedCollId: location.state.collTypeObj.latest_published_entity_id,
-                editName: location.state.editName,
+                publishedCollId: res.data.id,
+                editName: collectionTypeName,
                 lastHistoryObj: {
                   ...location.state
                 }
@@ -426,8 +442,8 @@ export function CollectionTypeAddFieldSet() {
             {
               state: {
                 context: 'fieldSet',
-                publishedCollId: location.state.collTypeObj.latest_published_entity_id,
-                editName: location.state.editName,
+                publishedCollId: res.data.id,
+                editName: collectionTypeName,
                 lastHistoryObj: {
                   ...location.state
                 }

@@ -34,7 +34,7 @@ function CollectionTypesList() {
   const mainStyles = getMainStyles();
 
   const { centralLoadingFlags, tostAlert, selectedUser, location, navigate, collectionTypeList, fetchCollectionTypes,
-    fetchPublishedCollection, fieldSetList, fetchFieldSets } = useOutletContext();
+    fetchPublishedCollection, fieldSetList, fetchFieldSets, fetchPublishedFieldset } = useOutletContext();
 
   function a11yProps(index) {
     return {
@@ -246,9 +246,15 @@ function CollectionTypesList() {
     setSelectedRowDataFieldDetails(selectedData)
   }
 
-  const handleRefresh = () => {
-    fetchCollectionTypes()
-    fetchPublishedCollection()
+  const handleRefresh = (type) => {
+    if (type === "collection") {
+      fetchCollectionTypes()
+      fetchPublishedCollection()
+    }
+    if (type === "fieldset") {
+      fetchFieldSets()
+      fetchPublishedFieldset()
+    }
   }
 
   const getRedirectPathForError = (error, collectionDetails) => {
@@ -528,7 +534,7 @@ function CollectionTypesList() {
                         ?
                         <CircularProgress size={20.5} sx={classes.loadingIcon} />
                         :
-                        <RefreshOutlined sx={classes.refreshIcon} onClick={() => handleRefresh()} />
+                        <RefreshOutlined sx={classes.refreshIcon} onClick={() => handleRefresh("collection")} />
                       }
                     </Box>
                   </Box>
@@ -586,18 +592,17 @@ function CollectionTypesList() {
                     />
                   </Box>
                   <Box sx={classes.refreshBtnBox}>
-                    <Box sx={classes.cloneBtn} onClick={deleteCollectionType}>
+                    {/* <Box sx={classes.cloneBtn} onClick={deleteCollectionType}>
                       <DeleteOutline color='secondary' />
                       <Typography sx={classes.deleteText}><FormattedMessage {...messages.delete} /></Typography>
-                    </Box>
+                    </Box> */}
                     <Box>
                       {
                         centralLoadingFlags && 'fieldSets' in centralLoadingFlags && centralLoadingFlags.fieldSets
                           ?
                           <CircularProgress size={20.5} sx={classes.loadingIcon} />
                           :
-                          <RefreshOutlined sx={classes.refreshIcon} onClick={fetchFieldSets} />
-
+                          <RefreshOutlined sx={classes.refreshIcon} onClick={() => handleRefresh("fieldset")} />
                       }
                     </Box>
                   </Box>

@@ -5,7 +5,7 @@ import { routesConfig } from './Routes';
 function ProtectedRoutes(props) {
 
     const { isAuthenticated, centralLoadingFlags, tostAlert, selectedUser, emailVerified, collectionTypeList, fetchCollectionTypes,
-        fetchPublishedCollection, fieldSetList, fetchFieldSets, fieldSetListPublished, collectionPublishedList, setLoading, staffList, open, setOpen } = props;
+        fetchPublishedCollection, fieldSetList, fetchFieldSets, fieldSetListPublished, collectionPublishedList, fetchPublishedFieldset, setLoading, staffList, open, setOpen } = props;
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -44,6 +44,8 @@ function ProtectedRoutes(props) {
             fetchFieldSets,
             fieldSetListPublished,
             collectionPublishedList,
+            fetchPublishedFieldset,
+
             setLoading,
             staffList,
 

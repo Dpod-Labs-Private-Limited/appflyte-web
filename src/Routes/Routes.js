@@ -92,6 +92,11 @@ export const routesConfig = [
         component: 'collection_types'
     },
     {
+        path: '/workspace/:space_id/project/:project_id/collection-types/add/configure',
+        element: <CollectionTypeConfView />,
+        component: 'collection_types'
+    },
+    {
         path: '/workspace/:space_id/project/:project_id/collection-types/edit/configure',
         element: <CollectionTypeConfView />,
         component: 'collection_types'
@@ -110,6 +115,11 @@ export const routesConfig = [
     },
     {
         path: '/workspace/:space_id/project/:project_id/collection-types/field-set/edit/configure',
+        element: <CollectionTypeConfView />,
+        component: 'collection_types'
+    },
+    {
+        path: '/workspace/:space_id/project/:project_id/collection-types/field-set/add/configure',
         element: <CollectionTypeConfView />,
         component: 'collection_types'
     },

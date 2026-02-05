@@ -78,7 +78,7 @@ class collectionTypesService {
         return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish`)
     }
     getPublishedCollectionTypesPagination(accountId, subscriptionId, subscriberId, schema_id, lastEvaluatedKey, limit) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish/limit/${limit}/last_evaluated_key/${lastEvaluatedKey}?include_detail=true&schema_id=${schema_id}`)
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish?limit=${limit}&last_evaluated_key=${lastEvaluatedKey}&include_detail=true&schema_id=${schema_id}`)
     }
     getPublishedFieldSets(accountId, subscriptionId, subscriberId, schema_id, lastEvaluatedKey, limit) {
         return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/publish?limit=${limit}&last_evaluated_key=${lastEvaluatedKey}&include_detail=true&schema_id=${schema_id}`)

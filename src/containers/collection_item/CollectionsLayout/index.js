@@ -232,6 +232,7 @@ export function CollectionsLayout() {
                     otherItemsList={otherItemsList}
                   />
               }
+
             </Box>
 
           </Box>

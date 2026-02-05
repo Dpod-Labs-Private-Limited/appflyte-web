@@ -32,6 +32,10 @@ function CollectionItem(props) {
   const { entity, validateUniqueness, validateTriggered, fieldErrors, setFieldErrors, selectedLanguage, fieldValues,
     setFieldValues, entityExtraData, languageList, editVal, setSelectedLanguage, isLocalEnable } = props
 
+
+  console.log("entity", entity)
+  // return
+
   const classes = styles;
 
   const [checkedList, setCheckedList] = useState([])
@@ -302,15 +306,15 @@ function CollectionItem(props) {
         switch (entity.field_sub_type) {
           case 'date':
           case 'Date':
-            // return entity.settings.default_value == "current" ? moment.utc().format("MM/DD/YYYY") : '' // This code is commented because by default current date time shout be there
-            return moment.utc().format("MM/DD/YYYY")
+            return moment.utc().toISOString()
           case 'time':
           case 'Time':
-            // return entity.settings.default_value == "current" ? moment.utc().format("hh:mm a") : ''
-            return moment.utc().format("h:mm a")
+            return moment.utc().format("HH:mm")
+          case 'dateTime':
+          case 'DateTime':
+            return moment.utc().toISOString()
           default:
-            // return entity.settings.default_value == "current" ? moment.utc().format("MM/DD/YYYY hh:mm a") : ''
-            return moment.utc().format("MM/DD/YYYY h:mm a")
+            return moment.utc().toISOString()
         }
       case 'media':
       case 'component':
@@ -831,7 +835,8 @@ function CollectionItem(props) {
                 disableToolbar
                 variant="inline"
                 autoOk
-                format="dd MMM yyyy"
+                // format="dd MMM yyyy"
+                format="dd MMM yyyy h:mm aaa"
                 margin="normal"
                 id={entity.field_definition_id}
                 key={"collection_item_key_" + entity.field_definition_id}
@@ -842,13 +847,19 @@ function CollectionItem(props) {
                 label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
                 error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
                 helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
-                value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().format("MM/DD/YYYY") : moment().format("MM/DD/YYYY")}
+                // value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().toDate() : new Date()}
+                value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).toDate() : new Date()}
+                // onChange={(date) => {
+                //   setFieldValues(prevValue => ({
+                //     ...prevValue,
+                //     [entity.field_name]: moment(date).utc().format("MM/DD/YYYY")
+                //   }))
+                //   validateSingleField(entity, moment(date).utc().format("MM/DD/YYYY"))
+                // }}
+
                 onChange={(date) => {
-                  setFieldValues(prevValue => ({
-                    ...prevValue,
-                    [entity.field_name]: moment(date).utc().format("MM/DD/YYYY")
-                  }))
-                  validateSingleField(entity, moment(date).utc().format("MM/DD/YYYY"))
+                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
+                  validateSingleField(entity, date)
                 }}
                 TextFieldComponent={props => <TextField  {...props} variant="filled" size="small" error={null} />}
                 KeyboardButtonProps={{
@@ -868,13 +879,18 @@ function CollectionItem(props) {
                 name={entity.field_name}
                 format="h:mm a"
                 label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-                value={fieldValues ? fieldValues[entity.field_name] : ''}
+                // value={fieldValues && fieldValues[entity.field_name] ? moment(fieldValues[entity.field_name], "h:mm a").toDate() : new Date()}
+                value={fieldValues && fieldValues[entity.field_name] ? moment(fieldValues[entity.field_name], "HH:mm").toDate() : new Date()}
                 error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
                 helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
                 fullWidth
                 size="small"
+                // onChange={(date) => {
+                //   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).format("HH:mm") }))
+                //   validateSingleField(entity, date)
+                // }}
                 onChange={(date) => {
-                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: date }))
+                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
                   validateSingleField(entity, date)
                 }}
                 TextFieldComponent={props => <TextField  {...props} variant="filled" size="small" error={null} />}
@@ -894,13 +910,17 @@ function CollectionItem(props) {
                 autoOk
                 format="dd MMM yyyy h:mm a"
                 label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-                value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().format("MM/DD/YYYY h:mm a") : moment().format("MM/DD/YYYY h:mm a")}
+                value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().toDate() : new Date()}
                 error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
                 helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
                 fullWidth
                 size="small"
+                // onChange={(date) => {
+                //   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().format("MM/DD/YYYY h:mm a") }))
+                //   validateSingleField(entity, date)
+                // }}
                 onChange={(date) => {
-                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().format("MM/DD/YYYY h:mm a") }))
+                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
                   validateSingleField(entity, date)
                 }}
                 TextFieldComponent={props => <TextField  {...props} variant="filled" size="small" error={null} />}

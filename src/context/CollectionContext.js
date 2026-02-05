@@ -8,30 +8,17 @@ export function CollectionProvider({ children }) {
 
     const [collectionTypeList, setCollectionTypeList] = useState([])
     const [collectionPublishedList, setCollectionPublishedList] = useState([])
-    const [collectionPublishedListFiltered, setCollectionPublishedListFiltered] = useState([])
 
     const [fieldSetList, setFieldSetList] = useState([])
     const [fieldSetListPublished, setFieldSetListPublished] = useState([])
 
     return (
         <CollectionContext.Provider value={{
-            centralLoadingFlags,
-            setCentralLoadingFlag,
-
-            collectionTypeList,
-            setCollectionTypeList,
-
-            collectionPublishedList,
-            setCollectionPublishedList,
-
-            collectionPublishedListFiltered,
-            setCollectionPublishedListFiltered,
-
-            fieldSetList,
-            setFieldSetList,
-
-            fieldSetListPublished,
-            setFieldSetListPublished
+            centralLoadingFlags, setCentralLoadingFlag,
+            collectionTypeList, setCollectionTypeList,
+            collectionPublishedList, setCollectionPublishedList,
+            fieldSetList, setFieldSetList,
+            fieldSetListPublished, setFieldSetListPublished
         }}>
             {children}
         </CollectionContext.Provider>

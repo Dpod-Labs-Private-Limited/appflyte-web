@@ -179,7 +179,7 @@ function Navbar() {
         if (selectedProject) {
             setProjectsMenu(project_selected);
             setSelectedProject(selectedProject)
-            handleSidebarConfig(selectedProject, navigate)
+            handleSidebarConfig(selectedWorkspace, selectedProject, navigate)
         }
         return
     }

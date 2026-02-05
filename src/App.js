@@ -38,7 +38,6 @@ function App() {
     centralLoadingFlags, setCentralLoadingFlag,
     collectionTypeList, setCollectionTypeList,
     collectionPublishedList, setCollectionPublishedList,
-    collectionPublishedListFiltered, setCollectionPublishedListFiltered,
     fieldSetList, setFieldSetList,
     fieldSetListPublished, setFieldSetListPublished
   } = useCollection();
@@ -62,7 +61,7 @@ function App() {
       fetchCollectionTypes(true);
       fetchPublishedCollection();
       fetchFieldSets(true);
-      // fetchPublishedFieldset()
+      fetchPublishedFieldset()
       //eslint-disable-next-line
     }
   }, [parsedDPODToken, selectedProject]);
@@ -122,12 +121,7 @@ function App() {
           setCollectionTypeList()
         })
         .finally(() => {
-          // if (ignoreLoading && ignoreLoading === true) {
-
-          // }
-          // else {
           setCentralLoadingFlag(prev => ({ ...prev, collectionTypes: false }))
-          // }
         })
     }
   }
@@ -144,14 +138,15 @@ function App() {
         const schemaId = selectedProject.payload.__auto_id__
 
         let publishedList = []
-        let lastKey = '{}'
+        let lastKey = null
         let counter = 0
+        const limit = 50
 
         try {
 
           do {
-            const res = await CollectionTypesService.getPublishedCollectionTypesPagination(accID, subscriptionId, subscriberId, schemaId, lastKey, 50)
-            const latest_data = res?.data ?? [];
+            const res = await CollectionTypesService.getPublishedCollectionTypesPagination(accID, subscriptionId, subscriberId, schemaId, lastKey, limit)
+            const latest_data = res?.data?.items ?? [];
             publishedList = [...publishedList, ...latest_data]
 
             if (res.data.last_evaluated_key == null) {
@@ -186,13 +181,11 @@ function App() {
             }
           }
           const filteredListFinal = filteredList.filter(x => (x.api_prural_id === OTHER_PLURAL_ID.websiteRequest || x.api_prural_id === APPLICATION_CODE_PLURAL.lookups || (x.system_predefined === false && x.system_utility === false && x.soft_deleted === false)))
-          setCollectionPublishedList(filteredList)
-          setCollectionPublishedListFiltered(filteredListFinal)
+          setCollectionPublishedList(filteredListFinal)
         }
         catch (err) {
           console.log("Error occured while fetching published collection type list for a coach", err)
           setCollectionPublishedList([])
-          setCollectionPublishedListFiltered([])
         }
         finally {
           setCentralLoadingFlag(prev => ({ ...prev, publishedCollection: false }))
@@ -201,7 +194,6 @@ function App() {
     } catch (err) {
       console.log("Error occured while fetching published collection type list for a coach", err)
       setCollectionPublishedList([])
-      setCollectionPublishedListFiltered([])
     } finally {
       setCentralLoadingFlag(prev => ({ ...prev, publishedCollection: false }))
     }
@@ -224,25 +216,8 @@ function App() {
           setFieldSetList([])
         })
         .finally(() => {
-          // if (ignoreLoading && ignoreLoading === true) {
-          // Do Nothing
-          // }
-          // else {
-          setCentralLoadingFlag(prev => ({
-            ...prev,
-            fieldSets: false,
-          }))
-          // }
+          setCentralLoadingFlag(prev => ({ ...prev, fieldSets: false }))
         })
-      // let lastKey = null;
-      // CollectionTypesService.getPublishedFieldSets(accID, subscriptionId, subscriberId, schemaId, lastKey, 50)
-      //   .then(res => {
-      //     setFieldSetListPublished(res.data)
-      //   })
-      //   .catch(err => {
-      //     console.log("Error occured while fetching published fieldset list for a coach", err)
-      //     setFieldSetListPublished([])
-      //   })
     }
   }
 
@@ -260,11 +235,12 @@ function App() {
         let publishedList = []
         let lastKey = null
         let counter = 0
+        const limit = 50
 
         try {
 
           do {
-            const res = await CollectionTypesService.getPublishedFieldSets(accID, subscriptionId, subscriberId, schemaId, lastKey, 50)
+            const res = await CollectionTypesService.getPublishedFieldSets(accID, subscriptionId, subscriberId, schemaId, lastKey, limit)
 
             const latest_data = res?.data?.items ?? [];
             publishedList = [...publishedList, ...latest_data]
@@ -387,13 +363,14 @@ function App() {
                       emailVerified={emailVerified}
 
                       collectionTypeList={collectionTypeList}
+                      collectionPublishedList={collectionPublishedList}
                       fetchCollectionTypes={fetchCollectionTypes}
                       fetchPublishedCollection={fetchPublishedCollection}
-                      collectionPublishedList={collectionPublishedListFiltered}
 
                       fieldSetList={fieldSetList}
-                      fetchFieldSets={fetchFieldSets}
                       fieldSetListPublished={fieldSetListPublished}
+                      fetchFieldSets={fetchFieldSets}
+                      fetchPublishedFieldset={fetchPublishedFieldset}
 
                       setLoading={setFileLoading}
                       staffList={staffList}
