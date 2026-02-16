@@ -86,8 +86,6 @@ function ServicesList() {
     }
 
     const checkServiceName = {
-        "extraction_agent": 'EXTRACT',
-        "analytics_tool": 'ANALYST',
         "appflyte_agent": 'APPFLYTE'
     };
 
@@ -157,11 +155,7 @@ function ServicesList() {
                                             onClick={() => handleServiceSelection(item)}
                                         >
                                             <ReactSVG
-                                                src={{
-                                                    analytics_tool: IconSvg.analysisIcon,
-                                                    extraction_agent: IconSvg.extarctionIcon,
-                                                    appflyte_agent: IconSvg.aiQmsIcon
-                                                }[item?.payload?.name] || IconSvg.filesIcon}
+                                                src={{ appflyte_agent: IconSvg.aiQmsIcon }[item?.payload?.name] || IconSvg.filesIcon}
                                                 beforeInjection={(svg) => {
                                                     svg.setAttribute('style', 'width:48px; height:48px; display:block;');
                                                 }}

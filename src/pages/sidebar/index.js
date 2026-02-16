@@ -61,6 +61,11 @@ function Sidebar() {
       icon: IconSvg.mediaIcon,
       label: 'Files',
       path: 'files'
+    },
+    {
+      icon: IconSvg.appsIcon,
+      label: 'Apps',
+      path: 'appflyte_apps'
     }
   ];
 
@@ -146,6 +151,10 @@ function Sidebar() {
 
       case 'files':
         navigate(`/workspace/${workspace_id}/project/${project_id}/files`)
+        break;
+
+      case 'appflyte_apps':
+        navigate(`/apps`)
         break;
 
       case 'settings':

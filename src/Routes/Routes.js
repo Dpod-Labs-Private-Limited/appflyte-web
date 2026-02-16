@@ -8,6 +8,7 @@ import Spaces from "../containers/Spaces/index";
 import AddWorkspace from "../containers/WorkspaceAdd/index";
 import Projects from "../containers/Projects/index";
 import AddProject from "../containers/ProjectAdd/index";
+import Apps from "../containers/Apps/index";
 
 import SettingsHome from "../containers/Settings/SettingsHome";
 import BilingHome from "../pages/Billing";
@@ -169,6 +170,12 @@ export const routesConfig = [
     },
 
     //Others 
+    {
+        path: '/apps',
+        element: <Apps />,
+        component: 'apps'
+    },
+
     {
         path: '/settings/*',
         element: <SettingsHome />,
