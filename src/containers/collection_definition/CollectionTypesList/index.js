@@ -27,6 +27,7 @@ import { APPLICATION_CODE_PLURAL } from '../../../utils/constants';
 import getMainStyles from '../../../styles/getStyles';
 import LoadingOverlay from 'react-loading-overlay';
 import { useOutletContext } from 'react-router-dom';
+import Chatbot from '../../../components/Chatbot';
 
 
 function CollectionTypesList() {
@@ -426,6 +427,8 @@ function CollectionTypesList() {
   return (
     <Box sx={classes.mainContainer}>
       <Box sx={classes.cardContainer}>
+
+        <Chatbot />
 
         <Box sx={classes.breadButtonsBox}>
           {tabValue === 0

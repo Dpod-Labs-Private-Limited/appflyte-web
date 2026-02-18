@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 import { ArrowForward, ContentCopy, ContentCopyOutlined } from '@mui/icons-material';
 import LoadingOverlay from 'react-loading-overlay';
 import topbar from 'topbar';
@@ -23,8 +23,8 @@ function Apps() {
     const { selectedOrganization, selectedWorkspace, selectedProject } = useAppContext();
 
     const [allApps, setAllApps] = useState([
-        { id: 'bug_tracker', name: 'Bug Tracker', description: 'Bug Tracker', status: false },
-        { id: 'impilos', name: 'Impilos', description: 'Impilos', status: false }
+        { id: 'bug_tracker', name: 'Bug Tracker', description: 'Bug Tracker', status: false }
+        // { id: 'impilos', name: 'Impilos', description: 'Impilos', status: false }
     ]);
     const [loading, setLoading] = useState(false);
     const [copiedData, setCopiedData] = useState(null);
@@ -32,32 +32,6 @@ function Apps() {
     useEffect(() => {
         loading ? topbar.show() : topbar.hide();
     }, [loading]);
-
-    useEffect(() => {
-        console.log("allApps", allApps)
-    }, [allApps]);
-
-    // const fetchData = async () => {
-    //     if (!selectedProject?.payload?.__auto_id__) return;
-
-    //     setLoading(true);
-    //     try {
-    //         const projectId = selectedProject.payload.__auto_id__;
-    //         const response = await getAppflyteAppData(projectId);
-    //         const enabledAppTypes = new Set(response.map(item => item?.payload?.app_type));
-
-    //         setAllApps(prevApps =>
-    //             prevApps.map(app => ({
-    //                 ...app,
-    //                 status: enabledAppTypes.has(app.id)
-    //             }))
-    //         );
-    //     } catch (error) {
-    //         console.error(error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const fetchData = async () => {
         if (!selectedProject?.payload?.__auto_id__) return;

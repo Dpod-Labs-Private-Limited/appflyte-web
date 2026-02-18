@@ -20,6 +20,7 @@ import messages from './messages';
 import topbar from 'topbar';
 import LoadingOverlay from 'react-loading-overlay';
 import { useOutletContext } from 'react-router-dom';
+import Chatbot from '../../../components/Chatbot';
 
 export function CollectionsLayout() {
 
@@ -125,6 +126,8 @@ export function CollectionsLayout() {
             position: 'fixed'
           }),
         }}>
+
+        <Chatbot />
 
         <Box sx={styles.sidebar}>
           <Box sx={classes.drawerContentBox}>
