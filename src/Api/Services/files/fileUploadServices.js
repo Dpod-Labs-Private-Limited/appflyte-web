@@ -2,9 +2,9 @@ import axios from 'axios';
 import { AxiosObjCollection } from '../../Configurations/axios-setup';
 
 class fileUploadServices {
-  getPredignedURL(accountId, subscriberId, subscriptionId, reqBody) {
+  getPredignedURL(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
     return AxiosObjCollection
-      .post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/generate-upload-url`, reqBody, {
+      .post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/generate-upload-url`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
         }

@@ -87,6 +87,8 @@ export function FilesRecycleBin() {
             subscriberId: folder.subscriber_id,
             access_type: folder.access_type,
             can_be_subscribed: folder.can_be_subscribed,
+            bucketName: null,
+            objectKey: null
           }))
           const entityFiles = res.data.files.map(file => ({
             entityId: file.id,
@@ -101,6 +103,8 @@ export function FilesRecycleBin() {
             subscriberId: file.subscriber_id,
             access_type: file.access_type,
             can_be_subscribed: true,
+            bucketName: file.bucket_name,
+            objectKey: file.object_key
           }))
           setFileList([...entityFolders, ...entityFiles])
           setFilteredList([...entityFolders, ...entityFiles])
@@ -237,46 +241,64 @@ export function FilesRecycleBin() {
   const handleFilesRestore = async () => {
     handleCloseMoreMenu()
     if (window.confirm("Are you sure you want to restore selected files")) {
-      const accID = selectedUser.root_account_id
-      const subscriberId = selectedUser.subscriber_id
-      const subscriptionId = selectedUser.subscription_id
-      const schemaId = selectedProject.payload.__auto_id__
-
-      const folderRestoreArr = []
-      const fileRestoreArr = []
-      selectedEntityDetails.forEach(entity => {
-        if (entity.entityType == ENTITY_TYPE_DIRECTORY)
-          folderRestoreArr.push(entity.entityId)
-        else
-          fileRestoreArr.push(entity.entityId)
-      })
-      let folderRestoreFlag = false
-      if (folderRestoreArr.length > 0) {
-        try {
-          const resFolder = await GalleryService.recycleBinRestoreFolder(accID, subscriberId, subscriptionId, schemaId, folderRestoreArr)
-          folderRestoreFlag = true
-        }
-        catch (errFolder) {
-          console.log("error Occured while deleting Folders", errFolder)
-          folderRestoreFlag = false
-        }
-      }
-      else
-        folderRestoreFlag = true
       try {
-        const resFile = await GalleryService.recycleBinRestoreFiles(accID, subscriberId, subscriptionId, schemaId, fileRestoreArr)
-        if (folderRestoreFlag)
-          tostAlert(<FormattedMessage {...messages.bothRestored} />, "success")
-        else
-          tostAlert(<FormattedMessage {...messages.partialRestoreFiles} />, "warning")
+        SetLoading(true)
+
+        const accID = selectedUser.root_account_id
+        const subscriberId = selectedUser.subscriber_id
+        const subscriptionId = selectedUser.subscription_id
+        const schemaId = selectedProject.payload.__auto_id__
+
+        const folderRestoreArr = []
+        const fileRestoreArr = []
+
+        selectedEntityDetails.forEach(entity => {
+          if (entity.entityType == ENTITY_TYPE_DIRECTORY)
+            folderRestoreArr.push(entity.entityId)
+          else
+            fileRestoreArr.push(entity.entityId)
+        })
+
+        let folderRestoreFlag = true;
+        let fileRestoreFlag = true;
+
+        if (folderRestoreArr.length > 0) {
+          try {
+            await GalleryService.recycleBinRestoreFolder(accID, subscriberId, subscriptionId, schemaId, folderRestoreArr)
+          } catch (errFolder) {
+            console.log("Error occurred while restoring folders", errFolder);
+            folderRestoreFlag = false;
+          }
+        }
+
+        if (fileRestoreArr.length > 0) {
+          try {
+            await GalleryService.recycleBinRestoreFiles(accID, subscriberId, subscriptionId, schemaId, fileRestoreArr)
+          } catch (errFile) {
+            console.log("Error occurred while deleting files", errFile);
+            fileRestoreFlag = false;
+          }
+        }
+
         fetchRecyclebinContent(parentRootId)
-      }
-      catch (errFile) {
-        console.log("error Occured while deleting Files", errFile)
-        if (folderRestoreFlag)
-          tostAlert(<FormattedMessage {...messages.partialRestoreFiles} />, "success")
-        else
-          tostAlert(<FormattedMessage {...messages.serverError} />, "warning")
+
+        if (folderRestoreFlag && fileRestoreFlag) {
+          tostAlert(<FormattedMessage {...messages.bothRestored} />, "success")
+        }
+        else if (!folderRestoreFlag && fileRestoreFlag) {
+          tostAlert(<FormattedMessage {...messages.partialRestoreFiles} />, "warning");
+        }
+        else if (folderRestoreFlag && !fileRestoreFlag) {
+          tostAlert(<FormattedMessage {...messages.partialRestoreFiles} />, "warning");
+        }
+        else {
+          tostAlert(<FormattedMessage {...messages.serverError} />, "warning");
+        }
+
+      } catch (error) {
+        console.log(error)
+      } finally {
+        SetLoading(false)
       }
     }
   }
@@ -284,46 +306,63 @@ export function FilesRecycleBin() {
   const handleSelectedFilesDelete = async () => {
     handleCloseMoreMenu()
     if (window.confirm("Are you sure you want to Delete")) {
-      const accID = selectedUser.root_account_id
-      const subscriberId = selectedUser.subscriber_id
-      const subscriptionId = selectedUser.subscription_id
-      const schemaId = selectedProject.payload.__auto_id__
-
-      const folderDeleteArr = []
-      const fileDeleteArr = []
-      selectedEntityDetails.forEach(entity => {
-        if (entity.entityType == ENTITY_TYPE_DIRECTORY)
-          folderDeleteArr.push(entity.entityId)
-        else
-          fileDeleteArr.push(entity.entityId)
-      })
-      let folderDeleteFlag = false
-      if (folderDeleteArr.length > 0) {
-        try {
-          const resFolder = await GalleryService.recycleBinFolderPermanentDelete(accID, subscriberId, subscriptionId, schemaId, folderDeleteArr)
-          folderDeleteFlag = true
-        }
-        catch (errFolder) {
-          console.log("error Occured while deleting Folders", errFolder)
-          folderDeleteFlag = false
-        }
-      }
-      else
-        folderDeleteFlag = true
       try {
-        const resFile = await GalleryService.recycleBinFilesPermanentDelete(accID, subscriberId, subscriptionId, schemaId, fileDeleteArr)
-        if (folderDeleteFlag)
-          tostAlert(<FormattedMessage {...messages.bothDeleted} />, "success")
-        else
-          tostAlert(<FormattedMessage {...messages.partialDeletedFiles} />, "warning")
+        SetLoading(true)
+
+        const accID = selectedUser.root_account_id
+        const subscriberId = selectedUser.subscriber_id
+        const subscriptionId = selectedUser.subscription_id
+        const schemaId = selectedProject.payload.__auto_id__
+
+        const folderDeleteArr = []
+        const fileDeleteArr = []
+
+        selectedEntityDetails.forEach(entity => {
+          if (entity.entityType == ENTITY_TYPE_DIRECTORY)
+            folderDeleteArr.push(entity.entityId)
+          else
+            fileDeleteArr.push(entity.entityId)
+        })
+
+        let folderDeleteFlag = true;
+        let fileDeleteFlag = true;
+
+        if (folderDeleteArr.length > 0) {
+          try {
+            await GalleryService.recycleBinFolderPermanentDelete(accID, subscriberId, subscriptionId, schemaId, folderDeleteArr)
+          } catch (errFolder) {
+            console.log("Error occurred while deleting folders", errFolder);
+            folderDeleteFlag = false;
+          }
+        }
+
+        if (fileDeleteArr.length > 0) {
+          try {
+            await GalleryService.recycleBinFilesPermanentDelete(accID, subscriberId, subscriptionId, schemaId, fileDeleteArr)
+          } catch (errFile) {
+            console.log("Error occurred while deleting files", errFile);
+            fileDeleteFlag = false;
+          }
+        }
+
         fetchRecyclebinContent(parentRootId)
-      }
-      catch (errFile) {
-        console.log("error Occured while deleting Files", errFile)
-        if (folderDeleteFlag)
-          tostAlert(<FormattedMessage {...messages.partialDeletedFiles} />, "success")
-        else
-          tostAlert(<FormattedMessage {...messages.serverError} />, "warning")
+
+        if (folderDeleteFlag && fileDeleteFlag) {
+          tostAlert(<FormattedMessage {...messages.bothDeleted} />, "success")
+        }
+        else if (!folderDeleteFlag && fileDeleteFlag) {
+          tostAlert(<FormattedMessage {...messages.partialDeletedFiles} />, "warning")
+        }
+        else if (folderDeleteFlag && !fileDeleteFlag) {
+          tostAlert(<FormattedMessage {...messages.partialDeletedFiles} />, "warning")
+        }
+        else {
+          tostAlert(<FormattedMessage {...messages.serverError} />, "warning");
+        }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        SetLoading(false)
       }
     }
   }
@@ -343,7 +382,7 @@ export function FilesRecycleBin() {
               navigate(-1)
             }}
           >
-            <FormattedMessage {...messages.done} />
+            <FormattedMessage {...messages.back} />
           </Button>
         </Box>
 
@@ -501,6 +540,7 @@ export function FilesRecycleBin() {
                     ?
                     filteredFilesList.map(file =>
                       <FileItem
+                        selectedUser={selectedUser}
                         fileName={file.entityName}
                         fileType={file.entitySubType}
                         isFolder={file.entityType === ENTITY_TYPE_DIRECTORY}

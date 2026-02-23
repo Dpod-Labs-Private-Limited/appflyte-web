@@ -58,9 +58,9 @@ function App() {
 
   useEffect(() => {
     if (parsedDPODToken && selectedProject) {
-      fetchCollectionTypes(true);
+      fetchCollectionTypes();
       fetchPublishedCollection();
-      fetchFieldSets(true);
+      fetchFieldSets();
       fetchPublishedFieldset()
       //eslint-disable-next-line
     }
@@ -102,7 +102,7 @@ function App() {
     }
   };
 
-  const fetchCollectionTypes = (ignoreLoading) => {
+  const fetchCollectionTypes = () => {
     if (parsedDPODToken && selectedProject) {
       setCentralLoadingFlag(prev => ({ ...prev, collectionTypes: true }))
 
@@ -199,7 +199,7 @@ function App() {
     }
   }
 
-  const fetchFieldSets = (ignoreLoading) => {
+  const fetchFieldSets = () => {
     if (parsedDPODToken) {
       setCentralLoadingFlag(prev => ({ ...prev, fieldSets: true }))
 

@@ -14,13 +14,14 @@ import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 import { useEffect, useState } from 'react';
 import { getAzureUrlForFile } from '../../Api/Services/files/fileUtilityService';
+import GalleryService from '../../Api/Services/files/galleryService';
+import { useAppContext } from '../../context/AppContext';
 function FileItem(props) {
-
-  console.log("FileItem props: ", props)
 
   const { fileName, fileType, isFolder, file, selectedEntity, setSelectedEntity, selectedEntityDetails, setSelectedEntityDetails, handleDoubleClick, customMargin, selectionLimit, fileTypeLimit } = props
 
   const classes = styles;
+  const { selectedProject } = useAppContext();
 
   const handleFileSelect = (e) => {
     e.stopPropagation();
@@ -46,15 +47,24 @@ function FileItem(props) {
   const [fileDownloadUrl, setFileDownloadUrl] = useState(null)
 
   useEffect(() => {
+
     const fetchFileDownloadUrl = async () => {
       if (file && file.entitySubType === 'Image') {
-        console.log("file: ", file);
-        const FILE_CONTEXT = process.env.FILE_CONTEXT || 'impilos';
         try {
-          const res = await getAzureUrlForFile(FILE_CONTEXT, file.bucket_name, file.object_key);
-          console.log("Response from newGetThumbnailUrlForFile: ", res);
+          const accID = props?.selectedUser?.root_account_id ?? null;
+          const subscriberId = props?.selectedUser?.subscriber_id ?? null;
+          const subscriptionId = props?.selectedUser?.subscription_id ?? null;
+          const schemaId = selectedProject.payload.__auto_id__ ?? null;
+          const bucket_name = file?.bucketName ?? null;
+          const object_paths = file?.objectKey ?? null;
+
+          const res = await GalleryService.getDownloadURL(accID, subscriberId, subscriptionId, schemaId, bucket_name, object_paths);
           if (res.status === 200) {
-            setFileDownloadUrl(res.data.download_url);
+            const res_data = res?.data?.at(-1) ?? null;
+            const file_url = Object.values(res_data)?.at(-1) ?? null;
+            if (file_url) {
+              setFileDownloadUrl(file_url)
+            }
           }
         } catch (error) {
           console.error("Error fetching file download URL: ", error);

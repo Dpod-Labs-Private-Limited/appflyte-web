@@ -9,9 +9,9 @@ import { defineMessages } from 'react-intl';
 export const scope = 'app.containers.FilesRecycleBin';
 
 export default defineMessages({
-  done: {
-    id: `${scope}.done`,
-    defaultMessage: 'Done',
+  back: {
+    id: `${scope}.back`,
+    defaultMessage: 'Back',
   },
   back: {
     id: `${scope}.back`,

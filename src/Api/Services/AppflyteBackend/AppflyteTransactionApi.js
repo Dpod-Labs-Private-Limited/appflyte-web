@@ -30,15 +30,18 @@ class DpodAppFlyteApi {
     }
 
     getCreditBundles = async (organization_id) => {
-        return AxiosStripeServiceObj.get(`/get-credit-bundles/organization/${organization_id}`)
+        const schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosStripeServiceObj.get(`/get-credit-bundles/schema_id/${schema_id}/organization_id/${organization_id}`)
     }
 
     getBalanceDetails = async (organization_id) => {
-        return AxiosStripeServiceObj.get(`/get-credit-balance/${organization_id}`)
+        const schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosStripeServiceObj.get(`/get-credit-balance/schema_id/${schema_id}/organization_id/${organization_id}`)
     }
 
     getFreeCredit = async (reqObj) => {
-        return AxiosStripeServiceObj.post(`/get-free-credits`, reqObj)
+        const schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosStripeServiceObj.post(`/get-free-credits/schema_id/${schema_id}`, reqObj)
     }
 }
 

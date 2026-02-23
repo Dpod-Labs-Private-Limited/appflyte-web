@@ -72,6 +72,7 @@ export function FilesListing() {
 
   const fetchFilesAndFolders = (parentId) => {
     if (selectedUser) {
+      console.log("---------------------------")
       setSelectedEntity([])
       setSelectedEntityDetails([])
       SetLoading(true)
@@ -85,6 +86,7 @@ export function FilesListing() {
         .then(res => {
           const existingEntityNames = []
           const entityFolders = []
+
           res.data.folders.forEach(folder => {
             existingEntityNames.push(folder.folder_name)
             if (folder.is_hidden)
@@ -102,14 +104,18 @@ export function FilesListing() {
               subscriberId: folder.subscriber_id,
               access_type: folder.access_type,
               can_be_subscribed: folder.can_be_subscribed,
+              bucketName: null,
+              objectKey: null
             })
           }
           )
+
           const entityFiles = []
           res.data.files.forEach(file => {
             existingEntityNames.push(file.file_attributes.file_name)
             if (file.is_hidden)
               return
+
             entityFiles.push({
               entityId: file.id,
               entityType: ENTITY_TYPE_FILE,
@@ -123,9 +129,12 @@ export function FilesListing() {
               subscriberId: file.subscriber_id,
               access_type: file.access_type,
               can_be_subscribed: true,
+              bucketName: file.bucket_name,
+              objectKey: file.object_key
             })
-          }
-          )
+          })
+          console.log("entityFiles", entityFiles)
+
           setExistingFilesName(existingEntityNames)
           setFileList([...entityFolders, ...entityFiles])
           setFilteredList([...entityFolders, ...entityFiles])
@@ -307,45 +316,62 @@ export function FilesListing() {
   const handleSelectedFilesDelete = async () => {
     handleCloseMoreMenu()
     if (window.confirm("Are you sure you want to Delete")) {
-      const accID = selectedUser.root_account_id
-      const subscriberId = selectedUser.subscriber_id
-      const subscriptionId = selectedUser.subscription_id
-      const schemaId = selectedProject.payload.__auto_id__
-      const folderDeleteArr = []
-      const fileDeleteArr = []
-      selectedEntityDetails.forEach(entity => {
-        if (entity.entityType == ENTITY_TYPE_DIRECTORY)
-          folderDeleteArr.push(entity.entityId)
-        else
-          fileDeleteArr.push(entity.entityId)
-      })
-      let folderDeleteFlag = false
-      if (folderDeleteArr.length > 0) {
-        try {
-          const resFolder = await GalleryService.deleteFolder(accID, subscriberId, subscriptionId, schemaId, folderDeleteArr)
-          folderDeleteFlag = true
-        }
-        catch (errFolder) {
-          console.log("error Occured while deleting Folders", errFolder)
-          folderDeleteFlag = false
-        }
-      }
-      else
-        folderDeleteFlag = true
       try {
-        const resFile = await GalleryService.deleteFiles(accID, subscriberId, subscriptionId, schemaId, fileDeleteArr)
-        if (folderDeleteFlag)
-          tostAlert(<FormattedMessage {...messages.bothMoved} />, "success")
-        else
-          tostAlert(<FormattedMessage {...messages.partialMovedFiles} />, "warning")
-        fetchFilesAndFolders(parentRootId)
-      }
-      catch (errFile) {
-        console.log("error Occured while deleting Files", errFile)
-        if (folderDeleteFlag)
-          tostAlert(<FormattedMessage {...messages.partialMovedFolder} />, "success")
-        else
-          tostAlert(<FormattedMessage {...messages.serverError} />, "warning")
+        SetLoading(true)
+        const accID = selectedUser.root_account_id
+        const subscriberId = selectedUser.subscriber_id
+        const subscriptionId = selectedUser.subscription_id
+        const schemaId = selectedProject.payload.__auto_id__
+        const folderDeleteArr = []
+        const fileDeleteArr = []
+
+        selectedEntityDetails.forEach(entity => {
+          if (entity.entityType == ENTITY_TYPE_DIRECTORY)
+            folderDeleteArr.push(entity.entityId)
+          else
+            fileDeleteArr.push(entity.entityId)
+        })
+
+        let folderDeleteFlag = true;
+        let fileDeleteFlag = true;
+
+        if (folderDeleteArr.length > 0) {
+          try {
+            await GalleryService.deleteFolder(accID, subscriberId, subscriptionId, schemaId, folderDeleteArr);
+          } catch (errFolder) {
+            console.log("Error occurred while deleting folders", errFolder);
+            folderDeleteFlag = false;
+          }
+        }
+
+        if (fileDeleteArr.length > 0) {
+          try {
+            await GalleryService.deleteFiles(accID, subscriberId, subscriptionId, schemaId, fileDeleteArr);
+          } catch (errFile) {
+            console.log("Error occurred while deleting files", errFile);
+            fileDeleteFlag = false;
+          }
+        }
+
+        if (folderDeleteFlag && fileDeleteFlag) {
+          tostAlert(<FormattedMessage {...messages.bothMoved} />, "success");
+        }
+        else if (!folderDeleteFlag && fileDeleteFlag) {
+          tostAlert(<FormattedMessage {...messages.partialMovedFiles} />, "warning");
+        }
+        else if (folderDeleteFlag && !fileDeleteFlag) {
+          tostAlert(<FormattedMessage {...messages.partialMovedFolder} />, "warning");
+        }
+        else {
+          tostAlert(<FormattedMessage {...messages.serverError} />, "warning");
+        }
+
+        fetchFilesAndFolders(parentRootId);
+
+      } catch (error) {
+        console.log(error)
+      } finally {
+        SetLoading(false)
       }
     }
   }
@@ -421,6 +447,7 @@ export function FilesListing() {
             tostAlert={tostAlert}
           />
         </Modal>
+
         <Modal
           open={openAccessModal}
           onClose={handleCloseAccessModal}
@@ -437,6 +464,7 @@ export function FilesListing() {
             fetchFilesAndFolders={fetchFilesAndFolders}
           />
         </Modal>
+
         <Modal
           open={openShareModal}
           onClose={handleCloseShareModal}
@@ -451,6 +479,7 @@ export function FilesListing() {
             tostAlert={tostAlert}
           />
         </Modal>
+
         <Modal
           open={openMoveFolderModal}
           onClose={handleCloseMoveFolderModal}
@@ -467,6 +496,7 @@ export function FilesListing() {
             tostAlert={tostAlert}
           />
         </Modal>
+
         <Modal
           open={openRenameModal}
           onClose={handleCloseRenameModal}
@@ -509,115 +539,115 @@ export function FilesListing() {
 
         <Box display="flex" pt={5} justifyContent="center">
           <Box width="85%" maxWidth="960px">
-            {/* <LoadingOverlay
-            active={loading}
-            horizontal
-            styles={{
-              wrapper: {
-                height: '100%',
-                width: '100%',
-              },
-              overlay: (base) => ({
-                ...base,
-                background: 'rgba(0, 0, 0, 0.2)',
-                zIndex: 1600,
-                height: '100%',
-                position: 'fixed'
-              }),
-            }}> */}
-            <Box flex={1} my="20px">
-              <TextField
-                placeholder="Search"
-                id="searchField_in_FilesList"
-                variant='outlined'
-                value={searchKeyword}
-                fullWidth
-                size="small"
-                onChange={(evt) => {
-                  searchFnc(evt.target.value, appliedFilters)
-                }}
-                classes={{ root: classes.searchBar }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Tooltip title="Search" >
-                        <Search />
-                      </Tooltip>
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Box>
-            <Box sx={classes.whiteBox}>
-              <Box sx={classes.filterHeadBox}>
-                <Box display="flex" alignItems='center'>
-                  {
-                    appliedFilters.length === 0 || appliedFilters.length === 4
-                      ?
-                      <Typography sx={classes.filterText}><FormattedMessage {...messages.filterTag} /></Typography>
-                      :
-                      <Typography sx={classes.filterTextClick} onClick={handleClearFilter}><FormattedMessage {...messages.clearFilter} /></Typography>
-                  }
-                  <FilterAlt color="secondary" onClick={handleMenuClickFilter} sx={classes.filterIcon} />
-                </Box>
-                <Menu
-                  id="file-filter-menu"
-                  keepMounted
-                  anchorEl={anchorFilter}
-                  open={Boolean(anchorFilter)}
-                  onClose={handleCloseFilterMenu}
-                  getContentAnchorEl={null}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
+            <LoadingOverlay
+              active={loading}
+              horizontal
+              styles={{
+                wrapper: {
+                  height: '100%',
+                  width: '100%',
+                },
+                overlay: (base) => ({
+                  ...base,
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  zIndex: 1600,
+                  height: '100%',
+                  position: 'fixed'
+                }),
+              }}>
+              <Box flex={1} my="20px">
+                <TextField
+                  placeholder="Search"
+                  id="searchField_in_FilesList"
+                  variant='outlined'
+                  value={searchKeyword}
+                  fullWidth
+                  size="small"
+                  onChange={(evt) => {
+                    searchFnc(evt.target.value, appliedFilters)
                   }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
+                  classes={{ root: classes.searchBar }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Tooltip title="Search" >
+                          <Search />
+                        </Tooltip>
+                      </InputAdornment>
+                    )
                   }}
-                >
-                  <Box display="flex" alignItems="center" width="185px">
-                    <Checkbox
-                      size='small'
-                      checked={appliedFilters.includes(FILE_TYPE_IMAGE)}
-                      onChange={handleFilterChange}
-                      value={FILE_TYPE_IMAGE}
-                    />
-                    <Typography sx={classes.noItemText}><FormattedMessage {...messages.photos} /></Typography>
+                />
+              </Box>
+              <Box sx={classes.whiteBox}>
+                <Box sx={classes.filterHeadBox}>
+                  <Box display="flex" alignItems='center'>
+                    {
+                      appliedFilters.length === 0 || appliedFilters.length === 4
+                        ?
+                        <Typography sx={classes.filterText}><FormattedMessage {...messages.filterTag} /></Typography>
+                        :
+                        <Typography sx={classes.filterTextClick} onClick={handleClearFilter}><FormattedMessage {...messages.clearFilter} /></Typography>
+                    }
+                    <FilterAlt color="secondary" onClick={handleMenuClickFilter} sx={classes.filterIcon} />
                   </Box>
-                  <Divider width="100%" />
-                  <Box display="flex" alignItems="center" width="185px">
-                    <Checkbox
-                      size='small'
-                      checked={appliedFilters.includes(FILE_TYPE_VIDEO)}
-                      onChange={handleFilterChange}
-                      value={FILE_TYPE_VIDEO}
-                    />
-                    <Typography sx={classes.noItemText}><FormattedMessage {...messages.videos} /></Typography>
-                  </Box>
-                  <Divider width="100%" />
-                  <Box display="flex" alignItems="center" width="185px">
-                    <Checkbox
-                      size='small'
-                      checked={appliedFilters.includes(FILE_TYPE_DOCUMENT)}
-                      onChange={handleFilterChange}
-                      value={FILE_TYPE_DOCUMENT}
-                    />
-                    <Typography sx={classes.noItemText}><FormattedMessage {...messages.documents} /></Typography>
-                  </Box>
-                  <Divider width="100%" />
-                  <Box display="flex" alignItems="center" width="185px">
-                    <Checkbox
-                      size='small'
-                      checked={appliedFilters.includes(FILE_TYPE_FOLDER)}
-                      onChange={handleFilterChange}
-                      value={FILE_TYPE_FOLDER}
-                    />
-                    <Typography sx={classes.noItemText}><FormattedMessage {...messages.folders} /></Typography>
-                  </Box>
-                </Menu>
-                <Box display="flex">
-                  <Button
+                  <Menu
+                    id="file-filter-menu"
+                    keepMounted
+                    anchorEl={anchorFilter}
+                    open={Boolean(anchorFilter)}
+                    onClose={handleCloseFilterMenu}
+                    getContentAnchorEl={null}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                  >
+                    <Box display="flex" alignItems="center" width="185px">
+                      <Checkbox
+                        size='small'
+                        checked={appliedFilters.includes(FILE_TYPE_IMAGE)}
+                        onChange={handleFilterChange}
+                        value={FILE_TYPE_IMAGE}
+                      />
+                      <Typography sx={classes.noItemText}><FormattedMessage {...messages.photos} /></Typography>
+                    </Box>
+                    <Divider width="100%" />
+                    <Box display="flex" alignItems="center" width="185px">
+                      <Checkbox
+                        size='small'
+                        checked={appliedFilters.includes(FILE_TYPE_VIDEO)}
+                        onChange={handleFilterChange}
+                        value={FILE_TYPE_VIDEO}
+                      />
+                      <Typography sx={classes.noItemText}><FormattedMessage {...messages.videos} /></Typography>
+                    </Box>
+                    <Divider width="100%" />
+                    <Box display="flex" alignItems="center" width="185px">
+                      <Checkbox
+                        size='small'
+                        checked={appliedFilters.includes(FILE_TYPE_DOCUMENT)}
+                        onChange={handleFilterChange}
+                        value={FILE_TYPE_DOCUMENT}
+                      />
+                      <Typography sx={classes.noItemText}><FormattedMessage {...messages.documents} /></Typography>
+                    </Box>
+                    <Divider width="100%" />
+                    <Box display="flex" alignItems="center" width="185px">
+                      <Checkbox
+                        size='small'
+                        checked={appliedFilters.includes(FILE_TYPE_FOLDER)}
+                        onChange={handleFilterChange}
+                        value={FILE_TYPE_FOLDER}
+                      />
+                      <Typography sx={classes.noItemText}><FormattedMessage {...messages.folders} /></Typography>
+                    </Box>
+                  </Menu>
+                  <Box display="flex">
+                    {/* <Button
                     disableElevation
                     variant='contained'
                     size="small"
@@ -633,54 +663,54 @@ export function FilesListing() {
                   >
                     <FolderSharedOutlined sx={classes.btnIcon} />
                     <FormattedMessage {...messages.shredWithMe} />
-                  </Button>
-                  <Button
-                    disableElevation
-                    variant='contained'
-                    size="small"
-                    sx={classes.recyclebin}
-                    onClick={() => {
-                      const currentPath = location.pathname
-                      if (currentPath.charAt(currentPath.length - 1) === '/') {
-                        navigate(currentPath + "recyclebin")
-                      } else {
-                        navigate(currentPath + "/recyclebin")
-                      }
+                  </Button> */}
+                    <Button
+                      disableElevation
+                      variant='contained'
+                      size="small"
+                      sx={classes.recyclebin}
+                      onClick={() => {
+                        const currentPath = location.pathname
+                        if (currentPath.charAt(currentPath.length - 1) === '/') {
+                          navigate(currentPath + "recyclebin")
+                        } else {
+                          navigate(currentPath + "/recyclebin")
+                        }
+                      }}
+                    >
+                      <DeleteOutlineOutlined sx={classes.btnIcon} />
+                      <FormattedMessage {...messages.recyclebin} />
+                    </Button>
+                    {
+                      selectedEntity && selectedEntity.length > 0
+                        ?
+                        <Box sx={classes.actionsBox} onClick={handleMenuClickMore}>
+                          <Typography sx={classes.filterText}><FormattedMessage {...messages.actions} /></Typography>
+                          <Avatar sx={classes.moreAvatar}>
+                            <MoreHoriz sx={classes.moreIcon} />
+                          </Avatar>
+                        </Box>
+                        :
+                        ''
+                    }
+                  </Box>
+                  <Menu
+                    id="file-select-menu"
+                    keepMounted
+                    anchorEl={anchorMoreItems}
+                    open={Boolean(anchorMoreItems)}
+                    onClose={handleCloseMoreMenu}
+                    getContentAnchorEl={null}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
                     }}
                   >
-                    <DeleteOutlineOutlined sx={classes.btnIcon} />
-                    <FormattedMessage {...messages.recyclebin} />
-                  </Button>
-                  {
-                    selectedEntity && selectedEntity.length > 0
-                      ?
-                      <Box sx={classes.actionsBox} onClick={handleMenuClickMore}>
-                        <Typography sx={classes.filterText}><FormattedMessage {...messages.actions} /></Typography>
-                        <Avatar sx={classes.moreAvatar}>
-                          <MoreHoriz sx={classes.moreIcon} />
-                        </Avatar>
-                      </Box>
-                      :
-                      ''
-                  }
-                </Box>
-                <Menu
-                  id="file-select-menu"
-                  keepMounted
-                  anchorEl={anchorMoreItems}
-                  open={Boolean(anchorMoreItems)}
-                  onClose={handleCloseMoreMenu}
-                  getContentAnchorEl={null}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                >
-                  {
+                    {/* {
                     selectedEntity.length < 2
                       ?
                       <MenuItem onClick={handleFileDownload}>
@@ -691,8 +721,8 @@ export function FilesListing() {
                       </MenuItem>
                       :
                       ''
-                  }
-                  {
+                  } */}
+                    {/* {
                     selectedEntity.length < 2
                       ?
                       <MenuItem onClick={handleOpenShareModal}>
@@ -703,14 +733,14 @@ export function FilesListing() {
                       </MenuItem>
                       :
                       ''
-                  }
-                  < MenuItem onClick={handleOpenMoveFolderModal}>
+                  } */}
+                    {/* < MenuItem onClick={handleOpenMoveFolderModal}>
                     <Box display="flex" width="185px">
                       <FolderMoveIcon color="secondary" sx={classes.filterIcon} />
                       <Typography sx={classes.noItemText}><FormattedMessage {...messages.moveTo} /></Typography>
                     </Box>
-                  </MenuItem>
-                  {
+                  </MenuItem> */}
+                    {/* {
                     selectedEntity.length < 2
                       ?
                       <MenuItem onClick={handleOpenAccessModal}>
@@ -721,8 +751,8 @@ export function FilesListing() {
                       </MenuItem>
                       :
                       ''
-                  }
-                  {
+                  } */}
+                    {/* {
                     selectedEntity.length < 2
                       ?
                       <MenuItem onClick={handleOpenNewTagModal}>
@@ -733,71 +763,72 @@ export function FilesListing() {
                       </MenuItem>
                       :
                       ''
-                  }
-                  {
-                    selectedEntity.length < 2
-                      ?
-                      <MenuItem onClick={handleOpenRenameModal}>
-                        <Box display="flex" width="185px">
-                          <FileRenameIcon color="secondary" sx={classes.filterIcon} />
-                          <Typography sx={classes.noItemText}><FormattedMessage {...messages.rename} /></Typography>
-                        </Box>
-                      </MenuItem>
-                      :
-                      ''
-                  }
-                  <MenuItem onClick={handleSelectedFilesDelete}>
-                    <Box display="flex" width="185px">
-                      <DeleteOutlineOutlined color="secondary" sx={classes.filterIcon} />
-                      <Typography sx={classes.noItemText}><FormattedMessage {...messages.delete} /></Typography>
-                    </Box>
-                  </MenuItem>
-                </Menu>
-              </Box>
-              {
-                loading ? <LinearProgress marginY="10px" width="100%" /> : ''
-              }
-              {
-                loading === false && parentRootId != null
-                  ?
-                  <Box display="flex" width="100%" marginY="10px" marginX="5px" sx={classes.linkBox} onClick={handleFolderBack}>
-                    <ArrowBackIos sx={classes.backIcon} />
-                    <Typography sx={classes.noItemText}><FormattedMessage {...messages.back} /></Typography>
-                  </Box>
-                  :
-                  ''
-              }
-              <Box display="flex" width="100%" flexWrap="wrap" paddingBottom="200px" onClick={handleClickBlank}>
-                {
-                  filteredFilesList.length > 0
-                    ?
-                    filteredFilesList.map(file =>
-                      <FileItem
-                        fileName={file.entityName}
-                        fileType={file.entitySubType}
-                        isFolder={file.entityType === ENTITY_TYPE_DIRECTORY}
-                        file={file}
-                        selectedEntity={selectedEntity}
-                        setSelectedEntity={setSelectedEntity}
-                        selectedEntityDetails={selectedEntityDetails}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        handleDoubleClick={file.entityType === ENTITY_TYPE_DIRECTORY ? handleFolderDoubeClick.bind(this, file.entityId, file.entityName) : null}
-                      />
-                    )
-                    :
-                    (
-                      loading === false
+                  } */}
+                    {
+                      selectedEntity.length < 2
                         ?
-                        <Box display="flex" justifyContent="center" alignItems="center" width="100%" height="250px">
-                          <Typography sx={classes.noItemText}><FormattedMessage {...messages.noItems} /></Typography>
-                        </Box>
+                        <MenuItem onClick={handleOpenRenameModal}>
+                          <Box display="flex" width="185px">
+                            <FileRenameIcon color="secondary" sx={classes.filterIcon} />
+                            <Typography sx={classes.noItemText}><FormattedMessage {...messages.rename} /></Typography>
+                          </Box>
+                        </MenuItem>
                         :
                         ''
-                    )
+                    }
+                    <MenuItem onClick={handleSelectedFilesDelete}>
+                      <Box display="flex" width="185px">
+                        <DeleteOutlineOutlined color="secondary" sx={classes.filterIcon} />
+                        <Typography sx={classes.noItemText}><FormattedMessage {...messages.delete} /></Typography>
+                      </Box>
+                    </MenuItem>
+                  </Menu>
+                </Box>
+                {
+                  loading ? <LinearProgress marginY="10px" width="100%" /> : ''
                 }
+                {
+                  loading === false && parentRootId != null
+                    ?
+                    <Box display="flex" width="100%" marginY="10px" marginX="5px" sx={classes.linkBox} onClick={handleFolderBack}>
+                      <ArrowBackIos sx={classes.backIcon} />
+                      <Typography sx={classes.noItemText}><FormattedMessage {...messages.back} /></Typography>
+                    </Box>
+                    :
+                    ''
+                }
+                <Box display="flex" width="100%" flexWrap="wrap" paddingBottom="200px" onClick={handleClickBlank}>
+                  {
+                    filteredFilesList.length > 0
+                      ?
+                      filteredFilesList.map(file =>
+                        <FileItem
+                          selectedUser={selectedUser}
+                          fileName={file.entityName}
+                          fileType={file.entitySubType}
+                          isFolder={file.entityType === ENTITY_TYPE_DIRECTORY}
+                          file={file}
+                          selectedEntity={selectedEntity}
+                          setSelectedEntity={setSelectedEntity}
+                          selectedEntityDetails={selectedEntityDetails}
+                          setSelectedEntityDetails={setSelectedEntityDetails}
+                          handleDoubleClick={file.entityType === ENTITY_TYPE_DIRECTORY ? handleFolderDoubeClick.bind(this, file.entityId, file.entityName) : null}
+                        />
+                      )
+                      :
+                      (
+                        loading === false
+                          ?
+                          <Box display="flex" justifyContent="center" alignItems="center" width="100%" height="250px">
+                            <Typography sx={classes.noItemText}><FormattedMessage {...messages.noItems} /></Typography>
+                          </Box>
+                          :
+                          ''
+                      )
+                  }
+                </Box>
               </Box>
-            </Box>
-            {/* </LoadingOverlay> */}
+            </LoadingOverlay>
           </Box>
         </Box>
 

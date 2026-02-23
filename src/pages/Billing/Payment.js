@@ -80,6 +80,7 @@ function Payment() {
             const credit_bundle_id = payload?.__auto_id__ ?? null;
             const display_name = payload?.display_name ?? null;
             const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null
+            const schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
 
             const [email_id, user_id, account_id, subscriber_id, subscription_id] = await Promise.all([
                 fetchUserEmail(),
@@ -101,6 +102,7 @@ function Payment() {
             else {
                 const sessionReqObj = {
                     ...reqObj,
+                    schema_id: schema_id,
                     success_url: `${process.env.REACT_APP_AMEYA_WEB_URL}/user/billing`,
                     cancel_url: `${process.env.REACT_APP_AMEYA_WEB_URL}/user/billing`,
                     user_id,

@@ -1,76 +1,92 @@
-import { AxiosObjCollection } from '../../Configurations/axios-setup';
+import { AxiosObjBaseCollection, AxiosObjCollection } from '../../Configurations/axios-setup';
 
 class collectionTypesService {
     getSupportedFieldTypes() {
-        return AxiosObjCollection.get(`/api/collection/collection-fields`)
+        return AxiosObjBaseCollection.get(`/api/collection/collection-fields`)
     }
     getSupportedLanguages() {
-        return AxiosObjCollection.get(`/api/collection/languages`)
+        return AxiosObjBaseCollection.get(`/api/collection/languages`)
     }
     getTemplateList() {
         return AxiosObjCollection.get(`/publisc-lookups/templates/`)
     }
     getAllCollectionTypesForCoach(accountId, subscriptionId, subscriberId, schema_id) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/definition?schema_id=${schema_id}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/definition?collection_schema_id=${schema_id}`)
     }
     getCollectionTypesByIdForCoach(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/definition/${collectionId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/definition/${collectionId}`)
     }
     createNewCollectionType(accountId, subscriptionId, subscriberId, resObj) {
-        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/definition`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/definition`, resObj, {
             'accept': 'application/json'
         })
     }
     deleteCollectionType(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.delete(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/definition/${collectionId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.delete(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/definition/${collectionId}`)
     }
     updateCollectionFields(accountId, subscriptionId, subscriberId, collectionId, resObj) {
-        return AxiosObjCollection.put(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/definition/${collectionId}`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.put(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/definition/${collectionId}`, resObj, {
             'accept': 'application/json'
         })
     }
     publishCollectionType(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish/${collectionId}`, { "collection_id": collectionId }, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/publish/${collectionId}`, { "collection_id": collectionId }, {
             'accept': 'application/json'
         })
     }
     saveCollectionConfiguration(accountId, subscriptionId, subscriberId, collectionId, resObj) {
-        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/configure/view/${collectionId}`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/configure/view/${collectionId}`, resObj, {
             'accept': 'application/json'
         })
     }
     getCollectionConfiguration(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish/${collectionId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/publish/${collectionId}`)
     }
     getFieldSetConfiguration(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/publish/${collectionId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/publish/${collectionId}`)
     }
     saveFieldSetConfiguration(accountId, subscriptionId, subscriberId, collectionId, resObj) {
-        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/configure/view/fieldset/${collectionId}`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/configure/view/fieldset/${collectionId}`, resObj, {
             'accept': 'application/json'
         })
     }
     getAllFieldSetsForCoach(accountId, subscriptionId, subscriberId, schemaId) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${schemaId}/collection/fieldset/definition`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/definition?collection_schema_id=${schemaId}`)
     }
     createNewCollectionFieldSet(accountId, subscriptionId, subscriberId, resObj) {
-        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/definition`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/definition`, resObj, {
             'accept': 'application/json'
         })
     }
     deleteFieldSet(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.delete(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/definition/${collectionId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.delete(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/definition/${collectionId}`)
     }
     publishFieldSet(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/publish/${collectionId}`, { "fieldset_id": collectionId }, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/publish/${collectionId}`, { "fieldset_id": collectionId }, {
             'accept': 'application/json'
         })
     }
     getFieldSetByIdForCoach(accountId, subscriptionId, subscriberId, collectionId) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/definition/${collectionId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/definition/${collectionId}`)
     }
     updateFieldSetFields(accountId, subscriptionId, subscriberId, collectionId, resObj) {
-        return AxiosObjCollection.put(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/definition/${collectionId}`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.put(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/fieldset/definition/${collectionId}`, resObj, {
             'accept': 'application/json'
         })
     }
@@ -78,10 +94,12 @@ class collectionTypesService {
         return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish`)
     }
     getPublishedCollectionTypesPagination(accountId, subscriptionId, subscriberId, schema_id, lastEvaluatedKey, limit) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/publish?limit=${limit}&last_evaluated_key=${lastEvaluatedKey}&include_detail=true&schema_id=${schema_id}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/published/collections?limit=${limit}&last_evaluated_key=${lastEvaluatedKey}&include_detail=true&collection_schema_id=${schema_id}`)
     }
     getPublishedFieldSets(accountId, subscriptionId, subscriberId, schema_id, lastEvaluatedKey, limit) {
-        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection/fieldset/publish?limit=${limit}&last_evaluated_key=${lastEvaluatedKey}&include_detail=true&schema_id=${schema_id}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/published/collection/fieldsets?limit=${limit}&last_evaluated_key=${lastEvaluatedKey}&include_detail=true&fieldset_schema_id=${schema_id}`)
     }
     getAppAndPluginList(accountId, subscriptionId, subscriberId) {
         return AxiosObjCollection.get(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/collection-modules`)

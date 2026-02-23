@@ -130,10 +130,13 @@ export function FileUpload() {
 
   const uploadFile = async (blob, reqBody) => {
     try {
+
       const accID = selectedUser.root_account_id
       const subscriberId = selectedUser.subscriber_id
       const subscriptionId = selectedUser.subscription_id
-      const resData = await FileUploadServices.getPredignedURL(accID, subscriberId, subscriptionId, JSON.stringify(reqBody))
+      const schemaId = selectedProject.payload.__auto_id__
+
+      const resData = await FileUploadServices.getPredignedURL(accID, subscriberId, subscriptionId, schemaId, JSON.stringify(reqBody))
       if (resData.status === 200) {
         if (resData.data.provider === 'azure') {
           const resUpload = await FileUploadServices.azureUploadFile(resData.data.url, blob)
@@ -169,12 +172,14 @@ export function FileUpload() {
       file_type: '',
       file_name: file.name
     }
+
     const uploadedFileId = await uploadFile(file, reqBodyFile)
     const tempJsonArr = [...resJsonVar]
+
     const uploadResObj = {
       access_type: filePermission,
       file_type: fileType,
-      folder_id: parentRootId,
+      folder_id: parentRootId ? parentRootId : 'ROOT',
       file_id: uploadedFileId,
       thumbnail_file_id: thumbnailFileId,
       file_attributes: {
@@ -183,6 +188,7 @@ export function FileUpload() {
         file_extension: file.name.split('.')[1]
       }
     }
+
     tempJsonArr.push(uploadResObj)
     resJsonVar = tempJsonArr
     setUploadJson(tempJsonArr)
@@ -190,6 +196,7 @@ export function FileUpload() {
     tempLoadArr[index] = 'processed'
     uploadProgress = tempLoadArr
     setUploadProgress([...tempLoadArr])
+
   }
 
   const uploadThumbnailAndImage = async (fileType, file, index, blob) => {
@@ -270,12 +277,15 @@ export function FileUpload() {
   }
 
   const uploadSingleFile = (file, index) => {
+
     const tempLoadArr = [...uploadProgress]
     tempLoadArr[index] = 'uploading'
     uploadProgress = tempLoadArr
     setUploadProgress([...tempLoadArr])
+
     const fileExt = file.name.split('.')[1].toLowerCase()
     const fileType = getFileType(file)
+
     switch (fileType) {
       case FILE_TYPE_IMAGE:
         if (fileExt === "svg")
@@ -510,12 +520,12 @@ export function FileUpload() {
                         previewText=""
                       />
                     </Box>
-                    <Typography sx={classes.boldText}><FormattedMessage {...messages.manageAccess} /></Typography>
+                    {/* <Typography sx={classes.boldText}><FormattedMessage {...messages.manageAccess} /></Typography>
                     <RadioGroup aria-label="gender" name="gender1" row value={filePermission} onChange={handlePermissionChange}>
                       <FormControlLabel classes={{ label: classes.mediumLabel }} value="PRIVATE" control={<Radio size='small' />} label={<FormattedMessage {...messages.private} />} />
                       <FormControlLabel classes={{ label: classes.mediumLabel }} value="PUBLIC" control={<Radio size='small' />} label={<FormattedMessage {...messages.public} />} />
                       <FormControlLabel classes={{ label: classes.mediumLabel }} value="SUBSCRIPTION_REQUIRED" control={<Radio size='small' />} label={<FormattedMessage {...messages.reqSubscription} />} />
-                    </RadioGroup>
+                    </RadioGroup> */}
                   </Box>
                 </Paper>
               </Box>

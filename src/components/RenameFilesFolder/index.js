@@ -6,17 +6,13 @@ import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 import { useFormik } from 'formik';
 import styles from './styles';
-import { useSelector } from 'react-redux';
-
+import { useAppContext } from '../../context/AppContext';
 
 function RenameFilesFolder(props) {
   const { selectedEntity, selectedUser, handleClose, tostAlert, isFolder, parentRootId, fetchFilesAndFolders, existingFilesName } = props;
   const classes = styles;
   const [loading, setLoading] = useState(false);
-
-  const selected_space = useSelector(state => state.current_selected_data.selected_space)
-  const selected_project = useSelector(state => state.current_selected_data.selected_project)
-
+  const { selectedProject } = useAppContext();
 
   const apiErrorHandler = (err) => {
     if (err.response !== undefined && err.response !== null) {
@@ -47,6 +43,7 @@ function RenameFilesFolder(props) {
       entityName: selectedEntity?.entityName ?? '',
     },
     validate,
+
     onSubmit: async values => {
       if (existingFilesName.includes(values.entityName)) {
         tostAlert(<FormattedMessage {...messages.sameNameExist} />, "error");
@@ -56,14 +53,14 @@ function RenameFilesFolder(props) {
       const accID = props.selectedUser.root_account_id
       const subscriberId = props.selectedUser.subscriber_id
       const subscriptionId = props.selectedUser.subscription_id
-      const schemaId = selected_project.payload.__auto_id__
+      const schemaId = selectedProject.payload.__auto_id__
 
       const resObj = isFolder ?
         ({
           folder_name: values.entityName,
           access_type: selectedEntity.access_type,
           can_be_subscribed: selectedEntity.can_be_subscribed,
-          parent_folder_id: parentRootId
+          parent_folder_id: parentRootId ? parentRootId : 'ROOT'
         })
         :
         ({

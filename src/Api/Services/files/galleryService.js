@@ -48,6 +48,15 @@ class galleryService {
       .delete(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file?fileId=${fileIdStr}`)
   }
 
+  getDownloadURL(accountId, subscriberId, subscriptionId, schemaId, bucket_name, object_paths) {
+    return AxiosObjCollection
+      .post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/generate-download-url?bucket_name=${bucket_name}&object_paths=${object_paths}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+  }
+
   getFolderContents(accountId, subscriberId, subscriptionId, schemaId, parentFolderId, fileType) {
     if (parentFolderId == null && fileType == null)
       return AxiosObjCollection
