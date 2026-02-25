@@ -23,6 +23,9 @@ import { IconSvg } from '../../utils/globalIcons';
 import { getAllRoleAssignmentData, getAllRoleInstanceData } from '../../utils/ApiFunctions/AccessControlData';
 import { useAppContext } from '../../context/AppContext';
 import { getUserItemId } from '../../utils/GetAccountDetails';
+import { checkCredit } from '../../utils';
+import { useCredit } from '../../context/CreditContext';
+import { tostAlert } from '../../utils/AlertToast';
 
 function ViewProjects() {
 
@@ -32,6 +35,7 @@ function ViewProjects() {
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const { credit } = useCredit()
     const { selectedOrganization, setSelectedProject, setSelectedWorkspace,
         selectedWorkspace, setPermissionStatus, isOrganizationOwner, authData } = useAppContext();
     const [currentspace, setCurrentSpace] = useState(null)
@@ -58,11 +62,21 @@ function ViewProjects() {
     }
     const [selectedProjectData, setSelectedProjectData] = useState(selected_project_settings);
     const validTypes = ["ext_user_singin", "ext_existing_user", "ext_user_signup"];
+    const [noCredit, setNoCredit] = useState(false);
 
     useEffect(() => {
         getAllData()
         //eslint-disable-next-line
     }, [navigate])
+
+    useEffect(() => {
+        const validateCredit = async () => {
+            const result = await checkCredit(credit);
+            setNoCredit(result);
+        };
+
+        validateCredit();
+    }, [credit]);
 
     const getAllData = async () => {
         setLoading(true)
@@ -154,6 +168,13 @@ function ViewProjects() {
     }
 
     const handleProjectSelection = async (item) => {
+
+        const result = await checkCredit(credit);
+        if (result) {
+            tostAlert('Your credits have run out. Please top up account to continue.', 'error')
+            return
+        }
+
         setSelectedProject(item)
         await handleSidebarConfig(selectedWorkspace, item, navigate)
     }
@@ -227,7 +248,7 @@ function ViewProjects() {
                             </Breadcrumbs>
                         </Stack>
 
-                        {(isOrganizationOwner && !validTypes.includes(authData?.request_type)) && <Button
+                        {(isOrganizationOwner && !validTypes.includes(authData?.request_type) && !noCredit) && <Button
                             sx={styles.addBtn}
                             onClick={() => handleProjectCreation()}
                         >

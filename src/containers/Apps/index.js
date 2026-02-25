@@ -86,7 +86,7 @@ function Apps() {
                 app_name: app.name,
                 app_description: app.description,
                 app_type: app.id,
-                app_slug: `${projectName}_${app.id}`,
+                app_slug: projectId,
                 organization_id: organizationId,
                 workspace_id: workspaceId,
                 project_id: projectId,
@@ -108,7 +108,8 @@ function Apps() {
 
     const handleDataCopy = (itemId, data) => {
         if (itemId) {
-            const base_url = "https://dpod-bugtracker.ameya.ai"
+            const base_url = "http://localhost:3001"
+            // const app_base_url = process.env.REACT_APP_BUGTRACKER_BASE_URL || "http://localhost:3001"
             const bug_tracker_url = `${base_url}/${data}`
             navigator.clipboard.writeText(bug_tracker_url).then(() => {
                 setCopiedData(itemId);

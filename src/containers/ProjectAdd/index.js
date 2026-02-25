@@ -22,6 +22,8 @@ import ProjectsApi from '../../Api/Services/AppflyteBackend/ProjectsApi';
 import getAppflyteEnginesData from '../../utils/ApiFunctions/AppflyteEngines';
 import { getUserName } from '../../utils/GetAccountDetails';
 import { useAppContext } from '../../context/AppContext';
+import { checkCredit } from '../../utils';
+import { useCredit } from '../../context/CreditContext';
 
 function AddProject() {
 
@@ -35,6 +37,7 @@ function AddProject() {
     const dispatch = useDispatch();
     const { action } = useParams();
     const location = useLocation()
+    const { credit } = useCredit();
 
     const [loading, setLoading] = useState(false)
     const [appflyteEngines, setAppflyteEngines] = useState([]);
@@ -55,6 +58,14 @@ function AddProject() {
         const organization_id = selectedOrganization?.payload?.__auto_id__;
         const workspace_id = selectedWorkspace?.payload?.__auto_id__;
 
+        const validateCredit = async () => {
+            const result = await checkCredit(credit);
+            if (result) {
+                navigate(`/organization/${organization_id}/workspace/${workspace_id}/projects`);
+            }
+        };
+        validateCredit();
+
         if (action !== "add-project" && action !== "edit-project") {
             navigate(`/organization/${organization_id}/workspace/${workspace_id}/projects`);
         }
@@ -74,7 +85,7 @@ function AddProject() {
                 projectUpdateKey: selected_project_update_key
             })
         }
-    }, [action, selectedOrganization, selectedWorkspace, navigate, location]);
+    }, [action, selectedOrganization, selectedWorkspace, navigate, location, credit]);
 
     useEffect(() => {
         getEngineData();

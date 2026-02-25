@@ -20,6 +20,8 @@ import { IconSvg } from '../../utils/globalIcons';
 import { getAllRoleAssignmentData, getAllRoleInstanceData } from '../../utils/ApiFunctions/AccessControlData';
 import { getUserItemId } from '../../utils/GetAccountDetails';
 import { useAppContext } from '../../context/AppContext';
+import { checkCredit } from '../../utils';
+import { useCredit } from '../../context/CreditContext';
 // import { AppflyteWorkspacePermissions } from '../../utils/ApiFunctions/AppflytePermissionsData';
 
 function Spaces() {
@@ -28,6 +30,7 @@ function Spaces() {
     const mainStyles = getMainStyles(theme);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { credit } = useCredit();
     const { selectedOrganization, selectedService, setSelectedWorkspace,
         setSelectedProject, setPermissionStatus, isOrganizationOwner, authData } = useAppContext();
 
@@ -49,12 +52,21 @@ function Spaces() {
     }
     const [selectedSpaceData, setSelectedSpaceData] = useState(selected_space_settings);
     const validTypes = ["ext_user_singin", "ext_existing_user", "ext_user_signup"];
-
+    const [noCredit, setNoCredit] = useState(false);
 
     useEffect(() => {
         getAllData()
         //eslint-disable-next-line
     }, [navigate, selectedService])
+
+    useEffect(() => {
+        const validateCredit = async () => {
+            const result = await checkCredit(credit);
+            setNoCredit(result);
+        };
+
+        validateCredit();
+    }, [credit]);
 
     const getAllData = async () => {
         setSpaceLoading(true)
@@ -178,7 +190,7 @@ function Spaces() {
                 {spaceLoading && <LoadBar />}
                 <Box padding={'20px'}>
 
-                    {(isOrganizationOwner && !validTypes.includes(authData?.request_type)) && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                    {(isOrganizationOwner && !validTypes.includes(authData?.request_type) && !noCredit) && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                         <Typography sx={styles.mainHeadingText}>All Spaces</Typography>
                         <Button
                             sx={styles.addBtn}

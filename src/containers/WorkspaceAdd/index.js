@@ -23,6 +23,8 @@ import WorkspaceApi from '../../Api/Services/AppflyteBackend/WorkspaceApi';
 import { getUserName } from '../../utils/GetAccountDetails';
 import { useAppContext } from '../../context/AppContext';
 import { getServicesById } from '../../utils/ApiFunctions/ServicesData';
+import { checkCredit } from '../../utils';
+import { useCredit } from '../../context/CreditContext';
 
 function AddWorkspace() {
     const theme = useTheme();
@@ -34,6 +36,7 @@ function AddWorkspace() {
     const dispatch = useDispatch();
     const { action } = useParams();
     const location = useLocation()
+    const { credit } = useCredit();
 
     const spaceDetails = {
         spaceName: '',
@@ -48,6 +51,14 @@ function AddWorkspace() {
     const { selectedOrganization, selectedService } = useAppContext();
 
     useEffect(() => {
+
+        const validateCredit = async () => {
+            const result = await checkCredit(credit);
+            if (result) {
+                navigate(`/organization/${organization_id}/workspaces`)
+            }
+        };
+        validateCredit();
 
         const organization_id = selectedOrganization?.payload?.__auto_id__;
 
@@ -70,7 +81,7 @@ function AddWorkspace() {
                 spaceUpdateKey: selected_space_update_key
             })
         }
-    }, [action, selectedOrganization, navigate, location]);
+    }, [action, selectedOrganization, navigate, location, credit]);
 
     useEffect(() => {
         fetchServices()

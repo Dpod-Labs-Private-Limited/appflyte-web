@@ -47,6 +47,6 @@ const getStyles = () => ({
         '@media (min-width: 900px)': {
             gridColumn: 'span 4',
         }
-    },
+    }
 })
 export default getStyles;
