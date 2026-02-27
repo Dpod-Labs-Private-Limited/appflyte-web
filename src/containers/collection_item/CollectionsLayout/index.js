@@ -127,7 +127,7 @@ export function CollectionsLayout() {
           }),
         }}>
 
-        <Chatbot />
+        <Chatbot chatbot_type={"appflyte_dml"} />
 
         <Box sx={styles.sidebar}>
           <Box sx={classes.drawerContentBox}>

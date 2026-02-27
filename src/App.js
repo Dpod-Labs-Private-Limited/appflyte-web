@@ -44,8 +44,6 @@ function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [parsedDPODToken, setParsedDPODToken] = useState(null)
-  const [emailVerified, setEmailVerified] = useState(true)
-  const [staffList, setStaffList] = useState()
   const [fileLoading, setFileLoading] = useState(false);
   const [open, setOpen] = useState(true);
 
@@ -360,7 +358,7 @@ function App() {
                       centralLoadingFlags={centralLoadingFlags}
                       tostAlert={tostAlert}
                       selectedUser={parsedDPODToken}
-                      emailVerified={emailVerified}
+                      emailVerified={true}
 
                       collectionTypeList={collectionTypeList}
                       collectionPublishedList={collectionPublishedList}
@@ -373,7 +371,7 @@ function App() {
                       fetchPublishedFieldset={fetchPublishedFieldset}
 
                       setLoading={setFileLoading}
-                      staffList={staffList}
+                      staffList={[]}
 
                       open={open}
                       setOpen={setOpen}

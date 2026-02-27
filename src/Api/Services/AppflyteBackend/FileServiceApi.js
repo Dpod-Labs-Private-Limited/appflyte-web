@@ -61,7 +61,7 @@ class DpodAppFlyteApi {
 
     getAmeyaDownloadUrl = async (bucket_name, object_paths) => {
         await this.initialize();
-        return AxiosObj.post(`/api/media/${this.accountId}/subscriber/${this.subscriberId}/subscription/${this.subscriptionId}/ameya-generate-download-url?bucket_name=${bucket_name}&object_paths=${object_paths}`)
+        return AxiosObj.post(`/api/media/${this.accountId}/subscriber/${this.subscriberId}/subscription/${this.subscriptionId}/${process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID}/ameya-generate-download-url?bucket_name=${bucket_name}&object_paths=${object_paths}`)
     }
 
     getFilesById = async (file_id) => {

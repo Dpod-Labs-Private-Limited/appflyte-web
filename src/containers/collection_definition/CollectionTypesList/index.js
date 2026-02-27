@@ -428,7 +428,7 @@ function CollectionTypesList() {
     <Box sx={classes.mainContainer}>
       <Box sx={classes.cardContainer}>
 
-        <Chatbot />
+        <Chatbot chatbot_type={"appflyte_ddl"} />
 
         <Box sx={classes.breadButtonsBox}>
           {tabValue === 0

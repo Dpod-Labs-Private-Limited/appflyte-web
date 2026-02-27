@@ -134,10 +134,16 @@ function Payment() {
             renderCell: (row) => (<Typography sx={{ fontWeight: 600 }}>{row?.payload?.display_name}</Typography>)
         },
         {
-            id: 'payload.credits',
-            label: 'Credits',
+            id: 'payload.projects',
+            label: 'Projects',
             sortable: false,
-            renderCell: (row) => row?.payload?.credits
+            renderCell: (row) => row?.payload?.projects
+        },
+           {
+            id: 'payload.api_calls',
+            label: 'API Requests/mo',
+            sortable: false,
+            renderCell: (row) => row?.payload?.api_calls
         },
         {
             id: 'payload.price_in_dollar',
@@ -153,16 +159,6 @@ function Payment() {
             )
         },
         {
-            id: 'payload.price_per_credit_dollar',
-            label: 'Per Credit',
-            sortable: false,
-            renderCell: (row) =>
-                new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                }).format(row?.payload?.price_per_credit_dollar ?? 0)
-        },
-        {
             id: '',
             label: '',
             sortable: false,
@@ -172,7 +168,7 @@ function Payment() {
                     onClick={() => handleContinue(row)}
                     disabled={loading || paymentLoading}
                 >
-                    Buy Now
+                    Upgrade Now
                 </Button>
             )
         }

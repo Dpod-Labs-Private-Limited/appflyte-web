@@ -45,7 +45,15 @@ export const CreditProvider = ({ children }) => {
                     setCredit(0);
                 } else {
                     const data = snapshot.data();
-                    setCredit(Number(data.credit_balance ?? 0));
+                    console.log("data",data)
+                    setCredit(100);
+                    // console.log('Credit data from Firestore:', data);
+                    // const credit_cycle_end = data.credit_cycle_end ? new Date(data.credit_cycle_end * 1000) : null;
+                    // if (credit_cycle_end && credit_cycle_end < new Date()) {
+                    //     setCredit(0);
+                    // } else {
+                    //     setCredit(Number(data.credit_balance ?? 0));
+                    // }
                 }
                 setCreditLoading(false);
             },

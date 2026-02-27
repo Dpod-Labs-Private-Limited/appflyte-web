@@ -20,7 +20,7 @@ import { setProjectAdded } from "../../Redux/slice/newDataSlice";
 import { setAppflyteEngineState } from "../../Redux/slice/dataSlice";
 import ProjectsApi from '../../Api/Services/AppflyteBackend/ProjectsApi';
 import getAppflyteEnginesData from '../../utils/ApiFunctions/AppflyteEngines';
-import { getUserName } from '../../utils/GetAccountDetails';
+import { getUserItemId, getUserName } from '../../utils/GetAccountDetails';
 import { useAppContext } from '../../context/AppContext';
 import { checkCredit } from '../../utils';
 import { useCredit } from '../../context/CreditContext';
@@ -150,6 +150,7 @@ function AddProject() {
                     }
                 }
 
+                const userId = await getUserItemId()
                 const userName = getUserName()
                 const workspace_id = selectedWorkspace?.payload?.__auto_id__ ?? null;
 
@@ -164,6 +165,7 @@ function AddProject() {
                         configuration: engineConfig,
                         status: 'active',
                         created_by: userName,
+                        user_id: userId,
                         created_on: moment().format("DD-MM-YYYY HH:mm:ss"),
                         history: [{
                             updated_by: userName,

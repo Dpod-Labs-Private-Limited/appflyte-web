@@ -6,7 +6,8 @@ import { Box, Typography, FormControl, TextField, Button, Link } from '@mui/mate
 import { getStyles } from './Styles'
 import { useTheme } from '@mui/material/styles';
 
-import ameya_logo from "../images/ameya_logo.png"
+import appflyte_logo from "../images/appflyte_logo.svg"
+
 import { getComponentsStyles } from '../styles/componentsStyles';
 import { useState } from 'react';
 import { IconSvg } from '../utils/globalIcons';
@@ -140,8 +141,8 @@ function InviteSignIn() {
             <Box sx={styles.body}>
                 <Box sx={styles.signinContainer}>
                     <Box padding={'20px'} display={'flex'} alignItems={'center'} flexDirection={'column'}>
-                        <img src={ameya_logo} alt='ameya_logo' style={{ height: '68px', width: '200px' }} />
-                        <Typography sx={{ fontSize: '18px', fontWeight: 600, marginTop: '10px' }}>Welcome to Ameya AI Cloud</Typography>
+                        <img src={appflyte_logo} alt='appflyte_logo' style={{ height: '68px', width: '200px' }} />
+                        <Typography sx={{ fontSize: '18px', fontWeight: 600, marginTop: '10px' }}>Welcome to Appflyte</Typography>
                         <Typography sx={{ fontSize: '15px', fontWeight: 500, marginTop: '10px' }}>Sign Up</Typography>
 
                         <Box marginTop={'20px'} paddingBottom={'10px'}>
@@ -195,7 +196,7 @@ function InviteSignIn() {
                             </Typography>
                         </Button>
 
-                        <Box marginTop="20px" textAlign="center">
+                        {/* <Box marginTop="20px" textAlign="center">
                             <Typography sx={{ fontSize: '13px', fontWeight: 400 }}>
                                 By continuing, you are indicating that you accept our{" "}
                                 <Link
@@ -216,7 +217,7 @@ function InviteSignIn() {
                                     Privacy Policy
                                 </Link>
                             </Typography>
-                        </Box>
+                        </Box> */}
 
                     </Box>
                 </Box>
