@@ -1,34 +1,45 @@
 import { tostAlert } from "./AlertToast"
 
+const handleErrorCode = (code) => {
+    switch (code) {
+        case "INSUFFICIENT_PROJECT_BALANCE":
+            return "You don’t have enough project balance to create a new project. Please upgrade your plan.";
 
-const handleErrorCode = (err) => {
-    switch (err.code) {
+        case "API_LIMIT_EXCEEDED":
+            return "Your API call limit has been reached. Please upgrade your plan.";
+
+        case "PLAN_NOT_INITIALIZED":
+            return "Your subscription is not properly configured. Please contact support.";
+
         default:
-            return err.message
+            return code || "Something went wrong. Please try again.";
     }
-}
+};
 
 export const apiErrorHandler = (err) => {
-    if (err.response !== undefined && err.response !== null) {
+    if (err?.response?.data) {
 
-        if (err.response.data === null)
-            tostAlert('Something went wrong while fetching files', 'error')
+        const data = err.response.data;
 
-        else if ("schema_errors" in err.response.data)
-            tostAlert('Please check all fields and retry', 'error')
-
-        else if ("message" in err.response.data) {
-            if (typeof err.response.data.message === 'object' && "code" in err.response.data.message)
-                tostAlert(handleErrorCode(err.response.data.message), 'error')
-            else
-                tostAlert(err.response.data.message, 'error')
+        if (data === null) {
+            tostAlert('Something went wrong while fetching files', 'error');
+            return;
         }
 
-        else
-            tostAlert('Something went wrong while Fetching Data', 'error')
+        if ("schema_errors" in data) {
+            tostAlert('Please check all fields and retry', 'error');
+            return;
+        }
+
+        if ("message" in data) {
+            const message = data.message;
+            tostAlert(handleErrorCode(message), 'error');
+            return;
+        }
+
+        tostAlert('Something went wrong while fetching data', 'error');
     }
-    else {
-        if (err.message === "Network Error")
-            tostAlert('Something went wrong while Fetching Data', 'error')
+    else if (err.message === "Network Error") {
+        tostAlert('Network error. Please check your connection.', 'error');
     }
-}
+};

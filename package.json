@@ -24,6 +24,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.18",
     "docx-preview": "^0.3.7",
+    "dpod-access-control": "file:libs/dpod-access-control-0.0.1.tgz",
     "env-cmd": "^10.1.0",
     "file-saver": "^2.0.5",
     "firebase": "^12.8.0",

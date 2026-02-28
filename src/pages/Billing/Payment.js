@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Box, Button, IconButton, CircularProgress, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useAppContext } from '../../context/AppContext'
 import AppflyteTransactionApi from '../../Api/Services/AppflyteBackend/AppflyteTransactionApi';
@@ -15,6 +15,7 @@ import {
 import GeneralTable from '../../components/GeneralTable'
 import { useCredit } from '../../context/CreditContext';
 import { getStyles } from './styles';
+import { Refresh } from '@mui/icons-material';
 
 function Payment() {
 
@@ -26,7 +27,7 @@ function Payment() {
     const [dataLoading, setDataLoading] = useState(false)
     const [creditBundlesData, setCreditBundlesData] = useState([])
     const { selectedOrganization, authData, initialAuthData, updateAuthData } = useAppContext();
-    const { credit } = useCredit();
+    const { credit, apiBalance, projectBalance } = useCredit();
 
     useEffect(() => {
         fetchAll()
@@ -126,6 +127,8 @@ function Payment() {
         }
     };
 
+    const activeLevel = Number(creditBundlesData.find(p => p.payload.active_plan)?.payload?.level || 0);
+
     const columns = [
         {
             id: 'payload.display_name',
@@ -139,11 +142,11 @@ function Payment() {
             sortable: false,
             renderCell: (row) => row?.payload?.projects
         },
-           {
+        {
             id: 'payload.api_calls',
             label: 'API Requests/mo',
             sortable: false,
-            renderCell: (row) => row?.payload?.api_calls
+            renderCell: (row) => formatCompact(Number(row?.payload?.api_calls || 0))
         },
         {
             id: 'payload.price_in_dollar',
@@ -162,31 +165,68 @@ function Payment() {
             id: '',
             label: '',
             sortable: false,
-            renderCell: (row) => (
-                <Button
-                    sx={{ textDecoration: 'none', textTransform: 'none', '&:hover': { textDecoration: 'underline' } }}
-                    onClick={() => handleContinue(row)}
-                    disabled={loading || paymentLoading}
-                >
-                    Upgrade Now
-                </Button>
-            )
+            renderCell: (row) => {
+                const rowLevel = Number(row?.payload?.level);
+
+                if (row?.payload?.active_plan) {
+                    return <Button disabled>Current Plan ✅</Button>;
+                }
+
+                if (rowLevel > activeLevel) {
+                    return (
+                        <Button
+                            onClick={() => handleContinue(row)}
+                            disabled={loading || paymentLoading}
+                        >
+                            Upgrade
+                        </Button>
+                    );
+                }
+
+                return <Typography textAlign={'start'}>—</Typography>;
+            }
         }
     ]
+
+    const formatCompact = (value) => {
+        return new Intl.NumberFormat('en', {
+            notation: 'compact',
+            maximumFractionDigits: 1,
+        }).format(value);
+    };
 
     return (<Box mt={5}>
 
         {(paymentLoading || dataLoading) && <LoadBar />}
 
-        <Typography sx={{ ...styles.paraText }}>Credit balance</Typography>
-
-        <Box display={'flex'} alignItems={'center'} gap={'10px'}>
+        <Box>
+            <Typography sx={{ ...styles.paraText }}>Api balance</Typography>
             <Typography sx={{ ...styles.creditText }}>
-                {Number(credit || 0).toFixed(2)}
+                {formatCompact(Number(apiBalance || 0))}
             </Typography>
         </Box>
 
-        <Box marginTop={'15px'}>
+        <Box mt={2}>
+            <Typography sx={{ ...styles.paraText }}>Project balance</Typography>
+            <Typography sx={{ ...styles.creditText }}>{Number(projectBalance || 0).toFixed(0)}</Typography>
+        </Box>
+
+
+        {!loading &&
+            <Box sx={{ marginTop: '5px', marginBottom: '10px', display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+                <Tooltip
+                    title="Reload"
+                    arrow
+                    placement="bottom"
+                >
+                    <IconButton onClick={fetchCreditBundless}>
+                        <Refresh />
+                    </IconButton>
+                </Tooltip>
+            </Box>
+        }
+
+        <Box marginTop={loading ? '40px' : '5px'}>
             <GeneralTable
                 columns={columns}
                 loading={loading || dataLoading}

@@ -31,7 +31,9 @@ function App() {
   const navigate = useNavigate()
   const mainStyles = getMainStyles(theme);
 
-  const { shouldShowCreditWarning } = useCredit();
+  const { shouldShowCreditWarning, warningMessage } = useCredit();
+
+  console.log('warningMessage', warningMessage)
   const { selectedProject } = useAppContext();
 
   const {
@@ -324,14 +326,14 @@ function App() {
           {shouldShowCreditWarning({ pathname: location.pathname }) && (
             <Box sx={{ ...mainStyles.creditContainer }}>
               <Typography>
-                Your credits have run out. Please top up account to continue.
+                {warningMessage}
               </Typography>
 
               <Button
                 sx={mainStyles.addBtn}
                 onClick={() => navigate("/user/billing")}
               >
-                ADD CREDIT
+                Upgrade
               </Button>
             </Box>
           )}

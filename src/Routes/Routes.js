@@ -23,6 +23,7 @@ import { FilesRecycleBin } from "../containers/files/FilesRecycleBin";
 import { SharedFilesListing } from "../containers/files/SharedFilesListing";
 import { FileUpload } from "../containers/files/FileUpload";
 import { CollectionsLayout } from "../containers/collection_item/CollectionsLayout";
+import UserManagement from "../pages/UserManagement";
 
 export const routesConfig = [
     {
@@ -185,6 +186,11 @@ export const routesConfig = [
         path: '/user/billing',
         element: <BilingHome />,
         component: 'Users'
-    }
+    },
+    {
+        path: '/user/settings',
+        element: <UserManagement />,
+        component: 'Users'
+    },
 
 ];
