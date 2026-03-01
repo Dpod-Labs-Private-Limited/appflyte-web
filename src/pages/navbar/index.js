@@ -198,8 +198,6 @@ function Navbar() {
     }
 
     const checkServiceName = {
-        "Ameya Extract": 'EXTRACT',
-        "Ameya Analyst": 'ANALYST',
         "Appflyte": 'APPFLYTE'
     };
 
@@ -333,15 +331,6 @@ function Navbar() {
                 <Box sx={styles.navRightContent}>
                     <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', alignSelf: 'center' }}>
 
-                        {/* <Box>
-                            <Button
-                                sx={{ backgroundColor: '#dedede', color: '#000000', borderRadius: '5px' }}
-                                onClick={() => navigate('/extraction')}
-                            >
-                                Ameya Train
-                            </Button>
-                        </Box> */}
-
                         {((all_services || [])?.length > 0 && selectedService) &&
                             <Tooltip title="Change Service">
                                 <IconButton onClick={(e) => setServiceAnchorEl(e.currentTarget)}>
@@ -354,18 +343,6 @@ function Navbar() {
                                 </IconButton>
                             </Tooltip>
                         }
-
-                        <Tooltip title="Ameya Support link">
-                            <IconButton
-                                onClick={() => window.open(process.env.REACT_APP_DOCYRUS_URL, '_blank')}                        >
-                                <ReactSVG
-                                    src={IconSvg.dsupportIcon}
-                                    beforeInjection={(svg) => {
-                                        svg.setAttribute('style', 'width:24px; height:24px; display:block;');
-                                    }}
-                                />
-                            </IconButton>
-                        </Tooltip>
 
                         <Box marginLeft={'5px'}>
                             <Chip
@@ -402,19 +379,6 @@ function Navbar() {
                                     onClose={handleClose}
                                     sx={{ mt: 3 }}
                                 >
-                                    <MenuItem
-                                        onClick={() => window.open(process.env.REACT_APP_SUPPORT_FORUM_URL, '_blank')}
-                                        sx={{ ...fontStyles.smallText, dispaly: 'flex', alignItems: 'center', gap: '10px' }}
-                                    >
-                                        <ReactSVG
-                                            src={IconSvg.supportIcon}
-                                            beforeInjection={(svg) => {
-                                                svg.setAttribute('style', 'width:18px; height:18px; display:block;');
-                                                svg.setAttribute('stroke', '#000000');
-                                            }}
-                                        />
-                                        <Typography sx={{ fontSize: '14px', fontWeight: '400' }}>Support Forum</Typography>
-                                    </MenuItem>
                                     <MenuItem
                                         onClick={() => handleLogout()}
                                         sx={{ ...fontStyles.smallText, dispaly: 'flex', alignItems: 'center', gap: '10px' }}

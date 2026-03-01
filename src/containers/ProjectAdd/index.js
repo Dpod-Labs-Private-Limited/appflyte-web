@@ -13,7 +13,6 @@ import { buttonStyles } from '../../styles/buttonStyles';
 
 import LoadBar from '../../utils/LoadBar';
 import { tostAlert } from '../../utils/AlertToast';
-import { AlertMessages } from '../../utils/AlertMessages';
 import { apiErrorHandler } from '../../utils/ApiErrorHandler';
 
 import { setProjectAdded } from "../../Redux/slice/newDataSlice";
@@ -22,7 +21,6 @@ import ProjectsApi from '../../Api/Services/AppflyteBackend/ProjectsApi';
 import getAppflyteEnginesData from '../../utils/ApiFunctions/AppflyteEngines';
 import { getUserItemId, getUserName } from '../../utils/GetAccountDetails';
 import { useAppContext } from '../../context/AppContext';
-import { checkCredit } from '../../utils';
 import { useCredit } from '../../context/CreditContext';
 
 function AddProject() {
@@ -37,7 +35,7 @@ function AddProject() {
     const dispatch = useDispatch();
     const { action } = useParams();
     const location = useLocation()
-    const { credit } = useCredit();
+    const { projectBalance } = useCredit();
 
     const [loading, setLoading] = useState(false)
     const [appflyteEngines, setAppflyteEngines] = useState([]);
@@ -58,13 +56,10 @@ function AddProject() {
         const organization_id = selectedOrganization?.payload?.__auto_id__;
         const workspace_id = selectedWorkspace?.payload?.__auto_id__;
 
-        const validateCredit = async () => {
-            const result = await checkCredit(credit);
-            if (result) {
-                navigate(`/organization/${organization_id}/workspace/${workspace_id}/projects`);
-            }
-        };
-        validateCredit();
+        if (projectBalance === 0 && action === "add-project") {
+            navigate(`/organization/${organization_id}/workspace/${workspace_id}/projects`);
+            return
+        }
 
         if (action !== "add-project" && action !== "edit-project") {
             navigate(`/organization/${organization_id}/workspace/${workspace_id}/projects`);
@@ -85,7 +80,7 @@ function AddProject() {
                 projectUpdateKey: selected_project_update_key
             })
         }
-    }, [action, selectedOrganization, selectedWorkspace, navigate, location, credit]);
+    }, [action, selectedOrganization, selectedWorkspace, navigate, location, projectBalance]);
 
     useEffect(() => {
         getEngineData();
@@ -121,6 +116,12 @@ function AddProject() {
         setLoading(true);
         e.preventDefault();
         try {
+
+            if (projectBalance === 0) {
+                tostAlert("You've reached your project limit. Upgrade to create more projects.", "warning")
+                return
+            }
+
             const errors = {};
             if (!projectData?.projectName?.trim()) { errors.projectName = 'This field is required' }
             if (!projectData?.projectDescription?.trim()) { errors.projectDescription = 'This field is required' }

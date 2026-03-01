@@ -24,7 +24,7 @@ function Sidebar() {
     setSelectedProject, setPermissionStatus, billingStatus, setBillingStatus, isOrganizationOwner,
     apiKeyStatus, setApiKeyStatus } = useAppContext();
   const [selectedMenuItem, setSelectedMenuItem] = useState(1);
-  const { credit } = useCredit();
+  const { shouldShowCreditWarning } = useCredit();
 
   const menuItems = [
     {
@@ -235,7 +235,7 @@ function Sidebar() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: credit <= 0 ? '30px' : '10px'
+        marginBottom: shouldShowCreditWarning ? '30px' : '10px'
       }}>
 
         {(selectedOrganization && isOrganizationOwner && process.env.REACT_APP_IS_SFS_INSTANCE !== "true") &&

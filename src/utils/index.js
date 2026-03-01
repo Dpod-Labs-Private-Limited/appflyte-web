@@ -73,16 +73,3 @@ export async function lowercaseStrings(jsonInput) {
 
     return processObject(jsonInput);
 }
-
-export async function checkCredit(credit) {
-
-    if (process.env.REACT_APP_IS_SFS_INSTANCE === "true") {
-        return false
-    }
-
-    if (credit <= 0.5) {
-        return true
-    }
-    return false
-
-}

@@ -1,4 +1,4 @@
-import { AxiosObj, AxiosObjBaseCollection } from "../../Configurations/axios-setup";
+import { AxiosObj, AxiosBaseObj } from "../../Configurations/axios-setup";
 import { fetchAccountId, fetchSubscriberId, fetchSubscriptionId } from "../../../utils/GetAccountDetails"
 import UpdateHeaders from "../../Configurations/UpdateHeaders";
 
@@ -20,7 +20,7 @@ class DpodAppFlyteApi {
 
     createApp = async (reqObj) => {
         await this.initialize();
-        return AxiosObjBaseCollection.post(`api/ameya/account/${this.accountId}/subscriber/${this.subscriberId}/subscription/${this.subscriptionId}/schema/${this.schemaId}/bug_tracker_setup`, reqObj)
+        return AxiosBaseObj.post(`api/ameya/account/${this.accountId}/subscriber/${this.subscriberId}/subscription/${this.subscriptionId}/schema/${this.schemaId}/bug_tracker_setup`, reqObj)
     }
 
     getAllAiApps = async (last_evaluated_key, project_id) => {

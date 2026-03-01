@@ -1,7 +1,7 @@
 import { FILE_TYPE_IMAGE, FILE_TYPE_VIDEO, FILE_TYPE_DOCUMENT } from '../../../utils/constants';
 import getCroppedImg from '../../../components/ImageCropperEnhanced/cropImage';
 import axios from 'axios';
-import { AxiosObjCollection } from '../../Configurations/axios-setup';
+import { AxiosObj } from '../../Configurations/axios-setup';
 
 export const getFileType = (file) => {
   const fileExt = file.name.split('.')[1].toLowerCase()
@@ -127,7 +127,7 @@ export const getThumbnailUrlForFile = async (accID, fileId, thumbnailName) => {
 
 
 export const getAzureUrlForFile = (fileContext, conatinerName, fileName) => {
-  return AxiosObjCollection.get(`/api/storage/${fileContext}/blob/download/${conatinerName}?blob_name=${fileName}`, {
+  return AxiosObj.get(`/api/storage/${fileContext}/blob/download/${conatinerName}?blob_name=${fileName}`, {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*'
@@ -159,7 +159,7 @@ export const downloadFile = (url) => {
     })
 }
 export const getFileObject = (accID, fileId) => {
-  return AxiosObjCollection.get(`/api/media/${accID}/subscriber/${accID}/subscription/${accID}/file/${fileId}`, {
+  return AxiosObj.get(`/api/media/${accID}/subscriber/${accID}/subscription/${accID}/file/${fileId}`, {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*'

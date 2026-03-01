@@ -1,4 +1,3 @@
-import ameya_logo from '../images/ameya_icon.png';
 
 
 export const getMainStyles = (theme) => ({
@@ -134,7 +133,6 @@ export const getMainStyles = (theme) => ({
         objectFit: 'cover',
         // margin: '4px',
         backgroundColor: '#DEDEDE',
-        backgroundImage: `url(${ameya_logo})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

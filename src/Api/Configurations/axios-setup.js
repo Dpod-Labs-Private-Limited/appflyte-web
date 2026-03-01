@@ -15,24 +15,28 @@ const fetchOrganizationId = () => {
     }
 }
 
+const noAuthRequestHandler = async (request) => {
+    request.headers['Content-Type'] = 'application/json';
+    request.headers['Accept'] = 'application/json';
+    return request
+}
+
 const AxiosObj = axios.create({
     baseURL: `${process.env.REACT_APP_APPFLYTE_BACKEND_URL}/appflyte`,
     responseType: "json"
 })
 
-const AxiosObjCollection = axios.create({
-    // baseURL: process.env.REACT_APP_COLLECTION_API_BASE_URL,
-    // baseURL: "https://api-dev.appflyte.net",
-    baseURL: "http://localhost:8003/appflyte",
-    responseType: "json"
-})
-
-const AxiosObjBaseCollection = axios.create({
+const AxiosBaseObj = axios.create({
     // baseURL: process.env.REACT_APP_COLLECTION_API_BASE_URL,
     // baseURL: "https://api-dev.appflyte.net",
     baseURL: "http://localhost:8003",
     responseType: "json"
 })
+
+const AxiosStripeServiceObj = axios.create({
+    baseURL: process.env.REACT_APP_STRIPE_SERVICE_URL,
+    responseType: "json"
+});
 
 const requestHandler = async (request) => {
     const organization_data = fetchOrganizationId()
@@ -44,7 +48,6 @@ const requestHandler = async (request) => {
 }
 
 AxiosObj.interceptors.request.use(request => requestHandler(request));
-AxiosObjCollection.interceptors.request.use(request => requestHandler(request));
-AxiosObjBaseCollection.interceptors.request.use(request => requestHandler(request));
-export { AxiosObj, AxiosObjCollection, AxiosObjBaseCollection };
-
+AxiosBaseObj.interceptors.request.use(request => requestHandler(request));
+AxiosStripeServiceObj.interceptors.request.use(request => noAuthRequestHandler(request))
+export { AxiosObj, AxiosBaseObj, AxiosStripeServiceObj };

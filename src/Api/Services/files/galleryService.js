@@ -1,8 +1,8 @@
-import { AxiosObjCollection } from "../../Configurations/axios-setup"
+import { AxiosObj } from "../../Configurations/axios-setup"
 
 class galleryService {
   createFile(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObjCollection.post(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file`, reqBody, {
+    return AxiosObj.post(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file`, reqBody, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -10,7 +10,7 @@ class galleryService {
   }
 
   modifyFiles(accountId, subscriberId, subscriptionId, schemaId, fileId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .put(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file/${fileId}`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ class galleryService {
   }
 
   moveFiles(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .patch(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -28,7 +28,7 @@ class galleryService {
   }
 
   createFolder(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .post(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -38,18 +38,18 @@ class galleryService {
 
   deleteFolder(accountId, subscriberId, subscriptionId, schemaId, folderIds) {
     const folderIdStr = folderIds.join()
-    return AxiosObjCollection
+    return AxiosObj
       .delete(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder?folderId=${folderIdStr}`)
   }
 
   deleteFiles(accountId, subscriberId, subscriptionId, schemaId, fileIds) {
     const fileIdStr = fileIds.join()
-    return AxiosObjCollection
+    return AxiosObj
       .delete(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file?fileId=${fileIdStr}`)
   }
 
   getDownloadURL(accountId, subscriberId, subscriptionId, schemaId, bucket_name, object_paths) {
-    return AxiosObjCollection
+    return AxiosObj
       .post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/generate-download-url?bucket_name=${bucket_name}&object_paths=${object_paths}`, {
         headers: {
           'Content-Type': 'application/json'
@@ -59,20 +59,20 @@ class galleryService {
 
   getFolderContents(accountId, subscriberId, subscriptionId, schemaId, parentFolderId, fileType) {
     if (parentFolderId == null && fileType == null)
-      return AxiosObjCollection
+      return AxiosObj
         .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder`)
     if (parentFolderId != null && fileType != null)
-      return AxiosObjCollection
+      return AxiosObj
         .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder?folderId=${parentFolderId}&fileType=${fileType}`)
     if (parentFolderId != null)
-      return AxiosObjCollection
+      return AxiosObj
         .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder?folderId=${parentFolderId}`)
-    return AxiosObjCollection
+    return AxiosObj
       .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder?fileType=${fileType}`)
   }
 
   modifyFolder(accountId, subscriberId, subscriptionId, schemaId, folderId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .put(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/${folderId}`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ class galleryService {
   }
 
   moveFolder(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .patch(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -91,49 +91,49 @@ class galleryService {
 
   getRecycleBinContent(accountId, subscriberId, subscriptionId, schemaId, parentFolderId = null, fileType = null) {
     if (parentFolderId == null && fileType == null)
-      return AxiosObjCollection
+      return AxiosObj
         .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/recycle-bin`)
     if (parentFolderId != null && fileType != null)
-      return AxiosObjCollection
+      return AxiosObj
         .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/recycle-bin?folderId=${parentFolderId}&fileType=${fileType}`)
     if (parentFolderId != null)
-      return AxiosObjCollection
+      return AxiosObj
         .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/recycle-bin?folderId=${parentFolderId}`)
-    return AxiosObjCollection
+    return AxiosObj
       .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/recycle-bin?fileType=${fileType}`)
   }
 
   recycleBinRestoreFolder(accountId, subscriberId, subscriptionId, schemaId, folderIds) {
     const folderIdStr = folderIds.join()
-    return AxiosObjCollection
+    return AxiosObj
       .patch(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/recycle-bin?folderId=${folderIdStr}`)
   }
 
   recycleBinRestoreFiles(accountId, subscriberId, subscriptionId, schemaId, fileIds) {
     const fileIdStr = fileIds.join()
-    return AxiosObjCollection
+    return AxiosObj
       .patch(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file/recycle-bin?fileId=${fileIdStr}`)
   }
 
   recycleBinFolderPermanentDelete(accountId, subscriberId, subscriptionId, schemaId, folderIds) {
     const folderIdStr = folderIds.join()
-    return AxiosObjCollection
+    return AxiosObj
       .delete(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/recycle-bin?folderId=${folderIdStr}`)
   }
 
   recycleBinFilesPermanentDelete(accountId, subscriberId, subscriptionId, schemaId, fileIds) {
     const fileIdStr = fileIds.join()
-    return AxiosObjCollection
+    return AxiosObj
       .delete(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file/recycle-bin?fileId=${fileIdStr}`)
   }
 
   getSharedContent(accountId, subscriberId, subscriptionId, schemaId) {
-    return AxiosObjCollection
+    return AxiosObj
       .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/shared`)
   }
 
   shareFolders(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .post(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/folder/share`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -142,7 +142,7 @@ class galleryService {
   }
 
   shareFiles(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObjCollection
+    return AxiosObj
       .post(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/file/share`, reqBody, {
         headers: {
           'Content-Type': 'application/json'
@@ -151,7 +151,7 @@ class galleryService {
   }
 
   getSharedUsersListForEntity(accountId, subscriberId, subscriptionId, schemaId, entityId) {
-    return AxiosObjCollection
+    return AxiosObj
       .get(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/shared/entity/${entityId}`)
   }
 

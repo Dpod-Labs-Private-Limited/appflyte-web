@@ -10,7 +10,10 @@ import { getStyles } from './styles';
 import { getMainStyles } from '../../styles/styles';
 import { breadCrumbsStyles } from '../../styles/breadCrumbs';
 
-import { setProjectAccessState, setProjectsState, setRoleAssignmentState, setRoleInstanceState, setSpacesState, setWorkspaceAccessState } from "../../Redux/slice/dataSlice";
+import {
+    setProjectAccessState, setProjectsState, setRoleAssignmentState,
+    setRoleInstanceState, setSpacesState, setWorkspaceAccessState
+} from "../../Redux/slice/dataSlice";
 import { setProjectAdded, setWorkspaceAdded } from '../../Redux/slice/newDataSlice';
 
 import LoadBar from '../../utils/LoadBar';
@@ -23,7 +26,6 @@ import { IconSvg } from '../../utils/globalIcons';
 import { getAllRoleAssignmentData, getAllRoleInstanceData } from '../../utils/ApiFunctions/AccessControlData';
 import { useAppContext } from '../../context/AppContext';
 import { getUserItemId } from '../../utils/GetAccountDetails';
-import { checkCredit } from '../../utils';
 import { useCredit } from '../../context/CreditContext';
 import { tostAlert } from '../../utils/AlertToast';
 
@@ -35,7 +37,7 @@ function ViewProjects() {
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { credit } = useCredit()
+    const { projectBalance } = useCredit()
     const { selectedOrganization, setSelectedProject, setSelectedWorkspace,
         selectedWorkspace, setPermissionStatus, isOrganizationOwner, authData } = useAppContext();
     const [currentspace, setCurrentSpace] = useState(null)
@@ -62,21 +64,11 @@ function ViewProjects() {
     }
     const [selectedProjectData, setSelectedProjectData] = useState(selected_project_settings);
     const validTypes = ["ext_user_singin", "ext_existing_user", "ext_user_signup"];
-    const [noCredit, setNoCredit] = useState(false);
 
     useEffect(() => {
         getAllData()
         //eslint-disable-next-line
     }, [navigate])
-
-    useEffect(() => {
-        const validateCredit = async () => {
-            const result = await checkCredit(credit);
-            setNoCredit(result);
-        };
-
-        validateCredit();
-    }, [credit]);
 
     const getAllData = async () => {
         setLoading(true)
@@ -163,18 +155,17 @@ function ViewProjects() {
     }
 
     const handleProjectCreation = async () => {
+
+        if (projectBalance === 0) {
+            tostAlert("You've reached your project limit. Upgrade to create more projects.", "warning")
+            return
+        }
+
         const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null
         navigate(`/organization/${organization_id}/workspace/${currentspace}/projects/add-project`)
     }
 
     const handleProjectSelection = async (item) => {
-
-        const result = await checkCredit(credit);
-        if (result) {
-            tostAlert('Your credits have run out. Please top up account to continue.', 'error')
-            return
-        }
-
         setSelectedProject(item)
         await handleSidebarConfig(selectedWorkspace, item, navigate)
     }
@@ -248,7 +239,7 @@ function ViewProjects() {
                             </Breadcrumbs>
                         </Stack>
 
-                        {(isOrganizationOwner && !validTypes.includes(authData?.request_type) && !noCredit) && <Button
+                        {(isOrganizationOwner && !validTypes.includes(authData?.request_type)) && <Button
                             sx={styles.addBtn}
                             onClick={() => handleProjectCreation()}
                         >

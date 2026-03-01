@@ -33,7 +33,6 @@ function App() {
 
   const { shouldShowCreditWarning, warningMessage } = useCredit();
 
-  console.log('warningMessage', warningMessage)
   const { selectedProject } = useAppContext();
 
   const {
@@ -304,7 +303,7 @@ function App() {
       toast.error(msg)
   }
 
-  const showCreditWarning = shouldShowCreditWarning({ pathname: location.pathname });
+  const showCreditWarning = shouldShowCreditWarning();
 
   return (
 
@@ -323,7 +322,7 @@ function App() {
         :
         (<>
 
-          {shouldShowCreditWarning({ pathname: location.pathname }) && (
+          {showCreditWarning && (
             <Box sx={{ ...mainStyles.creditContainer }}>
               <Typography>
                 {warningMessage}

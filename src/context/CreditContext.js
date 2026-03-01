@@ -8,14 +8,15 @@ const CreditContext = createContext();
 
 export const CreditProvider = ({ children }) => {
     const { selectedOrganization } = useAppContext();
+    const unsubscribeRef = useRef(null);
 
-    const [credit, setCredit] = useState(null);
+    const [creditLoading, setCreditLoading] = useState(true);
     const [apiBalance, setApiBalance] = useState(null);
     const [projectBalance, setProjectBalance] = useState(null);
-    const [creditLoading, setCreditLoading] = useState(true);
+
     const [warningStatus, setWarningStatus] = useState('')
     const [warningMessage, setWarningMessage] = useState('')
-    const unsubscribeRef = useRef(null);
+
 
     const formatCompact = (value) => {
         return new Intl.NumberFormat('en', {
@@ -24,17 +25,17 @@ export const CreditProvider = ({ children }) => {
         }).format(value);
     };
 
-    const handleWarningMessage = (balance, remaining) => {
-        if (balance >= 100) {
-            setWarningMessage("You've used all your API calls for this month. Upgrade your plan to continue.");
+    const handleWarningMessage = (percentageUsed, remaining) => {
+        if (percentageUsed >= 100) {
+            setWarningMessage("You've used all your API calls for this plan. Upgrade your plan to continue.");
             setWarningStatus(true);
         }
-        else if (balance >= 90) {
-            setWarningMessage(`${formatCompact(Number(remaining || 0))} API calls remaining. Consider upgrading to avoid interruptions.`);
+        else if (percentageUsed >= 90) {
+            setWarningMessage(`${formatCompact(Number(remaining || 0))} API calls remaining in this plan. Consider upgrading to avoid interruptions.`);
             setWarningStatus(true);
         }
-        else if (balance >= 70) {
-            setWarningMessage(`${formatCompact(Number(remaining || 0))} API calls remaining this month.`);
+        else if (percentageUsed >= 70) {
+            setWarningMessage(`${formatCompact(Number(remaining || 0))} API calls remaining in this plan.`);
             setWarningStatus(true);
         }
         else {
@@ -45,12 +46,6 @@ export const CreditProvider = ({ children }) => {
 
     useEffect(() => {
 
-        if (process.env.REACT_APP_IS_SFS_INSTANCE === "true") {
-            setCredit(100);
-            setCreditLoading(false);
-            return
-        }
-
         const orgId = selectedOrganization?.payload?.__auto_id__;
 
         if (unsubscribeRef.current) {
@@ -59,7 +54,8 @@ export const CreditProvider = ({ children }) => {
         }
 
         if (!orgId) {
-            setCredit(null);
+            setApiBalance(null);
+            setProjectBalance(null);
             setCreditLoading(false);
             return;
         }
@@ -72,26 +68,24 @@ export const CreditProvider = ({ children }) => {
             docRef,
             (snapshot) => {
                 if (!snapshot.exists()) {
-                    setCredit(0);
+                    setApiBalance(0);
+                    setProjectBalance(0);
                 } else {
                     const data = snapshot.data();
-                    console.log('data', data)
 
                     const project_used = toNumber(data?.project_used ?? 0);
                     const project_limlt = toNumber(data?.project_limlt ?? 0);
                     const project_balance = project_limlt - project_used
-                    setProjectBalance(project_balance)
 
                     const api_calls_used = toNumber(data?.api_calls_used ?? 0);
                     const api_limit = toNumber(data?.api_limit ?? 0);
-                    const api_balance = api_limit - api_calls_used
+                    const api_balance = api_limit - api_calls_used;
+
+                    setProjectBalance(project_balance)
                     setApiBalance(api_balance)
 
                     const api_percentage = (api_calls_used / api_limit) * 100;
-                    // const projects_percentage = (project_used / project_limlt) * 100;
-
                     handleWarningMessage(api_percentage, api_balance)
-                    setCredit(100);
                 }
                 setCreditLoading(false);
             },
@@ -109,13 +103,18 @@ export const CreditProvider = ({ children }) => {
         };
     }, [selectedOrganization]);
 
-    const shouldShowCreditWarning = ({ pathname }) => {
+    const shouldShowCreditWarning = () => {
         if (!selectedOrganization || creditLoading || !warningStatus) return false;
-        return warningStatus && pathname !== "/user/billing";
+        return warningStatus
     };
 
     return (
-        <CreditContext.Provider value={{ credit, shouldShowCreditWarning, apiBalance, projectBalance, warningMessage }}>
+        <CreditContext.Provider value={{
+            apiBalance,
+            projectBalance,
+            warningMessage,
+            shouldShowCreditWarning
+        }}>
             {children}
         </CreditContext.Provider>
     );

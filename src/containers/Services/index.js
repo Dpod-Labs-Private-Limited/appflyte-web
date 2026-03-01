@@ -160,7 +160,6 @@ function ServicesList() {
                                                     svg.setAttribute('style', 'width:48px; height:48px; display:block;');
                                                 }}
                                             />
-
                                             <Box marginTop="20px" textAlign="start" sx={{ flexGrow: 1 }}>
                                                 <Typography sx={styles.cardHeadingText}>{item?.payload?.label}</Typography>
                                                 <Typography sx={{ ...styles.cardDescriptionText, marginTop: '10px' }}>

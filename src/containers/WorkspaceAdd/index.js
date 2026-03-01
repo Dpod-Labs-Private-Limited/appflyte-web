@@ -9,13 +9,11 @@ import { useTheme } from '@mui/material/styles';
 import { getComponentsStyles } from '../../styles/componentsStyles';
 import { getStyles } from './styles';
 
-import { fontStyles } from '../../styles/fontStyles';
 import { buttonStyles } from '../../styles/buttonStyles';
 import { Box, Button, TextField, Typography } from '@mui/material';
 
 import LoadBar from '../../utils/LoadBar';
 import { tostAlert } from '../../utils/AlertToast';
-import { AlertMessages } from '../../utils/AlertMessages';
 import { apiErrorHandler } from '../../utils/ApiErrorHandler';
 
 import { setWorkspaceAdded } from "../../Redux/slice/newDataSlice";
@@ -23,8 +21,6 @@ import WorkspaceApi from '../../Api/Services/AppflyteBackend/WorkspaceApi';
 import { getUserName } from '../../utils/GetAccountDetails';
 import { useAppContext } from '../../context/AppContext';
 import { getServicesById } from '../../utils/ApiFunctions/ServicesData';
-import { checkCredit } from '../../utils';
-import { useCredit } from '../../context/CreditContext';
 
 function AddWorkspace() {
     const theme = useTheme();
@@ -36,7 +32,6 @@ function AddWorkspace() {
     const dispatch = useDispatch();
     const { action } = useParams();
     const location = useLocation()
-    const { credit } = useCredit();
 
     const spaceDetails = {
         spaceName: '',
@@ -51,14 +46,6 @@ function AddWorkspace() {
     const { selectedOrganization, selectedService } = useAppContext();
 
     useEffect(() => {
-
-        const validateCredit = async () => {
-            const result = await checkCredit(credit);
-            if (result) {
-                navigate(`/organization/${organization_id}/workspaces`)
-            }
-        };
-        validateCredit();
 
         const organization_id = selectedOrganization?.payload?.__auto_id__;
 
@@ -81,7 +68,7 @@ function AddWorkspace() {
                 spaceUpdateKey: selected_space_update_key
             })
         }
-    }, [action, selectedOrganization, navigate, location, credit]);
+    }, [action, selectedOrganization, navigate, location]);
 
     useEffect(() => {
         fetchServices()

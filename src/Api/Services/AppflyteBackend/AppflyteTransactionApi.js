@@ -1,6 +1,5 @@
-import { AxiosObj } from "../../Configurations/axios-setup";
+import { AxiosObj, AxiosStripeServiceObj } from "../../Configurations/axios-setup";
 import { fetchAccountId } from "../../../utils/GetAccountDetails"
-import { AxiosStripeServiceObj } from "../../Configurations/axios-ameya-setup";
 
 class DpodAppFlyteApi {
 

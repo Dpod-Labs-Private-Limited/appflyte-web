@@ -12,18 +12,18 @@ import Apps from "../containers/Apps/index";
 
 import SettingsHome from "../containers/Settings/SettingsHome";
 import BilingHome from "../pages/Billing";
-
-import CollectionTypesList from "../containers/collection_definition/CollectionTypesList";
-import { CollectionTypeAdd } from "../containers/collection_definition/CollectionTypeAdd";
-import { CollectionTypeConfView } from "../containers/collection_definition/CollectionTypeConfView";
-import { CollectionTypeAddFieldSet } from "../containers/collection_definition/CollectionTypeAddFieldSet";
-
-import { FilesListing } from "../containers/files/FilesListing";
-import { FilesRecycleBin } from "../containers/files/FilesRecycleBin";
-import { SharedFilesListing } from "../containers/files/SharedFilesListing";
-import { FileUpload } from "../containers/files/FileUpload";
-import { CollectionsLayout } from "../containers/collection_item/CollectionsLayout";
 import UserManagement from "../pages/UserManagement";
+
+import CollectionTypesList from "../containers/CollectionDefinitions/CollectionTypesList";
+import { CollectionTypeAdd } from "../containers/CollectionDefinitions/CollectionTypeAdd";
+import { CollectionTypeConfView } from "../containers/CollectionDefinitions/CollectionTypeConfView";
+import { CollectionTypeAddFieldSet } from "../containers/CollectionDefinitions/CollectionTypeAddFieldSet";
+import { CollectionsLayout } from "../containers/CollectionItems/CollectionsLayout";
+
+import { FilesListing } from "../containers/MediaFile/FilesListing";
+import { FilesRecycleBin } from "../containers/MediaFile/FilesRecycleBin";
+import { SharedFilesListing } from "../containers/MediaFile/SharedFilesListing";
+import { FileUpload } from "../containers/MediaFile/FileUpload";
 
 export const routesConfig = [
     {

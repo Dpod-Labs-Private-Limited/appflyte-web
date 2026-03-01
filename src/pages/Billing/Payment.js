@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Typography, Box, Button, IconButton, CircularProgress, Tooltip } from '@mui/material';
+import { Typography, Box, Button, IconButton, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useAppContext } from '../../context/AppContext'
 import AppflyteTransactionApi from '../../Api/Services/AppflyteBackend/AppflyteTransactionApi';
@@ -27,7 +27,7 @@ function Payment() {
     const [dataLoading, setDataLoading] = useState(false)
     const [creditBundlesData, setCreditBundlesData] = useState([])
     const { selectedOrganization, authData, initialAuthData, updateAuthData } = useAppContext();
-    const { credit, apiBalance, projectBalance } = useCredit();
+    const { apiBalance, projectBalance } = useCredit();
 
     useEffect(() => {
         fetchAll()
