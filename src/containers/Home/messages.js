@@ -10,5 +10,9 @@ export default defineMessages({
     error: {
         id: `${scope}.error`,
         defaultMessage: 'You do not appear to be assigned to any organization yet. Please contact your administrator to get started.',
+    },
+    service_error: {
+        id: `${scope}.service_error`,
+        defaultMessage: 'Service unavailable. Please try again.',
     }
 });

@@ -1,6 +1,7 @@
 import { tostAlert } from "./AlertToast"
 
 const handleErrorCode = (code) => {
+    console.log("code", code)
     switch (code) {
         case "INSUFFICIENT_PROJECT_BALANCE":
             return "You don’t have enough project balance to create a new project. Please upgrade your plan.";
@@ -10,6 +11,9 @@ const handleErrorCode = (code) => {
 
         case "PLAN_NOT_INITIALIZED":
             return "Your subscription is not properly configured. Please contact support.";
+
+        case "INTERNAL_SERVER_ERROR":
+            return "We encountered an unexpected issue. Please try again shortly. If the problem continues, please contact support.";
 
         default:
             return code || "Something went wrong. Please try again.";

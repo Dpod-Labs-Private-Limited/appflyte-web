@@ -16,10 +16,7 @@ function SubSidebar({ handleMenuChange }) {
     const { selectedWorkspace, selectedProject } = useAppContext();
     const [selectedMenuItem, setSelectedMenuItem] = useState(0);
 
-    const menuItems = [
-        { icon: IconSvg.genralSettingsIcon, label: 'General', path: 'general' },
-        { icon: IconSvg.keyIcon, label: 'API Keys', path: 'api_keys' }
-    ];
+    const menuItems = [{ icon: IconSvg.genralSettingsIcon, label: 'General', path: 'general' }];
 
     const filteredMenuItems = () => {
         let items = []
@@ -28,7 +25,7 @@ function SubSidebar({ handleMenuChange }) {
             const selected_sidebar_items = selectedProject?.payload?.configuration?.engine_config?.sidebar_items ?? {}
             const sub_sidebar_items = selected_sidebar_items?.['settings'] ?? [];
             const filteredMenuItemsList = menuItems?.filter(item => sub_sidebar_items?.map(subItem => subItem?.toLowerCase())?.includes(item?.path?.toLowerCase()));
-            const main_sidebar_order = ['general', 'api_keys'];
+            const main_sidebar_order = ['general'];
             const sortSidebarItems = filteredMenuItemsList.slice().sort((a, b) => {
                 const indexA = main_sidebar_order.indexOf(a.path);
                 const indexB = main_sidebar_order.indexOf(b.path);

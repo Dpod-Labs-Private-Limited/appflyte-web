@@ -73,15 +73,24 @@ function ViewProjects() {
     const getAllData = async () => {
         setLoading(true)
         try {
-            const [spaceResponse, projectResponse, roleInstanceResponse, roleAssignmentResponse] = await Promise.all([
+            // const [spaceResponse, projectResponse, roleInstanceResponse, roleAssignmentResponse] = await Promise.all([
+            //     getSpaceDetails(),
+            //     getProjectDetails(),
+            //     getRoleInstanceDetails(),
+            //     getRoleAssignmentDetails()
+            // ])
+            // if (spaceResponse && projectResponse && roleInstanceResponse && roleAssignmentResponse) {
+            //     // const appflyte_projects = await AppflyteProjectPermissions(projectResponse, roleInstanceResponse, roleAssignmentResponse, isOrganizationOwner);
+            //     // const filtered_projects = appflyte_projects?.filter(project => project?.payload?.workspace?.includes(spaceResponse))
+            //     const filtered_projects = projectResponse?.filter(project => project?.payload?.workspace?.includes(spaceResponse))
+            //     setCurrentSpace(spaceResponse)
+            //     setProjects(filtered_projects)
+            // }
+            const [spaceResponse, projectResponse] = await Promise.all([
                 getSpaceDetails(),
                 getProjectDetails(),
-                getRoleInstanceDetails(),
-                getRoleAssignmentDetails()
             ])
-            if (spaceResponse && projectResponse && roleInstanceResponse && roleAssignmentResponse) {
-                // const appflyte_projects = await AppflyteProjectPermissions(projectResponse, roleInstanceResponse, roleAssignmentResponse, isOrganizationOwner);
-                // const filtered_projects = appflyte_projects?.filter(project => project?.payload?.workspace?.includes(spaceResponse))
+            if (spaceResponse && projectResponse) {
                 const filtered_projects = projectResponse?.filter(project => project?.payload?.workspace?.includes(spaceResponse))
                 setCurrentSpace(spaceResponse)
                 setProjects(filtered_projects)

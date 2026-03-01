@@ -1,8 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import HmacSHA256 from "crypto-js/hmac-sha256";
 import Hex from "crypto-js/enc-hex";
-import { getSessionData } from "./sessionDataHandle";
-import agentApiTokenManager from "./AgentApiToken/getAgentAdminToken";
 
 const SECRET_KEY = "DPOD_AMEYA_2.0_AUTH_KEY";
 
@@ -30,15 +28,6 @@ export const checkProject = async (project_id) => {
     } catch (error) {
         console.log(error)
     }
-}
-
-export const getAgentApiToken = async () => {
-    const currentProject = getSessionData("selected_project")
-    if (currentProject) {
-        const token = await agentApiTokenManager.getAgentAdminToken();
-        return token ?? null
-    }
-    return null
 }
 
 export function decodeParamToken(fileId, documentType) {

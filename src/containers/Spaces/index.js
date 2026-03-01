@@ -58,13 +58,18 @@ function Spaces() {
     const getAllData = async () => {
         setSpaceLoading(true)
         try {
-            const [spaceResponse, roleInstanceResponse, roleAssignmentResponse] = await Promise.all([
-                getSpaceDetails(),
-                getRoleInstanceDetails(),
-                getRoleAssignmentDetails()
-            ])
-            if (spaceResponse && roleInstanceResponse && roleAssignmentResponse) {
-                // const appflyte_workspaces = await AppflyteWorkspacePermissions(spaceResponse, roleInstanceResponse, roleAssignmentResponse, isOrganizationOwner);
+            // const [spaceResponse, roleInstanceResponse, roleAssignmentResponse] = await Promise.all([
+            //     getSpaceDetails(),
+            //     getRoleInstanceDetails(),
+            //     getRoleAssignmentDetails()
+            // ])
+            // if (spaceResponse && roleInstanceResponse && roleAssignmentResponse) {
+            //     // const appflyte_workspaces = await AppflyteWorkspacePermissions(spaceResponse, roleInstanceResponse, roleAssignmentResponse, isOrganizationOwner);
+            //     setSpaces(spaceResponse)
+            // }
+
+            const spaceResponse = await getSpaceDetails()
+            if (spaceResponse) {
                 setSpaces(spaceResponse)
             }
         } catch (error) {

@@ -7,7 +7,10 @@ import { Box, Typography } from '@mui/material';
 import { useAppContext } from '../../context/AppContext';
 import { fetchOrganizationId, fetchOwnerByOrganization, getUserItemId } from '../../utils/GetAccountDetails';
 import { getOrganizationData } from '../../utils/ApiFunctions/OrganizationsData';
-import { setAppflyteEngineState, setOrganizationsState, setProjectsState, setRoleAssignmentState, setRoleInstanceState, setServicesState, setSpacesState } from '../../Redux/slice/dataSlice';
+import {
+    setAppflyteEngineState, setOrganizationsState, setProjectsState, setRoleAssignmentState,
+    setRoleInstanceState, setServicesState, setSpacesState
+} from '../../Redux/slice/dataSlice';
 import { getServicesByOrganization } from '../../utils/ApiFunctions/ServicesData';
 import getSpaceData from '../../utils/ApiFunctions/SpaceData';
 import getProjectData from '../../utils/ApiFunctions/ProjectData';
@@ -29,7 +32,8 @@ function MainHome() {
     const intl = useIntl();
     const { isAuthenticated } = useOutletContext();
     const { selectedOrganization, setDataLoading, setSelectedOrganization, setSelectedService, authData } = useAppContext();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [errorType, setErrorType] = useState("organization")
 
     const all_organizations = useSelector(state => state.all_data.organizations);
     const all_services = useSelector(state => state.all_data.services);
@@ -55,25 +59,17 @@ function MainHome() {
     }, [isAuthenticated, selectedOrganization, service_added])
 
     const getUserDeatils = async () => {
-        setLoading(true)
         try {
             const user_organization = fetchOrganizationId();
             if ((user_organization || user_organization)?.length > 0) {
 
-                const requestType = authData?.request_type ?? null;
                 const userAuthType = authData?.user_auth_type ?? null;
                 const creditBundleId = authData?.credit_bundle_id ?? null;
 
-                const isExternalUser = requestType === "ext_existing_user" || requestType === "ext_user_singin";
-                const promises = [getAllOrganization()];
-
-                if (isExternalUser) {
-                    promises.push(getAllAppflyteEngines());
-                }
-
-                const results = await Promise.all(promises);
-                const organizations_data = results[0];
-                const appflyteEngines = isExternalUser ? results[1] : null;
+                const [organizations_data, appflyteEngines] = await Promise.all([
+                    getAllOrganization(),
+                    getAllAppflyteEngines()
+                ])
 
                 if (organizations_data && (organizations_data)?.length) {
                     if ((organizations_data || [])?.length === 1) {
@@ -82,41 +78,48 @@ function MainHome() {
                         setSelectedOrganization({ ...selected_org })
 
                         const organization_id = selected_org?.payload?.__auto_id__ ?? null;
-                        const is_owner = await fetchOwnerByOrganization(organization_id)
+                        // const is_owner = await fetchOwnerByOrganization(organization_id)
 
-                        if (userAuthType === "external_ameya_stripe" && creditBundleId && is_owner) {
-                            navigate("/user/billing")
+                        // if (userAuthType === "external_ameya_stripe" && creditBundleId && is_owner) {
+                        //     navigate("/user/billing")
+                        //     return
+                        // }
+
+                        const filtered_engine = (appflyteEngines || []).find((e) => e?.payload?.configuration?.engine_name === "appflyte_agent") ?? null;
+                        if (!filtered_engine) {
+                            setErrorType('service')
                             return
                         }
 
-                        if (isExternalUser) {
+                        const engine_id = filtered_engine?.payload?.__auto_id__ ?? null;
+                        const service_name = filtered_engine?.payload?.configuration?.engine_name ?? null;
+                        const response = await getServicesByOrganization(organization_id);
+                        const services = response ?? [];
 
-                            const filtered_engine = (appflyteEngines || []).find((e) => e?.payload?.configuration?.engine_name === "extraction_agent") ?? null;
-                            if (!filtered_engine) {
-                                navigate(`/organization/${organization_id}/services`);
-                                return
-                            }
 
-                            const engine_id = filtered_engine?.payload?.__auto_id__ ?? null;
-                            const response = await getServicesByOrganization(organization_id);
-                            const services = response ?? [];
-
-                            if (!response || !services.length) {
-                                navigate(`/organization/${organization_id}/services`);
-                                return
-                            }
-
-                            const selected_service = services.find((s) => s?.payload?.appflyte_engine?.includes(engine_id)) ?? null;
-                            if (selected_service) {
-                                setSelectedService(selected_service);
-                                return navigate(`/organization/${organization_id}/workspaces`);
-                            }
-
-                            return navigate(`/organization/${organization_id}/services`);
-
-                        } else {
-                            navigate(`/organization/${organization_id}/services`);
+                        if (!response || !services.length) {
+                            navigate(`/organization/${organization_id}/services/add-service`, {
+                                state: {
+                                    engine_type: engine_id,
+                                    service_name: service_name
+                                }
+                            })
+                            return
                         }
+
+                        const selected_service = services.find((s) => s?.payload?.appflyte_engine?.includes(engine_id)) ?? null;
+                        if (selected_service) {
+                            setSelectedService(selected_service);
+                            return navigate(`/organization/${organization_id}/workspaces`);
+                        }
+
+                        navigate(`/organization/${organization_id}/services/add-service`, {
+                            state: {
+                                engine_type: engine_id,
+                                service_name: service_name
+                            }
+                        })
+
                     }
                     else if ((organizations_data || [])?.length > 1) {
                         setSelectedOrganization(null)
@@ -169,9 +172,9 @@ function MainHome() {
             await Promise.allSettled([
                 getAllServiceData(organization_id),
                 getAllWorkspaceData(organization_id),
-                getAllProjectData(organization_id),
-                getRoleAssignmentDetails(),
-                getRoleInstanceDetails(organization_id)
+                getAllProjectData(organization_id)
+                // getRoleAssignmentDetails(),
+                // getRoleInstanceDetails(organization_id)
             ])
 
         } catch (error) {
@@ -253,7 +256,7 @@ function MainHome() {
         :
         (<>
             <Typography sx={{ ...styles.infoText, color: '#999' }}>
-                {intl.formatMessage(messages.error)}
+                {intl.formatMessage(errorType === "organization" ? messages.error : messages.service_error)}
             </Typography>
         </>)
 

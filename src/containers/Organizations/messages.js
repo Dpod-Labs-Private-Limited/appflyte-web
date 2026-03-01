@@ -10,5 +10,9 @@ export default defineMessages({
     no_record: {
         id: `${scope}.no_record`,
         defaultMessage: 'No records to display.',
+    },
+    service_error: {
+        id: `${scope}.service_error`,
+        defaultMessage: 'Service unavailable. Please try again.',
     }
 });

@@ -3,7 +3,6 @@
     "home_layout.error": "You do not appear to be assigned to any organization yet. Please contact your administrator to get started.",
     "organizations.invalid": "Invalid organization.",
     "organizations.no_record": "No records to display.",
-    "services.no_record": "Service unavailable. Please try again.",
     "service_add.service_error": "Failed to create service. Please try again.",
     "service_add.workspace_error": "Failed to create workspace. Please try again.",
     "service_add.project_error": "Failed to create project. Please try again.",

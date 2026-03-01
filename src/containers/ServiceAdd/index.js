@@ -53,8 +53,7 @@ function ServiceAdd() {
             navigate('/')
         }
         if (!engine_type || !service_name) {
-            const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null;
-            navigate(`/organization/${organization_id}/services`)
+            navigate(`/home`)
         }
         fetchAllData()
     }, [location])
@@ -240,8 +239,7 @@ function ServiceAdd() {
     }
 
     const handleCancel = () => {
-        const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null;
-        navigate(`/organization/${organization_id}/services`)
+        navigate("/home")
     }
 
     const serviceDescriptions = {

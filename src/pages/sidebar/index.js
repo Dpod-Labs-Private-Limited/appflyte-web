@@ -191,16 +191,6 @@ function Sidebar() {
     navigate('/user/settings')
   }
 
-  const handleApiKeys = () => {
-    setBillingStatus(false)
-    setPermissionStatus(false)
-    setSelectedWorkspace(null)
-    setSelectedProject(null)
-    setApiKeyStatus(true)
-    const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null
-    navigate(`/organization/${organization_id}/api-keys`)
-  }
-
   const handleBilling = () => {
     setPermissionStatus(false)
     setBillingStatus(true)
@@ -238,7 +228,7 @@ function Sidebar() {
         marginBottom: shouldShowCreditWarning ? '30px' : '10px'
       }}>
 
-        {(selectedOrganization && isOrganizationOwner && process.env.REACT_APP_IS_SFS_INSTANCE !== "true") &&
+        {(selectedOrganization && isOrganizationOwner) &&
           <Box
             sx={{
               display: 'flex', justifyContent: 'center', flexDirection: 'column',

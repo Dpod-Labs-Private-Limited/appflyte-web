@@ -2,7 +2,6 @@ import HomeLayout from "../containers/HomeLayout";
 import MainHome from "../containers/Home/MainHome";
 import UserSetup from '../containers/Home/UserSetup';
 import Organizations from "../containers/Organizations";
-import Services from "../containers/Services";
 import ServiceAdd from "../containers/ServiceAdd";
 import Spaces from "../containers/Spaces/index";
 import AddWorkspace from "../containers/WorkspaceAdd/index";
@@ -44,11 +43,6 @@ export const routesConfig = [
     {
         path: '/organizations',
         element: <Organizations />,
-        component: 'home'
-    },
-    {
-        path: '/organization/:orgId/services',
-        element: <Services />,
         component: 'home'
     },
     {

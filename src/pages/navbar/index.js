@@ -40,7 +40,6 @@ function Navbar() {
     const [spacesmenu, setSpacesMenu] = useState("");
     const [projectsmenu, setProjectsMenu] = useState("");
     const [logoutmenu, setLogoutMenu] = useState(null);
-    const [serviceAnchorEl, setServiceAnchorEl] = useState(null);
 
     const [spaceData, setSpaceData] = useState([])
     const [projectData, setProjectData] = useState([])
@@ -117,7 +116,6 @@ function Navbar() {
             setSpacesMenu("")
             setProjectsMenu("")
 
-            setSelectedService(null)
             setSelectedWorkspace(null)
             setSelectedProject(null)
 
@@ -128,24 +126,11 @@ function Navbar() {
             setSelectedOrganization(selected_organization)
 
             const organization_id = selected_organization?.payload?.__auto_id__ ?? null;
-            navigate(`/organization/${organization_id}/services`);
+            const selected_service = all_services.find((s) => s?.payload?.organization_id?.includes(organization_id)) ?? null;
+            setSelectedService(selected_service)
+            navigate(`/organization/${organization_id}/workspaces`)
         }
         return
-    }
-
-    const handleServiceChange = async (item) => {
-        setServiceAnchorEl(null)
-        if (selectedService) {
-            const selected_service_name = selectedService?.payload?.name ?? null;
-            if (item?.payload?.name === selected_service_name) {
-                return
-            }
-        }
-        setSelectedWorkspace(null)
-        setSelectedProject(null)
-        setSelectedService(item)
-        const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null;
-        navigate(`/organization/${organization_id}/workspaces`);
     }
 
     const handleSpaceChange = async (space_selected, space_data) => {
@@ -197,10 +182,6 @@ function Navbar() {
         navigate("/")
     }
 
-    const checkServiceName = {
-        "Appflyte": 'APPFLYTE'
-    };
-
     return (
         <Box sx={{ flexGrow: 1 }}>
             <nav style={styles.navbar}>
@@ -213,14 +194,6 @@ function Navbar() {
                             <img src={appflyte_logo} alt="appflyte logo" style={{ ...styles.navbarBrand }} />
                         </Link>
                     </Box>
-
-                    {selectedService &&
-                        <Button sx={styles.serviceBtn}>
-                            <Typography sx={{ fontSize: '10px', fontWeight: '600' }}>
-                                {checkServiceName[selectedService?.payload?.name || 'Unknown']}
-                            </Typography>
-                        </Button>
-                    }
 
                     {(selectedOrganization !== null && (all_organizations || [])?.length > 1) &&
                         (<Box sx={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
@@ -331,19 +304,6 @@ function Navbar() {
                 <Box sx={styles.navRightContent}>
                     <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', alignSelf: 'center' }}>
 
-                        {((all_services || [])?.length > 0 && selectedService) &&
-                            <Tooltip title="Change Service">
-                                <IconButton onClick={(e) => setServiceAnchorEl(e.currentTarget)}>
-                                    <ReactSVG
-                                        src={IconSvg.appsIcon}
-                                        beforeInjection={(svg) => {
-                                            svg.setAttribute('style', 'width:24px; height:24px; display:block;');
-                                        }}
-                                    />
-                                </IconButton>
-                            </Tooltip>
-                        }
-
                         <Box marginLeft={'5px'}>
                             <Chip
                                 avatar={
@@ -398,40 +358,6 @@ function Navbar() {
                     </Box>
                 </Box>
             </nav>
-
-            <Popover
-                open={Boolean(serviceAnchorEl)}
-                anchorEl={serviceAnchorEl}
-                onClose={() => setServiceAnchorEl(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                sx={{ borderRadius: '5px' }}
-            >
-                <Box p={1} minWidth={200}>
-                    {(all_services || [])?.length > 0 &&
-                        all_services?.map((item, index) => (
-                            <MenuItem
-                                key={index}
-                                onClick={() => handleServiceChange(item)}
-                            >
-                                <Box sx={{ display: 'flex', justifyContent: 'start', alignItems: 'center', gap: '8px' }}>
-                                    <ReactSVG
-                                        src={{
-                                            "Ameya Extract": IconSvg.extarctionIcon,
-                                            "Ameya Analyst": IconSvg.analysisIcon,
-                                            "Appflyte": IconSvg.aiQmsIcon,
-                                        }[item?.payload?.name] || IconSvg.errorIcon}
-                                        beforeInjection={(svg) => {
-                                            svg.setAttribute('style', 'width: 24px; height: 24px; display: block;');
-                                            svg.setAttribute('stroke', '#000000');
-                                        }} />
-                                    <Typography sx={{ fontSize: '14px', fontWeight: '500' }}>{item?.payload?.name}</Typography>
-                                </Box>
-                            </MenuItem>
-                        ))
-                    }
-                </Box>
-            </Popover>
 
         </Box>
     )

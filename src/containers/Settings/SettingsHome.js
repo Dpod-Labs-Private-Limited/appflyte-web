@@ -5,8 +5,6 @@ import { Styles } from './Styles';
 import { InvalidAccess } from '../../utils/sessionDataHandle';
 
 import SubSidebar from './Sidebar';
-import APiKeys from './APIKeys/APiKeys';
-import CreateKey from './APIKeys/CreateKey';
 import GeneralSettings from './GeneralSettings';
 import { useAppContext } from '../../context/AppContext';
 
@@ -40,8 +38,6 @@ function SettingsHome() {
                 <Box sx={Styles.cardContainer}>
                     <Routes>
                         <Route path="general" element={<GeneralSettings />} />
-                        <Route path="api_keys" element={<APiKeys />} />
-                        <Route path="api_keys/create-api-keys" element={<CreateKey />} />
                     </Routes>
                 </Box >
             </main>

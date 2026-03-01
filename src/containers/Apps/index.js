@@ -108,9 +108,8 @@ function Apps() {
 
     const handleDataCopy = (itemId, data) => {
         if (itemId) {
-            const base_url = "http://localhost:3001"
-            // const app_base_url = process.env.REACT_APP_BUGTRACKER_BASE_URL || "http://localhost:3001"
-            const bug_tracker_url = `${base_url}/${data}`
+            const app_base_url = process.env.REACT_APP_BUGTRACKER_APP_BASE_URL
+            const bug_tracker_url = `${app_base_url}/${data}`
             navigator.clipboard.writeText(bug_tracker_url).then(() => {
                 setCopiedData(itemId);
                 setTimeout(() => setCopiedData(null), 2000);

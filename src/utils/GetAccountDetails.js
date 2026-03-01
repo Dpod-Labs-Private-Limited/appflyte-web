@@ -1,6 +1,4 @@
 import { jwtDecode } from "jwt-decode";
-import { getSessionData } from "./sessionDataHandle";
-import agentApiTokenManager from "./AgentApiToken/getAgentAdminToken";
 
 export const fetchOrganizationId = () => {
     try {
@@ -180,19 +178,6 @@ export const fetchAppflyteSchemaId = async () => {
     } catch (error) {
         console.log(error)
         return error
-    }
-}
-
-export const getAgentApiToken = async () => {
-    try {
-        const currentProject = getSessionData("selected_project")
-        if (currentProject) {
-            const token = await agentApiTokenManager.getAgentAdminToken();
-            return token ?? null
-        }
-        return null
-    } catch (error) {
-        console.log(error)
     }
 }
 

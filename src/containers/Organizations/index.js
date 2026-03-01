@@ -96,40 +96,22 @@ function Organizations() {
                 return tostAlert(intl.formatMessage(messages.invalid), "warning");
             }
 
-            const requestType = authData?.request_type ?? null;
-            const userAuthType = authData?.user_auth_type ?? null;
-            const creditBundleId = authData?.credit_bundle_id ?? null;
-
-            const isExternalUser = requestType === "ext_existing_user" || requestType === "ext_user_singin";
-            const is_owner = await fetchOwnerByOrganization(organization_id)
-
-            const resetStateAndNavigateToServices = (path = "services") => {
-                dispatch(setSpacesState([]));
-                dispatch(setProjectsState([]));
-                setSelectedService(null);
-                setSelectedWorkspace(null);
-                setSelectedProject(null);
-                setSelectedOrganization({ ...organization });
-
-                if (userAuthType === "external_ameya_stripe" && creditBundleId && is_owner) {
-                    navigate("/user/billing")
-                    return
-                }
-                navigate(`/organization/${organization_id}/${path}`);
-            };
-
-            if (!isExternalUser) {
-                return resetStateAndNavigateToServices("services");
-            }
-
-            const filtered_engine = (appflyteEngines || []).find((e) => e?.payload?.configuration?.engine_name === "extraction_agent") ?? null;
-
+            const filtered_engine = (appflyteEngines || []).find((e) => e?.payload?.configuration?.engine_name === "appflyte_agent") ?? null;
             if (!filtered_engine) {
-                return resetStateAndNavigateToServices("services");
+                tostAlert(intl.formatMessage(messages.service_error), 'warning')
+                return
             }
 
             const engine_id = filtered_engine?.payload?.__auto_id__ ?? null;
             const service_name = filtered_engine?.payload?.configuration?.engine_name ?? null;
+
+            // const userAuthType = authData?.user_auth_type ?? null;
+            // const creditBundleId = authData?.credit_bundle_id ?? null;
+            // const is_owner = await fetchOwnerByOrganization(organization_id)
+            // if (userAuthType === "external_ameya_stripe" && creditBundleId && is_owner) {
+            //     navigate("/user/billing")
+            //     return
+            // }
 
             const response = await getServicesByOrganization(organization_id);
             if (!response) {
@@ -140,7 +122,7 @@ function Organizations() {
 
             if (!services.length) {
                 return navigate(`/organization/${organization_id}/services/add-service`, {
-                    state: { engine_type: engine_id, service_name },
+                    state: { engine_type: engine_id, service_name }
                 });
             }
 
@@ -157,7 +139,7 @@ function Organizations() {
             }
 
             return navigate(`/organization/${organization_id}/services/add-service`, {
-                state: { engine_type: engine_id, service_name },
+                state: { engine_type: engine_id, service_name }
             });
 
         } catch (error) {

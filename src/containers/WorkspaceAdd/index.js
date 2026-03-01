@@ -81,7 +81,7 @@ function AddWorkspace() {
             const service_id = selectedService?.payload?.__auto_id__ ?? null
             const response = await getServicesById(service_id);
             if (!response) {
-                navigate(`/organization/${organization_id}/services`);
+                navigate(`/organization/${organization_id}/services/add-service`);
             }
             const service = response?.payload?.__auto_id__ || '';
             setServiceId(service)
