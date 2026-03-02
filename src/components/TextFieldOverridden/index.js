@@ -5,9 +5,9 @@
  */
 
 import React from 'react';
-import { TextField, makeStyles, FilledInput, FormControl, InputLabel } from '@mui/material';
+import { TextField, makeStyles, FilledInput, FormControl, InputLabel, Autocomplete, Chip } from '@mui/material';
 import MuiPhoneNumber from 'material-ui-phone-number';
-import ChipInput from 'material-ui-chip-input'
+// import ChipInput from 'material-ui-chip-input'
 // import PropTypes from 'prop-types';
 // import styled from 'styled-components';
 
@@ -148,6 +148,7 @@ function TextFieldOverridden(props) {
     InputProps={{ classes, ...props.InputProps }}
   />;
 }
+
 function TextFieldOverriddenWhite(props) {
 
 
@@ -188,35 +189,86 @@ function PhoneNumberFieldOverridden(props) {
   />;
 }
 
-function chipFieldOverridden(props) {
+// function chipFieldOverridden(props) {
 
 
-  const classes = useStylesReddit3;
-  const classes2 = useStylesReddit2;
+//   const classes = useStylesReddit3;
+//   const classes2 = useStylesReddit2;
 
-  return <ChipInput
-    {...props}
-    FormHelperTextProps={{
-      className: classes2.helperText
-    }}
-    // InputProps={{ classes, disableUnderline: false, ...props.InputProps }} 
-    InputProps={{ classes, ...props.InputProps }}
-  />;
+//   return <ChipInput
+//     {...props}
+//     FormHelperTextProps={{
+//       className: classes2.helperText
+//     }}
+//     // InputProps={{ classes, disableUnderline: false, ...props.InputProps }} 
+//     InputProps={{ classes, ...props.InputProps }}
+//   />;
+// }
+
+// function chipFieldOverriddenWhite(props) {
+
+//   const classes = useStylesReddit3White;
+//   const classes2 = useStylesReddit2;
+
+//   return <ChipInput
+//     {...props}
+//     FormHelperTextProps={{
+//       className: classes2.helperText
+//     }}
+//     // InputProps={{ classes, disableUnderline: false, ...props.InputProps }} 
+//     InputProps={{ classes, ...props.InputProps }}
+//   />;
+// }
+
+function chipFieldOverridden({ value = [], onChange, label, ...props }) {
+  return (
+    <Autocomplete
+      multiple
+      freeSolo
+      options={[]}
+      value={value}
+      onChange={(event, newValue) => {
+        onChange && onChange(newValue);
+      }}
+      renderTags={(value, getTagProps) =>
+        value.map((option, index) => (
+          <Chip
+            variant="filled"
+            label={option}
+            {...getTagProps({ index })}
+          />
+        ))
+      }
+      renderInput={(params) => (
+        <TextFieldOverridden
+          {...params}
+          label={label}
+          {...props}
+        />
+      )}
+    />
+  );
 }
 
-function chipFieldOverriddenWhite(props) {
-
-  const classes = useStylesReddit3White;
-  const classes2 = useStylesReddit2;
-
-  return <ChipInput
-    {...props}
-    FormHelperTextProps={{
-      className: classes2.helperText
-    }}
-    // InputProps={{ classes, disableUnderline: false, ...props.InputProps }} 
-    InputProps={{ classes, ...props.InputProps }}
-  />;
+function chipFieldOverriddenWhite({ value = [], onChange, label, ...props }) {
+  return (
+    <Autocomplete
+      multiple
+      freeSolo
+      options={[]}
+      value={value}
+      onChange={(event, newValue) => {
+        onChange && onChange(newValue);
+      }}
+      renderInput={(params) => (
+        <TextFieldOverriddenWhite
+          {...params}
+          label={label}
+          {...props}
+        />
+      )}
+    />
+  );
 }
 
 TextFieldOverridden.propTypes = {};

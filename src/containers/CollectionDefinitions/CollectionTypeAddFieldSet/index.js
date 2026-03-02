@@ -13,7 +13,6 @@ import './style.css';
 import { Box, Typography, Button, Paper, MenuItem, Modal, FormControlLabel, Checkbox, Menu, IconButton } from '@mui/material';
 import { TextFieldOverridden as TextField } from '../../../components/TextFieldOverridden/index';
 import LoadingOverlay from 'react-loading-overlay';
-// import MaterialTable, { MTableEditRow } from 'material-table';
 // import { tableOptions, tableHeaderStyle } from './tableCommonStyle';
 import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, LanguageOutlined } from '@mui/icons-material';
 import { FormattedMessage } from 'react-intl';

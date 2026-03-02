@@ -21,6 +21,6 @@ WORKDIR /ameya-web
 
 COPY --from=builder /ameya-web /ameya-web
 
-EXPOSE 3001
+EXPOSE 3007
 
 CMD ["npm", "start"]

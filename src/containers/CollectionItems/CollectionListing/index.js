@@ -17,7 +17,6 @@ import { Box, Typography, Paper, CircularProgress, MenuItem, CardMedia, Tabs, Ta
 import { AddBox, ArrowDownward, ShareOutlined, LanguageOutlined, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, RefreshOutlined, DescriptionOutlined } from '@mui/icons-material';
 import { getCollectionLabel } from '../../../Api/Services/collection/collectionUtilityServices';
 import CollectionItemsService from '../../../Api/Services/collection/collectionItemsService';
-// import MaterialTable from 'material-table';
 import LoadingOverlay from 'react-loading-overlay';
 import topbar from 'topbar';
 import { validate } from 'uuid';

@@ -13,7 +13,6 @@ import './style.css';
 import { Box, Typography, Button, Paper, MenuItem, Modal, FormControlLabel, Checkbox, RadioGroup, Radio, Menu, IconButton } from '@mui/material';
 import { TextFieldOverridden as TextField } from '../../../components/TextFieldOverridden/index';
 import LoadingOverlay from 'react-loading-overlay';
-import MaterialTable, { MTableEditRow } from 'material-table';
 import { tableOptions, tableHeaderStyle } from './tableCommonStyle';
 import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, LanguageOutlined } from '@mui/icons-material';
 import { FormattedMessage } from 'react-intl';
@@ -32,17 +31,6 @@ import { useSelector } from 'react-redux';
 import EnhancedCustomTable from '../../../components/EnhancedCustomTable/index.js';
 import { useAppContext } from '../../../context/AppContext.js';
 import { useOutletContext } from 'react-router-dom';
-
-
-
-const StyledEditRow = styled(MTableEditRow)(({ theme }) => ({
-  // Styling the h6 element inside MTableEditRow
-  "& h6": {
-    fontSize: "larger",
-    fontWeight: 400,
-    color: "red",
-  },
-}));
 
 export function CollectionTypeAdd() {
   const classes = styles;
@@ -1013,62 +1001,8 @@ export function CollectionTypeAdd() {
                 </Modal>
                 <Box id="fieldListDark">
                   {
-                    // savedCollTypeId != null
                     true
                       ?
-                      // <MaterialTable
-                      //   title={(<Typography sx={classes.relavantTherapiesText}><FormattedMessage {...messages.fields} /></Typography>)}
-                      //   icons={tableIcons}
-                      //   columns={fields.columns}
-                      //   options={{
-                      //     headerStyle: tableHeaderStyle,
-                      //     ...tableOptions,
-                      //   }}
-                      //   data={fields.data}
-                      //   components={{
-                      //     Container: props => <Paper {...props} elevation={0} sx={classes.tableRootPaper} />,
-                      //     EditRow: StyledEditRow,
-                      //   }}
-                      //   localization={{
-                      //     header: {
-                      //       actions: ""
-                      //     },
-                      //     body: { editRow: { deleteText: 'Are you sure you want to delete this field ?' } }
-                      //   }}
-                      //   actions={[
-                      //     {
-                      //       icon: forwardRef((props, ref) => <AddBox sx={classes.actionIconAdd} {...props} ref={ref} />),
-                      //       tooltip: <FormattedMessage {...messages.addField} />,
-                      //       isFreeAction: true,
-                      //       onClick: (event) => handleOpen(false)
-                      //     },
-                      //     {
-                      //       icon: forwardRef((props, ref) => <Edit sx={classes.actionIcon} {...props} ref={ref} />),
-                      //       tooltip: <FormattedMessage {...messages.editField} />,
-                      //       onClick: (event, rowData) => handleOpen(true, rowData)
-                      //     },
-                      //   ]}
-                      //   editable={{
-                      //     onRowDelete: (oldData) =>
-                      //       new Promise((resolve) => {
-                      //         setTimeout(() => {
-                      //           resolve();
-                      //           setSaveFlag(true)
-                      //           setFields((prevState) => {
-                      //             const data = [...prevState.data];
-                      //             data.splice(data.indexOf(oldData), 1);
-                      //             const updatedData = updateIndexOnDelete(data)
-                      //             return { ...prevState, data: updatedData };
-                      //           });
-                      //           setFieldNames(prev => {
-                      //             const data = [...prev]
-                      //             data.splice(prev.indexOf(oldData.name), 1)
-                      //             return data
-                      //           })
-                      //         }, 600);
-                      //       }),
-                      //   }}
-                      // />
                       <Box>
                         <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="10px">
                           <Typography sx={classes.relavantTherapiesText}><FormattedMessage {...messages.fields} /></Typography>

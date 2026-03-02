@@ -10,14 +10,15 @@ import messages from './messages';
 import styles from './styles'
 import { Box, Typography, Chip, MenuItem, RadioGroup, FormControlLabel, FormControl, Radio, Collapse, FormLabel, Drawer, InputLabel, Select, Autocomplete } from '@mui/material';
 import { TextFieldOverridden as TextField } from '../../components/TextFieldOverridden/index';
+// import { Autocomplete } from '@mui/lab';
 import { PhotoCameraBack, ArrowCircleUp, ArrowCircleDown } from '../../icons/extraIcons';
 import { AddBox, CloseOutlined, DeleteOutline } from '@mui/icons-material';
 import { getCollectionLabel, getDefaultBooleanValue, getListValuesByLanguage, getMediaTypesForFileInput } from '../../Api/Services/collection/collectionUtilityServices';
-import { LocalizationProvider, DatePicker, TimePicker, DateTimePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker, KeyboardDateTimePicker } from '@material-ui/pickers'
 import FieldSetRenderLayout from '../../components/FieldSetRenderLayout';
 import SearchAndAddFiles from '../../components/SearchAndAddFiles';
 import CollectionItemsService from '../../Api/Services/collection/collectionItemsService';
+import DateFnsUtils from '@date-io/date-fns';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import moment from 'moment-timezone';
@@ -33,6 +34,7 @@ function CollectionItem(props) {
 
 
   console.log("entity", entity)
+  // return
 
   const classes = styles;
 
@@ -572,6 +574,32 @@ function CollectionItem(props) {
     case 'list':
       if (entity.field_sub_type === 'multi')
         return (
+          // <TextField
+          //   variant="filled"
+          //   label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+          //   error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+          //   helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+          //   margin="normal"
+          //   SelectProps={{
+          //     multiple: true,
+          //     native: true
+          //   }}
+          //   name={entity.field_name}
+          //   defaultValue={entity.settings.default_value && !isNaN(entity.settings.default_value) ? getListValuesByLanguage(entity.settings.field_values, selectedLanguage)[entity.settings.default_value] : ''}
+          //   fullWidth
+          //   size="small"
+          //   key={"collection_item_key_" + entity.field_definition_id}
+          //   select
+          //   id={entity.field_definition_id}
+          //   onChange={handleTextValueChange}
+          //   value={fieldValues && fieldValues[entity.field_name] ? fieldValues[entity.field_name] : []}
+          // >
+          //   {
+          //     getListValuesByLanguage(entity.settings.field_values, selectedLanguage).map((item, index) =>
+          //       <MenuItem key={"key_value_list_" + index} value={"__index__" + index}>{item}</MenuItem>
+          //     )
+          //   }
+          // </TextField>
           <Box key={"collection_item_key_" + entity.field_definition_id}>
             <Box display="flex">
               <Typography sx={classes.fieldSetText}>
@@ -655,6 +683,7 @@ function CollectionItem(props) {
                         sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
                         onClick={handleLanguageChange.bind(this, lang.value)}
                       >
+                        {/* <Typography sx={classes.languageChipText}>{lang.name}</Typography> */}
                         {lang.name}
                       </Box>
                     )
@@ -701,6 +730,7 @@ function CollectionItem(props) {
                       sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
                       onClick={handleLanguageChange.bind(this, lang.value)}
                     >
+                      {/* <Typography sx={classes.languageChipText}>{lang.name}</Typography> */}
                       {lang.name}
                     </Box>
                   )
@@ -800,84 +830,104 @@ function CollectionItem(props) {
         case 'date':
         case 'Date':
           return (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                autoOk
+                // format="dd MMM yyyy"
+                format="dd MMM yyyy h:mm aaa"
+                margin="normal"
+                id={entity.field_definition_id}
+                key={"collection_item_key_" + entity.field_definition_id}
+                name={entity.field_name}
+                fullWidth
+                size="small"
+                // disablePast
                 label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+                error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+                helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+                // value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().toDate() : new Date()}
                 value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).toDate() : new Date()}
+                // onChange={(date) => {
+                //   setFieldValues(prevValue => ({
+                //     ...prevValue,
+                //     [entity.field_name]: moment(date).utc().format("MM/DD/YYYY")
+                //   }))
+                //   validateSingleField(entity, moment(date).utc().format("MM/DD/YYYY"))
+                // }}
+
                 onChange={(date) => {
                   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
                   validateSingleField(entity, date)
                 }}
-                format="dd MMM yyyy"
-                slotProps={{
-                  textField: {
-                    id: entity.field_definition_id,
-                    key: "collection_item_key_" + entity.field_definition_id,
-                    name: entity.field_name,
-                    fullWidth: true,
-                    size: "small",
-                    margin: "normal",
-                    variant: "filled",
-                    error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
-                    helperText: validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : '',
-                  }
+                TextFieldComponent={props => <TextField  {...props} variant="filled" size="small" error={null} />}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
                 }}
               />
-            </LocalizationProvider>
+            </MuiPickersUtilsProvider>
           )
         case 'time':
         case 'Time':
           return (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <TimePicker
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardTimePicker
+                margin="normal"
+                id={entity.field_definition_id}
+                key={"collection_item_key_" + entity.field_definition_id}
+                name={entity.field_name}
+                format="h:mm a"
                 label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+                // value={fieldValues && fieldValues[entity.field_name] ? moment(fieldValues[entity.field_name], "h:mm a").toDate() : new Date()}
                 value={fieldValues && fieldValues[entity.field_name] ? moment(fieldValues[entity.field_name], "HH:mm").toDate() : new Date()}
+                error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+                helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+                fullWidth
+                size="small"
+                // onChange={(date) => {
+                //   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).format("HH:mm") }))
+                //   validateSingleField(entity, date)
+                // }}
                 onChange={(date) => {
                   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
                   validateSingleField(entity, date)
                 }}
-                slotProps={{
-                  textField: {
-                    id: entity.field_definition_id,
-                    key: "collection_item_key_" + entity.field_definition_id,
-                    name: entity.field_name,
-                    fullWidth: true,
-                    size: "small",
-                    margin: "normal",
-                    variant: "filled",
-                    error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
-                    helperText: validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : '',
-                  }
-                }}
-              />
-            </LocalizationProvider>
+                TextFieldComponent={props => <TextField  {...props} variant="filled" size="small" error={null} />}
+                KeyboardButtonProps={{
+                  'aria-label': 'change time',
+                }} />
+            </MuiPickersUtilsProvider>
           )
         default:
           return (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DateTimePicker
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDateTimePicker
+                margin="normal"
+                id={entity.field_definition_id}
+                key={"collection_item_key_" + entity.field_definition_id}
+                name={entity.field_name}
+                autoOk
+                format="dd MMM yyyy h:mm a"
                 label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
                 value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().toDate() : new Date()}
+                error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+                helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+                fullWidth
+                size="small"
+                // onChange={(date) => {
+                //   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().format("MM/DD/YYYY h:mm a") }))
+                //   validateSingleField(entity, date)
+                // }}
                 onChange={(date) => {
                   setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
                   validateSingleField(entity, date)
                 }}
-                format="dd MMM yyyy h:mm a"
-                slotProps={{
-                  textField: {
-                    id: entity.field_definition_id,
-                    key: "collection_item_key_" + entity.field_definition_id,
-                    name: entity.field_name,
-                    fullWidth: true,
-                    size: "small",
-                    margin: "normal",
-                    variant: "filled",
-                    error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
-                    helperText: validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : '',
-                  }
-                }}
-              />
-            </LocalizationProvider>
+                TextFieldComponent={props => <TextField  {...props} variant="filled" size="small" error={null} />}
+                KeyboardButtonProps={{
+                  'aria-label': 'change time',
+                }} />
+            </MuiPickersUtilsProvider>
           )
       }
       break;
@@ -894,6 +944,7 @@ function CollectionItem(props) {
                       sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
                       onClick={handleLanguageChange.bind(this, lang.value)}
                     >
+                      {/* <Typography sx={classes.languageChipText}>{lang.name}</Typography> */}
                       {lang.name}
                     </Box>
                   )

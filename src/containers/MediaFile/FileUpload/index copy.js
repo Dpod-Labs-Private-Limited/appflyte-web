@@ -4,15 +4,15 @@
  *
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, CircularProgress, Divider, Radio, FormControlLabel, RadioGroup, LinearProgress } from '@mui/material';
 import styles from './styles'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { compose } from 'redux';
-import { CancelOutlined, CheckCircleOutlineOutlined, QueryBuilderOutlined, ErrorOutlineOutlined, CloudUploadOutlined } from '@mui/icons-material';
-import { useDropzone } from 'react-dropzone';
+import { CancelOutlined, CheckCircleOutlineOutlined, QueryBuilderOutlined, ErrorOutlineOutlined } from '@mui/icons-material';
+import { DropzoneAreaBase, DropzoneArea } from 'material-ui-dropzone';
 import messages from './messages';
 import LoadingOverlay from 'react-loading-overlay';
 import { FILE_TYPE_IMAGE, FILE_TYPE_VIDEO, FILE_TYPE_DOCUMENT } from '../../../utils/constants';
@@ -68,36 +68,22 @@ export function FileUpload() {
     setFilePermission(event.target.value);
   };
 
-  // react-dropzone: onDrop callback
-  const onDrop = useCallback((acceptedFiles) => {
+  const onFilesSelected = (files) => {
     const preSelectedFileNames = filesUpload.map(item => item.file.name)
-    const filesToAdd = acceptedFiles
-      .filter(f => !preSelectedFileNames.includes(f.name))
-      .map(f => ({ file: f, data: URL.createObjectURL(f) }))
-    setfilesUpload((prevState) => [...prevState, ...filesToAdd])
-  }, [filesUpload])
+    const filesToAdd = files.filter(x => !preSelectedFileNames.includes(x.file.name))
+    setfilesUpload((prevState) => {
+      return [...prevState, ...filesToAdd]
+    })
+  }
 
   const onFilesDeselect = (file) => {
     const filesListAfter = filesUpload.filter(x => x.file.name !== file.file.name)
     setfilesUpload(filesListAfter)
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    onDropRejected: (rejections) => {
-      rejections.forEach(({ errors }) => {
-        errors.forEach(e => tostAlert(e.message, "error"))
-      })
-    },
-    accept: {
-      'video/*': [],
-      'image/*': [],
-      'application/pdf': ['.pdf'],
-      'application/msword': ['.doc'],
-    },
-    maxSize: 500000000,
-    maxFiles: 10,
-  })
+  const onFilesError = (error, file) => {
+    tostAlert(error.message, "error")
+  }
 
   const apiErrorHandler = (err) => {
     if (err.response !== undefined && err.response !== null) {
@@ -464,7 +450,7 @@ export function FileUpload() {
               <Box width="100%">
                 {
                   filesUpload.map((file, index) =>
-                    <Box key={file.file.name}>
+                    <Box>
                       {
                         index > 0 ? <Divider width="100%" /> : ''
                       }
@@ -514,65 +500,25 @@ export function FileUpload() {
                       <FormattedMessage {...messages.uploadFiles} />
                     </Typography>
                     <Box marginTop="25px" marginBottom="10px">
-                      {/* react-dropzone dropzone area */}
-                      <Box
-                        {...getRootProps()}
-                        sx={{
-                          border: '2px dashed',
-                          borderColor: isDragActive ? 'primary.main' : 'grey.400',
-                          borderRadius: 2,
-                          p: 4,
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          backgroundColor: isDragActive ? 'action.hover' : 'background.paper',
-                          transition: 'border-color 0.2s, background-color 0.2s',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            backgroundColor: 'action.hover',
-                          },
-                        }}
-                      >
-                        <input {...getInputProps()} />
-                        <CloudUploadOutlined sx={{ fontSize: 40, color: 'grey.500', mb: 1 }} />
-                        <Typography className={classes.dropZoneFont}>
-                          {isDragActive
-                            ? 'DROP THE FILES HERE...'
-                            : 'DRAG AND DROP A FILE OR CLICK TO UPLOAD'}
-                        </Typography>
-                      </Box>
-
-                      {/* Selected file chips */}
-                      {filesUpload.length > 0 && (
-                        <Box display="flex" flexWrap="wrap" gap={1} mt={2}>
-                          {filesUpload.map((fileObj) => (
-                            <Box
-                              key={fileObj.file.name}
-                              sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                backgroundColor: 'secondary.main',
-                                color: 'secondary.contrastText',
-                                borderRadius: '16px',
-                                px: 1.5,
-                                py: 0.5,
-                                fontSize: '0.8125rem',
-                                gap: 0.5,
-                              }}
-                            >
-                              <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                                {fileObj.file.name}
-                              </Typography>
-                              <CancelOutlined
-                                sx={{ fontSize: 18, cursor: 'pointer', ml: 0.5 }}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onFilesDeselect(fileObj)
-                                }}
-                              />
-                            </Box>
-                          ))}
-                        </Box>
-                      )}
+                      <DropzoneAreaBase
+                        acceptedFiles={['video/*', 'image/*', '.pdf', '.doc']}
+                        onAdd={onFilesSelected}
+                        onDelete={onFilesDeselect}
+                        onError={onFilesError}
+                        maxFileSize={500000000}
+                        dropzoneText="DRAG AND DROP A FILE OR CLICK TO UPLOAD"
+                        showAlerts={false}
+                        filesLimit={10}
+                        fileObjects={filesUpload}
+                        dropzoneClass={classes.dropZone}
+                        dropzoneParagraphClass={classes.dropZoneFont}
+                        showPreviews={true}
+                        showPreviewsInDropzone={false}
+                        useChipsForPreview
+                        previewGridProps={{ container: { spacing: 1, direction: 'row', } }}
+                        previewChipProps={{ classes: { root: classes.previewChip }, color: "secondary", variant: "filled" }}
+                        previewText=""
+                      />
                     </Box>
                     {/* <Typography sx={classes.boldText}><FormattedMessage {...messages.manageAccess} /></Typography>
                     <RadioGroup aria-label="gender" name="gender1" row value={filePermission} onChange={handlePermissionChange}>
