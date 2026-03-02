@@ -20,18 +20,23 @@ class collectionItemsService {
         const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
         return AxiosObj.post(`/${accountId}/api/collection/subscriber/${subscriberId}/subscription/${subscriptionId}/schema/${default_schema_id}/collection/${collectionId}/item/${collectionIemId}/publish`)
     }
-    getItemsBySingularId(accountId, authorAccountId, pluralId, version, schemaId, entryType = "user", accessType = "public", queryParams = null) {
-        if (queryParams)
-            return AxiosObj.get(`/${accountId}/api/collection/${authorAccountId}/${entryType}/${accessType}/cm/v${version}/${schemaId}/${pluralId}?${queryParams}`)
-        return AxiosObj.get(`/${accountId}/api/collection/${authorAccountId}/${entryType}/${accessType}/cm/v${version}/${schemaId}/${pluralId}`)
-    }
+
     createCollectionItemBySingularId(accountId, authorAccountId, pluralId, version, schemaId, resObj, entryType = "user", accessType = "public") {
-        return AxiosObj.post(`/${accountId}/api/collection/${authorAccountId}/${entryType}/${accessType}/cm/v${version}/${schemaId}/${pluralId}`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObj.post(`/${accountId}/api/collection/${entryType}/${accessType}/cm/v${version}/${default_schema_id}/${schemaId}/${pluralId}`, resObj, {
             'accept': 'application/json'
         })
     }
+    getItemsBySingularId(accountId, authorAccountId, pluralId, version, schemaId, entryType = "user", accessType = "public", queryParams = null) {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        if (queryParams)
+            return AxiosObj.get(`/${accountId}/api/collection/${entryType}/${accessType}/cm/v${version}/${default_schema_id}/${schemaId}/${pluralId}?${queryParams}`)
+        return AxiosObj.get(`/${accountId}/api/collection/${entryType}/${accessType}/cm/v${version}/${default_schema_id}/${schemaId}/${pluralId}`)
+    }
+
     updateCollectionItemBySingularId(accountId, authorAccountId, singularId, version, schemaId, itemId, resObj, hashNumber = "", hashCode = "", entryType = "user", accessType = "public") {
-        return AxiosObj.put(`/${accountId}/api/collection/${authorAccountId}/${entryType}/${accessType}/cm/v${version}/${schemaId}/${singularId}/${itemId}`, resObj, {
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObj.put(`/${accountId}/api/collection/${entryType}/${accessType}/cm/v${version}/${default_schema_id}/${schemaId}/${singularId}/${itemId}`, resObj, {
             headers: {
                 'Content-Type': 'application/json',
                 'etag-hash': hashCode,
@@ -40,8 +45,8 @@ class collectionItemsService {
         })
     }
     deleteCollectionItem(accountId, authorAccountId, singularId, version, schemaId, itemId, entryType = "user", accessType = "public") {
-        return AxiosObj
-            .delete(`/${accountId}/api/collection/${authorAccountId}/${entryType}/${accessType}/cm/v${version}/${schemaId}/${singularId}/${itemId}`)
+        const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+        return AxiosObj.delete(`/${accountId}/api/collection/${entryType}/${accessType}/cm/v${version}/${default_schema_id}/${schemaId}/${singularId}/${itemId}`)
     }
 }
 

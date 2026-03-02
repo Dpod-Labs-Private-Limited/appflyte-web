@@ -27,9 +27,7 @@ const AxiosObj = axios.create({
 })
 
 const AxiosBaseObj = axios.create({
-    // baseURL: process.env.REACT_APP_COLLECTION_API_BASE_URL,
-    // baseURL: "https://api-dev.appflyte.net",
-    baseURL: "http://localhost:8003",
+    baseURL: `${process.env.REACT_APP_APPFLYTE_BACKEND_URL}`,
     responseType: "json"
 })
 
