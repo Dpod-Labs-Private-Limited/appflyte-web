@@ -3,12 +3,12 @@ import { AxiosObj } from '../../Configurations/axios-setup';
 
 class fileUploadServices {
   getPredignedURL(accountId, subscriberId, subscriptionId, schemaId, reqBody) {
-    return AxiosObj
-      .post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/generate-upload-url`, reqBody, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
+    const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+    return AxiosObj.post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${default_schema_id}/${schemaId}/generate-upload-url`, reqBody, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   }
 
 
