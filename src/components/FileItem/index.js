@@ -54,11 +54,10 @@ function FileItem(props) {
           const accID = props?.selectedUser?.root_account_id ?? null;
           const subscriberId = props?.selectedUser?.subscriber_id ?? null;
           const subscriptionId = props?.selectedUser?.subscription_id ?? null;
-          const schemaId = selectedProject.payload.__auto_id__ ?? null;
           const bucket_name = file?.bucketName ?? null;
           const object_paths = file?.objectKey ?? null;
 
-          const res = await GalleryService.getDownloadURL(accID, subscriberId, subscriptionId, schemaId, bucket_name, object_paths);
+          const res = await GalleryService.getDownloadURL(accID, subscriberId, subscriptionId, bucket_name, object_paths);
           if (res.status === 200) {
             const res_data = res?.data?.at(-1) ?? null;
             const file_url = Object.values(res_data)?.at(-1) ?? null;

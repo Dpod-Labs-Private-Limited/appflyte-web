@@ -49,8 +49,9 @@ class galleryService {
     return AxiosObj.delete(`api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${default_schema_id}/${schemaId}/file?fileId=${fileIdStr}`)
   }
 
-  getDownloadURL(accountId, subscriberId, subscriptionId, schemaId, bucket_name, object_paths) {
-    return AxiosObj.post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${schemaId}/generate-download-url?bucket_name=${bucket_name}&object_paths=${object_paths}`, {
+  getDownloadURL(accountId, subscriberId, subscriptionId, bucket_name, object_paths) {
+    const default_schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID ?? null;
+    return AxiosObj.post(`/api/media/${accountId}/subscriber/${subscriberId}/subscription/${subscriptionId}/${default_schema_id}/generate-download-url?bucket_name=${bucket_name}&object_paths=${object_paths}`, {
       headers: {
         'Content-Type': 'application/json'
       }
