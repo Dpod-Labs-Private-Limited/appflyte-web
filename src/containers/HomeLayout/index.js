@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -7,11 +7,8 @@ import LoadBar from '../../utils/LoadBar';
 
 import { useIntl } from 'react-intl';
 import messages from './messages';
-
-import HmacSHA256 from "crypto-js/hmac-sha256";
-import Hex from "crypto-js/enc-hex";
 import { useAppContext } from '../../context/AppContext';
-const SECRET_KEY = "DPOD_AMEYA_2.0_AUTH_KEY";
+import { UTIL_CONFIG } from '../../utils';
 
 function HomeLayout() {
 
@@ -21,8 +18,7 @@ function HomeLayout() {
     const intl = useIntl();
     const location = useLocation();
     const loading = true
-
-    const { updateAuthData } = useAppContext();
+    const { updateAuthData, initialAuthData } = useAppContext();
 
     useEffect(() => {
         handleSetup();
@@ -32,34 +28,36 @@ function HomeLayout() {
         try {
 
             const queryParams = new URLSearchParams(location.search)
-
+            const externalUserType = queryParams.get("user_type");
             const externalRequestType = queryParams.get("request_type");
-            const encodedToken = queryParams.get("token");
-
-            const fileId = queryParams.get("file_id");
-            const documentType = queryParams.get("document_type");
+            const serviceType = queryParams.get("service_type");
             const creditBundleId = queryParams.get("credit_bundle_id");
+            const isSupportedService = Boolean(serviceType && UTIL_CONFIG.SUPPORTED_SERVICES.includes(serviceType));
 
-            if (encodedToken && fileId && documentType && externalRequestType === "external_ameya_auth") {
-                const data = `${fileId}${documentType}`;
-                const computedToken = HmacSHA256(data, SECRET_KEY).toString(Hex);
-                if (computedToken === encodedToken) {
-                    updateAuthData({ file_id: fileId, document_type: documentType, request_type: "ext_existing_user" });
-                    navigate("/home")
+            if (externalUserType === UTIL_CONFIG.EXT_USER_TYPE) {
+
+                if (externalRequestType === UTIL_CONFIG.USER_REQUEST && isSupportedService) {
+                    updateAuthData({
+                        user_type: UTIL_CONFIG.EXT_USER_TYPE,
+                        request_type: UTIL_CONFIG.USER_REQUEST,
+                        collection_service_type: serviceType
+                    });
+                } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && creditBundleId) {
+                    updateAuthData({
+                        user_type: UTIL_CONFIG.EXT_USER_TYPE,
+                        request_type: UTIL_CONFIG.STRIPE_REQUEST,
+                        credit_bundle_id: creditBundleId
+                    });
                 } else {
-                    navigate("/home")
+                    updateAuthData(initialAuthData);
                 }
+
             } else {
-                const payload = {
-                    request_type: "direct_user",
-                    ...(externalRequestType === "external_ameya_stripe" && creditBundleId && {
-                        user_auth_type: externalRequestType,
-                        credit_bundle_id: creditBundleId,
-                    }),
-                };
-                updateAuthData(payload);
-                navigate("/home")
+                updateAuthData(initialAuthData);
             }
+
+            navigate("/home");
+
         } catch (err) {
             console.error("Failed to process request_type:", err);
         }

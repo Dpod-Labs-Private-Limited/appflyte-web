@@ -7,52 +7,38 @@ import { ReactSVG } from 'react-svg';
 
 import { useAppContext } from '../../context/AppContext';
 import { setOrganizationsState, setProjectsState, setRoleAssignmentState, setRoleInstanceState, setServicesState, setSpacesState } from '../../Redux/slice/dataSlice';
-import { fetchOrganizationId, getUserItemId, getUserName } from '../../utils/GetAccountDetails';
+import { fetchAccountId, fetchAppflyteSchemaId, fetchOrganizationId, fetchOwnerByOrganization, fetchSubscriberId, fetchSubscriptionId, getUserItemId, getUserName } from '../../utils/GetAccountDetails';
 import { getOrganizationData } from '../../utils/ApiFunctions/OrganizationsData';
 import { getServicesByOrganization } from '../../utils/ApiFunctions/ServicesData';
 import getSpaceData from '../../utils/ApiFunctions/SpaceData';
 import getProjectData from '../../utils/ApiFunctions/ProjectData';
-import { getAllRoleAssignmentData, getAllRoleInstanceData } from '../../utils/ApiFunctions/AccessControlData';
+// import { getAllRoleAssignmentData, getAllRoleInstanceData } from '../../utils/ApiFunctions/AccessControlData';
 import AmeyaAuthApi from '../../Api/Services/AppflyteAuth/UserSetupService';
 import { IconSvg } from '../../utils/globalIcons';
 import LoadBar from '../../utils/LoadBar';
 import { getStyles } from './styles';
 import setupStepsData from './setup_steps.json';
+import { UTIL_CONFIG } from '../../utils';
 
 const POLL_INTERVAL = 5000;
 const REQUIRED_SETUP_FIELDS = ['organization_id', 'service_id', 'workspace_id', 'project_id'];
 
 const STATUS_ICONS = {
-    extraction_init_status: {
+    appflyte_init_status: {
         init: IconSvg.initStatusIcon,
         loading: IconSvg.statusLoadingIcon,
         complete: IconSvg.check2Icon,
     },
-    extraction_space_project_status: {
+    appflyte_space_project_status: {
         init: IconSvg.initStatusIcon,
         loading: IconSvg.statusLoadingIcon,
         complete: IconSvg.check2Icon,
     },
-    extraction_doctype_schema_status: {
+    appflyte_chatbot_status: {
         init: IconSvg.initStatusIcon,
         loading: IconSvg.statusLoadingIcon,
         complete: IconSvg.check2Icon,
-    },
-    analytics_init_status: {
-        init: IconSvg.initStatusIcon,
-        loading: IconSvg.statusLoadingIcon,
-        complete: IconSvg.check2Icon,
-    },
-    analytics_data_source_status: {
-        init: IconSvg.initStatusIcon,
-        loading: IconSvg.statusLoadingIcon,
-        complete: IconSvg.check2Icon,
-    },
-    analytics_dataset_app_status: {
-        init: IconSvg.initStatusIcon,
-        loading: IconSvg.statusLoadingIcon,
-        complete: IconSvg.check2Icon,
-    },
+    }
 };
 
 const mapTaskStatus = (status) => {
@@ -77,8 +63,8 @@ function UserSetup() {
     const all_services = useSelector(state => state.all_data.services);
     const all_spaces = useSelector(state => state.all_data.spaces);
     const all_projects = useSelector(state => state.all_data.projects);
-    const all_role_instances = useSelector(state => state.all_data.all_role_instances);
-    const all_role_assignments = useSelector(state => state.all_data.all_role_assignments);
+    // const all_role_instances = useSelector(state => state.all_data.all_role_instances);
+    // const all_role_assignments = useSelector(state => state.all_data.all_role_assignments);
     const service_added = useSelector(state => state.data_added.service_added);
 
     const [loading, setLoading] = useState(false);
@@ -113,17 +99,15 @@ function UserSetup() {
 
         if (!authData) return;
 
-        const { organization_id, document_type, file_id, request_type } = authData;
-        const requiredValues = [organization_id, document_type, file_id];
-        const isMissingRequired = requiredValues.some(v => !v);
-
-        if (isMissingRequired || request_type !== 'ext_user_signup') {
+        const { organization_id, request_type } = authData;
+        if (!organization_id || request_type !== (UTIL_CONFIG.USER_REQUEST || UTIL_CONFIG.STRIPE_REQUEST)) {
+            updateAuthData(initialAuthData);
             navigate('/home');
             return;
         }
 
         hasInitializedRef.current = true;
-        handleExternalUserSetup(organization_id, document_type);
+        handleExternalUserSetup(organization_id);
     }, [location.state?.from, authData?.request_type]);
 
     useEffect(() => {
@@ -144,9 +128,7 @@ function UserSetup() {
     useEffect(() => {
         if (setupFinalStatus === null) return;
 
-        const hasAllDetails = REQUIRED_SETUP_FIELDS.every(
-            field => setupDetails[field]
-        );
+        const hasAllDetails = REQUIRED_SETUP_FIELDS.every(field => setupDetails[field]);
 
         if (setupFinalStatus === 'completed' && hasAllDetails) {
             handleUserServiceSelection();
@@ -156,7 +138,7 @@ function UserSetup() {
         }
     }, [setupFinalStatus]);
 
-    const handleExternalUserSetup = async (org_id, document_type) => {
+    const handleExternalUserSetup = async (org_id) => {
         setLoading(true);
         try {
 
@@ -167,12 +149,27 @@ function UserSetup() {
             setSelectedWorkspace(null);
             setSelectedProject(null);
 
-            const [user_id, user_name] = await Promise.all([
-                getUserItemId(),
-                Promise.resolve(getUserName())
-            ]);
+            const [user_id, user_name, schema_id, account_id,
+                subscriber_id, subscription_id] = await Promise.all([
+                    getUserItemId(),
+                    Promise.resolve(getUserName()),
+                    Promise.resolve(fetchAppflyteSchemaId()),
+                    Promise.resolve(fetchAccountId()),
+                    Promise.resolve(fetchSubscriberId()),
+                    Promise.resolve(fetchSubscriptionId())
+                ]);
 
-            const response = await AmeyaAuthApi.user_setup(user_id, user_name, document_type, org_id);
+            const reqObj = {
+                account_id: account_id,
+                subscriber_id: subscriber_id,
+                subscription_id: subscription_id,
+                schema_id: schema_id,
+                organization_id: org_id,
+                user_id: user_id,
+                user_name: user_name
+            }
+
+            const response = await AmeyaAuthApi.setup_appflyte_user(reqObj);
             if (response.status === 200) {
                 const responseData = response.data ?? {};
                 setSessionId(responseData.session_id ?? null);
@@ -180,7 +177,7 @@ function UserSetup() {
                     organization_id: responseData.organization_id ?? null,
                     service_id: responseData.service_id ?? null,
                     workspace_id: responseData.workspace_id ?? null,
-                    project_id: responseData.project_id ?? null,
+                    project_id: responseData.project_id ?? null
                 });
             } else {
                 throw new Error(`Setup failed with status ${response.status}`);
@@ -245,7 +242,6 @@ function UserSetup() {
         const status = await fetchSetupStatus();
 
         if (status === 'completed' || status === 'failed') {
-            console.log('Polling stopped:', status);
             AmeyaAuthApi.user_session_delete(statusSessionId);
             setPollLoading(false);
             setSetupFinalStatus(status);
@@ -264,13 +260,10 @@ function UserSetup() {
             }
 
             const response = await getOrganizationData();
-            const valid_organizations =
-                response?.filter(item =>
-                    user_organization.includes(item?.payload?.__auto_id__)
-                ) ?? [];
-
+            const valid_organizations = response?.filter(item => user_organization.includes(item?.payload?.__auto_id__)) ?? [];
             dispatch(setOrganizationsState(valid_organizations));
             return valid_organizations;
+
         } catch (error) {
             console.error('Failed to fetch organizations:', error);
             return [];
@@ -284,9 +277,7 @@ function UserSetup() {
                 return all_services;
             }
 
-            const response = await getServicesByOrganization(
-                setupDetails.organization_id
-            );
+            const response = await getServicesByOrganization(setupDetails.organization_id);
             dispatch(setServicesState(response));
             return response;
         } catch (error) {
@@ -328,39 +319,39 @@ function UserSetup() {
     }, [all_projects, setupDetails.organization_id, dispatch]);
 
     // Fetch role assignment data
-    const getRoleAssignmentDetails = useCallback(async () => {
-        try {
-            if (all_role_assignments?.length) {
-                return all_role_assignments;
-            }
+    // const getRoleAssignmentDetails = useCallback(async () => {
+    //     try {
+    //         if (all_role_assignments?.length) {
+    //             return all_role_assignments;
+    //         }
 
-            const user_id = await getUserItemId();
-            const response = await getAllRoleAssignmentData(user_id);
-            dispatch(setRoleAssignmentState(response));
-            return response;
-        } catch (error) {
-            console.error('Failed to fetch role assignments:', error);
-            return [];
-        }
-    }, [all_role_assignments, dispatch]);
+    //         const user_id = await getUserItemId();
+    //         const response = await getAllRoleAssignmentData(user_id);
+    //         dispatch(setRoleAssignmentState(response));
+    //         return response;
+    //     } catch (error) {
+    //         console.error('Failed to fetch role assignments:', error);
+    //         return [];
+    //     }
+    // }, [all_role_assignments, dispatch]);
 
     // Fetch role instance data
-    const getRoleInstanceDetails = useCallback(async () => {
-        try {
-            if (all_role_instances?.length) {
-                return all_role_instances;
-            }
+    // const getRoleInstanceDetails = useCallback(async () => {
+    //     try {
+    //         if (all_role_instances?.length) {
+    //             return all_role_instances;
+    //         }
 
-            const response = await getAllRoleInstanceData(
-                setupDetails.organization_id
-            );
-            dispatch(setRoleInstanceState(response));
-            return response;
-        } catch (error) {
-            console.error('Failed to fetch role instances:', error);
-            return [];
-        }
-    }, [all_role_instances, setupDetails.organization_id, dispatch]);
+    //         const response = await getAllRoleInstanceData(
+    //             setupDetails.organization_id
+    //         );
+    //         dispatch(setRoleInstanceState(response));
+    //         return response;
+    //     } catch (error) {
+    //         console.error('Failed to fetch role instances:', error);
+    //         return [];
+    //     }
+    // }, [all_role_instances, setupDetails.organization_id, dispatch]);
 
     //  user service selection after setup completes
     const handleUserServiceSelection = async () => {
@@ -375,7 +366,7 @@ function UserSetup() {
                     getAllProjectData(),
                 ]);
 
-            Promise.all([getRoleAssignmentDetails(), getRoleInstanceDetails()]);
+            // Promise.all([getRoleAssignmentDetails(), getRoleInstanceDetails()]);
 
             const filtered_organization = findItemById(orgResponse, setupDetails.organization_id);
             const filtered_service = findItemById(serviceResponse, setupDetails.service_id);
@@ -394,11 +385,46 @@ function UserSetup() {
         }
     };
 
-    const handleNavigate = useCallback(() => {
-        const hasAllDetails = REQUIRED_SETUP_FIELDS.every(
-            field => setupDetails[field]
-        );
-        navigate(hasAllDetails ? '/document-types' : '/home');
+    const handleNavigate = useCallback(async () => {
+
+        const homeNavigation = () => {
+            updateAuthData(initialAuthData);
+            navigate('/home');
+        };
+
+        const hasAllDetails = REQUIRED_SETUP_FIELDS.every(field => setupDetails[field]);
+
+        if (!hasAllDetails) {
+            return homeNavigation();
+        }
+
+        const isOwner = await fetchOwnerByOrganization(setupDetails.organization_id);
+        const { user_type, request_type, collection_service_type, credit_bundle_id } = authData;
+
+        const isSupportedService = collection_service_type && UTIL_CONFIG.SUPPORTED_SERVICES.includes(collection_service_type);
+
+        if (request_type === UTIL_CONFIG.USER_REQUEST && isSupportedService) {
+            const basePath = `/workspace/${setupDetails.workspace_id}/project/${setupDetails.project_id}`;
+
+            if (collection_service_type === UTIL_CONFIG.DDL_SERVICE) {
+                updateAuthData(initialAuthData);
+                return navigate(`${basePath}/collection-types`);
+            }
+
+            if (collection_service_type === UTIL_CONFIG.DML_SERVICE) {
+                updateAuthData(initialAuthData);
+                return navigate(`${basePath}/collections`);
+            }
+
+            return homeNavigation();
+        }
+
+        if (user_type === UTIL_CONFIG.EXT_USER_TYPE && request_type === UTIL_CONFIG.STRIPE_REQUEST && credit_bundle_id && isOwner) {
+            return navigate("/user/billing");
+        }
+
+        homeNavigation();
+
     }, [setupDetails, navigate]);
 
     const isLoadingState = loading || pollLoading || setupLoading || loadStatus;
@@ -412,12 +438,11 @@ function UserSetup() {
 
                 <Box marginTop={'10px'}>
                     <Typography sx={{ fontSize: '24px', fontWeight: 600 }}>
-                        Welcome to Ameya AI Cloud
+                        Welcome to Appflyte
                     </Typography>
                     <Typography sx={{ fontSize: '14px', fontWeight: 400, marginTop: '10px' }}>
                         Setting the stage... We're provisioning your workspace and services
                     </Typography>
-
 
                     <Box
                         sx={{
@@ -425,7 +450,8 @@ function UserSetup() {
                             display: 'flex',
                             flexDirection: { xs: 'column', sm: 'row' },
                             gap: '15px',
-                            alignItems: 'stretch'
+                            alignItems: 'stretch',
+                            justifyContent: 'center'
                         }}
                     >
                         {serviceData.map((item, index) => (
@@ -468,10 +494,7 @@ function UserSetup() {
 
                                     <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', marginTop: "15px" }}>
                                         <ReactSVG
-                                            src={{
-                                                analytics_tool: IconSvg.analysisIcon,
-                                                extraction_agent: IconSvg.extarctionIcon
-                                            }[item.service_type] || IconSvg.filesIcon}
+                                            src={IconSvg.aiQmsIcon}
                                             beforeInjection={(svg) => {
                                                 svg.setAttribute('style', 'width:48px; height:48px; display:block;');
                                             }}
@@ -514,7 +537,7 @@ function UserSetup() {
                                 Thanks for your patience. Your intelligence ecosystem is ready.
                             </Typography>
                             <Button sx={styles.navigateButton} onClick={handleNavigate}>
-                                Go to Ameya Extract console
+                                Let's Get Started
                             </Button>
                         </>
                     )}

@@ -29,7 +29,8 @@ function Navbar() {
     const navigate = useNavigate()
 
     const { setSelectedOrganization, setSelectedService, setSelectedWorkspace, setSelectedProject, setPermissionStatus, setBillingStatus,
-        selectedOrganization, selectedService, selectedWorkspace, selectedProject, setIsOrganizationOwner, setAuthData } = useAppContext();
+        selectedOrganization, selectedService, selectedWorkspace, selectedProject, setIsOrganizationOwner, setAuthData, authData,
+        updateAuthData, initialAuthData } = useAppContext();
 
     const all_organizations = useSelector(state => state.all_data.organizations);
     const all_services = useSelector(state => state.all_data.services);
@@ -164,7 +165,7 @@ function Navbar() {
         if (selectedProject) {
             setProjectsMenu(project_selected);
             setSelectedProject(selectedProject)
-            handleSidebarConfig(selectedWorkspace, selectedProject, navigate)
+            handleSidebarConfig(selectedWorkspace, selectedProject, navigate, authData, updateAuthData, initialAuthData)
         }
         return
     }

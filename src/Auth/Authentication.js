@@ -7,12 +7,11 @@ import { getStyles } from './Styles'
 import { useTheme } from '@mui/material/styles';
 import { ReactSVG } from "react-svg";
 
-import appflyte_logo from "../images/appflyte_logo.svg"
+import appflyte_logo from "../images/appflyte_logo.svg";
 import { IconSvg } from '../utils/globalIcons';
-import { useDispatch } from 'react-redux';
-import { decodeParamToken } from '../utils';
 import { useAppContext } from '../context/AppContext';
 import { tostAlert } from '../utils/AlertToast';
+import { UTIL_CONFIG } from '../utils';
 
 function Authentication() {
 
@@ -20,9 +19,9 @@ function Authentication() {
     const styles = getStyles(theme);
     const navigate = useNavigate()
     const location = useLocation();
-    const dispatch = useDispatch();
-    const { updateAuthData } = useAppContext();
+    const { updateAuthData, initialAuthData } = useAppContext();
     const [requestType, setRequestType] = useState('signin')
+    const [authStep, setAuthStep] = useState("select");
 
     const appName = process.env.REACT_APP_NAME
     const authServerUrl = process.env.REACT_APP_OAUTH_SERVER_URL
@@ -31,20 +30,6 @@ function Authentication() {
     const handleOAuthLogin = (authProvider) => {
         try {
 
-            localStorage.clear()
-            sessionStorage.clear()
-            dispatch({ type: 'RESET_ALL' });
-
-            const redirectTo = location.state?.from || "/";
-            const url = new URL(redirectTo, window.location.origin);
-
-            const externalRequestType = url.searchParams.get("request_type");
-            const fileId = url.searchParams.get("file_id");
-            const documentType = url.searchParams.get("document_type");
-            const creditBundleId = url.searchParams.get("credit_bundle_id");
-            const computedToken = decodeParamToken(fileId, documentType);
-            const encodedToken = url.searchParams.get("token");
-
             const params = new URLSearchParams({
                 app_name: appName,
                 schema_id: schemaId,
@@ -52,15 +37,12 @@ function Authentication() {
                 request_type: requestType
             });
 
-            if (computedToken === encodedToken) {
-                params.append("user_file_id", fileId);
-                params.append("document_type", documentType);
-                params.append("user_auth_type", "external_ameya_auth")
-            }
-
-            if (externalRequestType === "external_ameya_stripe" && creditBundleId) {
-                params.append("user_auth_type", "external_ameya_stripe")
-                params.append("credit_bundle_id", creditBundleId)
+            const externalParams = sessionStorage.getItem("externalParams")
+            if (externalParams) {
+                const external_params = new URLSearchParams(externalParams);
+                const userType = external_params.get("user_type");
+                const requestType = external_params.get("request_type");
+                userType === UTIL_CONFIG.EXT_USER_TYPE && params.append("user_auth_type", requestType)
             }
 
             const authUrlWithParams = `${authServerUrl}/user_auth?${params.toString()}`;
@@ -103,67 +85,75 @@ function Authentication() {
             const dpodToken = authResponse?.token;
             const refreshToken = authResponse?.refresh_token;
 
-            const isExternal = authResponse?.is_external ?? false;
-            const authRequestType = authResponse?.request_type ?? null;
-            const userAuthType = authResponse?.user_auth_type ?? null;
-            const organizationId = authResponse?.organization_id ?? null;
-
-            const userFileId = authResponse?.file_id ?? null;
-            const documentType = authResponse?.document_type ?? null;
-            const creditBundleId = authResponse?.credit_bundle_id ?? null;
-
             const decoded_dpod_token = jwtDecode(dpodToken);
             const app_subscribed = decoded_dpod_token?.app_subscribed ?? [];
             const user_name = decoded_dpod_token?.user_name;
 
-            if (app_subscribed.length > 0 && app_subscribed.includes(appName)) {
+            if (app_subscribed?.length > 0 && app_subscribed.includes(appName)) {
 
                 localStorage.setItem('dpod-token', JSON.stringify(dpodToken));
                 localStorage.setItem('refresh-token', JSON.stringify(refreshToken));
                 localStorage.setItem('UserName', JSON.stringify(user_name));
 
-                const isExternalUser = isExternal === "True";
+                const isExternalUser = Boolean(authResponse?.is_external === "True");
+                const authRequestType = authResponse?.request_type ?? null;
+                const organizationId = authResponse?.organization_id ?? null;
+
                 const isSignin = authRequestType === "signin";
                 const isSignup = authRequestType === "signup";
-                const hasFileData = userFileId && documentType;
+                const externalParams = sessionStorage.getItem("externalParams");
 
-                if (isExternalUser && hasFileData) {
+                if (isExternalUser && externalParams) {
+
+                    const externalParamsObj = new URLSearchParams(externalParams);
+                    const externalUserType = externalParamsObj.get("user_type");
+                    const externalRequestType = externalParamsObj.get("request_type");
+                    const serviceType = externalParamsObj.get("service_type");
+                    const creditBundleId = externalParamsObj.get("credit_bundle_id");
+                    const isSupportedService = Boolean(serviceType && UTIL_CONFIG.SUPPORTED_SERVICES.includes(serviceType));
+
+                    if (externalUserType === UTIL_CONFIG.EXT_USER_TYPE) {
+
+                        if (externalRequestType === UTIL_CONFIG.USER_REQUEST && isSupportedService) {
+                            updateAuthData({
+                                user_type: UTIL_CONFIG.EXT_USER_TYPE,
+                                request_type: UTIL_CONFIG.USER_REQUEST,
+                                collection_service_type: serviceType,
+                                organization_id: organizationId
+                            });
+                        } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && creditBundleId) {
+                            updateAuthData({
+                                user_type: UTIL_CONFIG.EXT_USER_TYPE,
+                                request_type: UTIL_CONFIG.STRIPE_REQUEST,
+                                credit_bundle_id: creditBundleId,
+                                organization_id: organizationId
+                            });
+                        } else {
+                            updateAuthData(initialAuthData);
+                        }
+
+                    } else {
+                        updateAuthData(initialAuthData);
+                    }
+
+                    sessionStorage.removeItem("externalParams");
 
                     if (isSignin) {
-                        updateAuthData({
-                            request_type: "ext_user_signin",
-                            user_auth_type: userAuthType,
-                            file_id: userFileId,
-                            document_type: documentType
-                        });
-
                         navigate("/home");
                         return;
                     }
 
                     if (isSignup && organizationId) {
-                        updateAuthData({
-                            request_type: "ext_user_signup",
-                            user_auth_type: userAuthType,
-                            organization_id: organizationId,
-                            file_id: userFileId,
-                            document_type: documentType
-                        });
-
                         navigate("/onboarding", { state: { from: "login" } });
                         return;
                     }
+
                 }
 
-                updateAuthData({
-                    request_type: "direct_user",
-                    user_auth_type: userAuthType,
-                    credit_bundle_id: creditBundleId
-                });
-
+                updateAuthData(initialAuthData);
                 navigate("/home");
-
-            } else {
+            }
+            else {
                 tostAlert("You do not have access to this application.", "error");
                 localStorage.clear();
             }
@@ -176,6 +166,85 @@ function Authentication() {
         }
     };
 
+    // const postLogin = async (authResponse) => {
+    //     try {
+
+    //         const dpodToken = authResponse?.token;
+    //         const refreshToken = authResponse?.refresh_token;
+
+    //         const isExternal = authResponse?.is_external ?? false;
+    //         const authRequestType = authResponse?.request_type ?? null;
+    //         const userAuthType = authResponse?.user_auth_type ?? null;
+    //         const organizationId = authResponse?.organization_id ?? null;
+
+    //         const userFileId = authResponse?.file_id ?? null;
+    //         const documentType = authResponse?.document_type ?? null;
+    //         const creditBundleId = authResponse?.credit_bundle_id ?? null;
+
+    //         const decoded_dpod_token = jwtDecode(dpodToken);
+    //         const app_subscribed = decoded_dpod_token?.app_subscribed ?? [];
+    //         const user_name = decoded_dpod_token?.user_name;
+
+    //         if (app_subscribed.length > 0 && app_subscribed.includes(appName)) {
+
+    //             localStorage.setItem('dpod-token', JSON.stringify(dpodToken));
+    //             localStorage.setItem('refresh-token', JSON.stringify(refreshToken));
+    //             localStorage.setItem('UserName', JSON.stringify(user_name));
+
+    //             const isExternalUser = isExternal === "True";
+    //             const isSignin = authRequestType === "signin";
+    //             const isSignup = authRequestType === "signup";
+    //             const hasFileData = userFileId && documentType;
+
+    //             if (isExternalUser && hasFileData) {
+
+    //                 if (isSignin) {
+    //                     updateAuthData({
+    //                         request_type: "ext_user_signin",
+    //                         user_auth_type: userAuthType,
+    //                         file_id: userFileId,
+    //                         document_type: documentType
+    //                     });
+
+    //                     navigate("/home");
+    //                     return;
+    //                 }
+
+    //                 if (isSignup && organizationId) {
+    //                     updateAuthData({
+    //                         request_type: "ext_user_signup",
+    //                         user_auth_type: userAuthType,
+    //                         organization_id: organizationId,
+    //                         file_id: userFileId,
+    //                         document_type: documentType
+    //                     });
+
+    //                     navigate("/onboarding", { state: { from: "login" } });
+    //                     return;
+    //                 }
+    //             }
+
+    //             updateAuthData({
+    //                 request_type: "direct_user",
+    //                 user_auth_type: userAuthType,
+    //                 credit_bundle_id: creditBundleId
+    //             });
+
+    //             navigate("/home");
+
+    //         } else {
+    //             tostAlert("You do not have access to this application.", "error");
+    //             localStorage.clear();
+    //         }
+    //     } catch (error) {
+    //         console.error('Error decoding Token:', error);
+    //         if (location.pathname !== '/invite-login' && location.pathname !== '/root-user') {
+    //             navigate('/login');
+    //         }
+    //         localStorage.clear()
+    //     }
+    // };
+
     return (
         <Box sx={styles.mainContainer}>
             <Box sx={styles.body}>
@@ -184,66 +253,101 @@ function Authentication() {
                         <img src={appflyte_logo} alt='appflyte_logo' style={{ height: '68px', width: '200px' }} />
                         <Typography sx={{ fontSize: '18px', fontWeight: 600, marginTop: '10px' }}>Welcome to Appflyte</Typography>
 
-                        {requestType === "signin"
-                            ?
-                            (<Typography sx={{ fontSize: '15px', fontWeight: 500, marginTop: '10px' }}>Sign in to your Appflyte account</Typography>)
-                            :
-                            (<Typography sx={{ fontSize: '15px', fontWeight: 500, marginTop: '10px' }}>Create an account to get started</Typography>)
-                        }
+                        {authStep === "select" && (
+                            <Box marginTop="30px" display="flex" flexDirection="column" gap={2}>
+                                <Button
+                                    sx={{
+                                        marginTop: '5px', width: '100px', height: '35px',
+                                        borderRadius: '10px',
+                                        backgroundColor: "#0B51C5", color: '#FFFFFF'
+                                    }}
+                                    onClick={() => {
+                                        setRequestType("signin");
+                                        setAuthStep("provider");
+                                    }}
+                                >
+                                    <Typography sx={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
+                                        SIGN IN
+                                    </Typography>
+                                </Button>
 
-                        <Box marginTop={'20px'}>
-                            <Box
-                                sx={styles.signinButton}
-                                onClick={() => handleOAuthLogin('google')}
-                            >
-                                <ReactSVG
-                                    src={IconSvg.googleIcon}
-                                    beforeInjection={(svg) => {
-                                        svg.setAttribute('style', 'width: 24px; height:24px; display: block;');
+                                <Button
+                                    sx={{
+                                        marginTop: '5px', width: '100px', height: '35px',
+                                        border: '1px solid #0B51C5', borderRadius: '10px',
+                                        backgroundColor: "#FFFFFF"
                                     }}
-                                />
-                                <Typography sx={{ fontSize: '15px', fontWeight: 600 }}>
-                                    {requestType === 'signin' ? 'Sign in with Google' : 'Continue with Google'}
-                                </Typography>
-                            </Box>
-                            <Box
-                                sx={{ ...styles.signinButton, marginTop: '20px' }}
-                                onClick={() => handleOAuthLogin('azure')}
-                            >
-                                <ReactSVG
-                                    src={IconSvg.office365Icon}
-                                    beforeInjection={(svg) => {
-                                        svg.setAttribute('style', 'width: 24px; height:24px; display: block;');
+                                    onClick={() => {
+                                        setRequestType("signup");
+                                        setAuthStep("provider");
                                     }}
-                                />
-                                <Typography sx={{ fontSize: '15px', fontWeight: 600 }}>
-                                    {requestType === 'signin' ? 'Sign in with Microsoft' : 'Continue with Microsoft'}
-                                </Typography>
+                                >
+                                    <Typography sx={{ fontSize: '14px', fontWeight: 700, color: '#0B51C5' }}>
+                                        SIGN UP
+                                    </Typography>
+                                </Button>
                             </Box>
-                        </Box>
+                        )}
 
                         <Box marginTop={'30px'} display={'flex'} flexDirection={'column'} alignItems={'center'}>
-                            <Typography sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                {requestType === 'signin' ? '  Don’t have an account?' : 'Already have an account?'}
-                            </Typography>
-                            <Button
-                                sx={{ marginTop: '5px', width: '90px', height: '35px', border: '1px solid #0B51C5', borderRadius: '10px' }}
-                                onClick={() => setRequestType(prev => (prev === 'signin' ? 'signup' : 'signin'))}
-                            >
-                                <Typography sx={{ fontSize: '14px', fontWeight: 700, color: '#0B51C5' }}>
-                                    {requestType === 'signin' ? 'SIGN UP' : 'SIGN IN'}
-                                </Typography>
-                            </Button>
+                            {authStep === "provider" && (
+                                <>
+                                    <Typography sx={{ fontSize: '15px', fontWeight: 500, marginTop: '10px' }}>
+                                        {requestType === 'signin' ? 'Sign in to your Appflyte account' : 'Create an account to get started'}
+                                    </Typography>
+
+                                    <Box marginTop={'20px'}>
+                                        {/* Google */}
+                                        <Box
+                                            sx={styles.signinButton}
+                                            onClick={() => handleOAuthLogin('google')}
+                                        >
+                                            <ReactSVG
+                                                src={IconSvg.googleIcon}
+                                                beforeInjection={(svg) => {
+                                                    svg.setAttribute('style', 'width: 24px; height:24px; display: block;');
+                                                }}
+                                            />
+                                            <Typography sx={{ fontSize: '15px', fontWeight: 600 }}>
+                                                {requestType === 'signin' ? 'Sign in with Google' : 'Continue with Google'}
+                                            </Typography>
+                                        </Box>
+
+                                        {/* Microsoft */}
+                                        <Box
+                                            sx={{ ...styles.signinButton, marginTop: '20px' }}
+                                            onClick={() => handleOAuthLogin('azure')}
+                                        >
+                                            <ReactSVG
+                                                src={IconSvg.office365Icon}
+                                                beforeInjection={(svg) => {
+                                                    svg.setAttribute('style', 'width: 24px; height:24px; display: block;');
+                                                }}
+                                            />
+                                            <Typography sx={{ fontSize: '15px', fontWeight: 600 }}>
+                                                {requestType === 'signin' ? 'Sign in with Microsoft' : 'Continue with Microsoft'}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    <Button
+                                        sx={{ marginTop: 3 }}
+                                        onClick={() => setAuthStep("select")}
+                                    >
+                                        Back
+                                    </Button>
+                                </>
+                            )}
                         </Box>
 
                         <Typography
                             sx={styles.linkText}
                             onClick={() => navigate('/root-user')}
                         >
-                            Sign in using root user email
+                            Sign in to root user account
                         </Typography>
 
-                        {/* <Box marginTop="20px" textAlign="center">
+                        <Box marginTop="20px" textAlign="center">
                             <Typography sx={{ fontSize: '13px', fontWeight: 400 }}>
                                 By continuing, you are indicating that you accept our{" "}
                                 <Link
@@ -264,7 +368,7 @@ function Authentication() {
                                     Privacy Policy
                                 </Link>
                             </Typography>
-                        </Box> */}
+                        </Box>
 
                     </Box>
                 </Box>

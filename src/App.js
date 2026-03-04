@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/App.css';
@@ -28,6 +29,7 @@ import { APPLICATION_CODE_PLURAL, OTHER_PLURAL_ID } from './utils/constants';
 function App() {
   const location = useLocation()
   const theme = useTheme()
+  const dispatch = useDispatch();
   const navigate = useNavigate()
   const mainStyles = getMainStyles(theme);
 
@@ -55,16 +57,6 @@ function App() {
     //eslint-disable-next-line
   }, [navigate]);
 
-  useEffect(() => {
-    if (parsedDPODToken && selectedProject) {
-      fetchCollectionTypes();
-      fetchPublishedCollection();
-      fetchFieldSets();
-      fetchPublishedFieldset()
-      //eslint-disable-next-line
-    }
-  }, [parsedDPODToken, selectedProject]);
-
   const handleAuthentication = async () => {
     const jwtIdToken = localStorage.getItem('dpod-token');
     if (location.pathname !== "/authorized") {
@@ -78,28 +70,40 @@ function App() {
           }
         } catch (error) {
           console.error("Failed to parse token:", error);
-          setIsAuthenticated(false);
           localStorage.clear();
-          if (location.pathname !== '/invite-login' && location.pathname !== '/root-user') {
-            navigate('/login');
-          }
+          sessionStorage.clear();
+          dispatch({ type: 'RESET_ALL' });
+          setIsAuthenticated(false);
+          navigate('/login');
         }
       } else {
+
         setIsAuthenticated(false);
-        localStorage.clear();
 
         const currentPath = location.pathname;
         const skipPaths = ['/invite-login', '/root-user', '/login'];
 
+        if (location.search) {
+          sessionStorage.setItem("externalParams", location.search);
+        }
+
         if (!skipPaths.includes(currentPath)) {
-          navigate('/login', {
-            state: { from: currentPath + location.search }
-          });
+          navigate('/login');
         }
 
       }
     }
   };
+
+  useEffect(() => {
+    if (parsedDPODToken && selectedProject) {
+      fetchCollectionTypes();
+      fetchPublishedCollection();
+      fetchFieldSets();
+      fetchPublishedFieldset()
+      //eslint-disable-next-line
+    }
+  }, [parsedDPODToken, selectedProject]);
 
   const fetchCollectionTypes = () => {
     if (parsedDPODToken && selectedProject) {

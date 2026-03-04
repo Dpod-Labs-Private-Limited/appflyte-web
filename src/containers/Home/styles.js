@@ -95,7 +95,6 @@ export const getStyles = (theme) => ({
         backgroundColor: '#0B51C5',
         fontSize: '14px',
         fontWeight: '600',
-        marginTop: '10px',
-        // marginBottom: '30px'
+        marginTop: '10px'
     }
 });

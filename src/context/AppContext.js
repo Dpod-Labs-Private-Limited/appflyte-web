@@ -101,18 +101,14 @@ export function AppProvider({ children }) {
     });
 
     const initialAuthData = {
-        document_type: null,
+        user_type: null,
         request_type: null,
-        file_id: null,
-        file_name: null,
         organization_id: null,
         service_id: null,
         workspace_id: null,
         project_id: null,
-        document_type_id: null,
-        task_id: null,
-        user_auth_type: null,
-        credit_bundle_id: null
+        credit_bundle_id: null,
+        collection_service_type: null
     };
 
     const [authData, setAuthData] = useState(() => {

@@ -62,3 +62,23 @@ export async function lowercaseStrings(jsonInput) {
 
     return processObject(jsonInput);
 }
+
+export const UTIL_CONFIG = {
+    EXT_USER_TYPE: "external_appflyte_user",
+    STRIPE_REQUEST: "external_stripe",
+    USER_REQUEST: "external_user",
+    SUPPORTED_SERVICES: ["ddl", "dml"],
+    DDL_SERVICE: "ddl",
+    DML_SERVICE: "dml",
+
+    AUTH_TYPE: "external_auth",
+    EXT_USER_SIGNIN: "ext_user_signin",
+    EXT_USER_SIGNUP: "ext_user_signup",
+    EXTERNAL_APPFLYTE_AUTH: "external_appflyte_auth",
+    EXTERNAL_APPFLYTE_USER: "external_appflyte_user",
+    EXTERNAL_APPFLYTE_STRIPE: "external_appflyte_stripe",
+    EXT_USER: "external_user",
+    DIRECT_USER: "direct_user",
+    APPFLYTE_AGENT: "appflyte_agent",
+    SERVICE_DDL: "ddl",
+};

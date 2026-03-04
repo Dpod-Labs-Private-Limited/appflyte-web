@@ -22,6 +22,7 @@ import { useIntl } from 'react-intl';
 import messages from './messages';
 import LoadBar from '../../utils/LoadBar';
 import getAppflyteEnginesData from '../../utils/ApiFunctions/AppflyteEngines';
+import { UTIL_CONFIG } from '../../utils';
 
 function MainHome() {
 
@@ -60,32 +61,33 @@ function MainHome() {
 
     const getUserDeatils = async () => {
         try {
+
             const user_organization = fetchOrganizationId();
+
             if ((user_organization || user_organization)?.length > 0) {
 
-                const userAuthType = authData?.user_auth_type ?? null;
-                const creditBundleId = authData?.credit_bundle_id ?? null;
-
-                const [organizations_data, appflyteEngines] = await Promise.all([
-                    getAllOrganization(),
-                    getAllAppflyteEngines()
-                ])
+                const [organizations_data, appflyteEngines] = await Promise.all([getAllOrganization(), getAllAppflyteEngines()])
 
                 if (organizations_data && (organizations_data)?.length) {
+
                     if ((organizations_data || [])?.length === 1) {
 
                         const selected_org = (organizations_data || [])?.at(-1)
                         setSelectedOrganization({ ...selected_org })
 
                         const organization_id = selected_org?.payload?.__auto_id__ ?? null;
-                        // const is_owner = await fetchOwnerByOrganization(organization_id)
+                        const is_owner = await fetchOwnerByOrganization(organization_id)
 
-                        // if (userAuthType === "external_ameya_stripe" && creditBundleId && is_owner) {
-                        //     navigate("/user/billing")
-                        //     return
-                        // }
+                        const requestType = authData?.request_type ?? null;
+                        const userType = authData?.user_type ?? null;
+                        const creditBundleId = authData?.credit_bundle_id ?? null;
 
-                        const filtered_engine = (appflyteEngines || []).find((e) => e?.payload?.configuration?.engine_name === "appflyte_agent") ?? null;
+                        if (userType === UTIL_CONFIG.EXT_USER_TYPE && requestType === UTIL_CONFIG.STRIPE_REQUEST && creditBundleId && is_owner) {
+                            navigate("/user/billing")
+                            return
+                        }
+
+                        const filtered_engine = (appflyteEngines || []).find((e) => e?.payload?.configuration?.engine_name === UTIL_CONFIG.APPFLYTE_AGENT) ?? null;
                         if (!filtered_engine) {
                             setErrorType('service')
                             return
@@ -95,7 +97,6 @@ function MainHome() {
                         const service_name = filtered_engine?.payload?.configuration?.engine_name ?? null;
                         const response = await getServicesByOrganization(organization_id);
                         const services = response ?? [];
-
 
                         if (!response || !services.length) {
                             navigate(`/organization/${organization_id}/services/add-service`, {

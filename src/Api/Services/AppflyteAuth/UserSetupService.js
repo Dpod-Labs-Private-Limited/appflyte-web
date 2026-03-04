@@ -2,10 +2,9 @@ import axios from "axios";
 
 class AmeyaAuthService {
 
-    user_setup = async (user_id, user_name, document_type, organization_id, jwtToken) => {
-        const schema_id = process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID;
+    setup_appflyte_user = async (reqObj) => {
         const JwtToken = JSON.parse(localStorage.getItem("dpod-token"))
-        const response = await axios.get(`${process.env.REACT_APP_OAUTH_SERVER_URL}/setup_user/${schema_id}/${user_id}/${encodeURIComponent(user_name)}/${encodeURIComponent(document_type)}/${organization_id}`, {
+        const response = await axios.post(`${process.env.REACT_APP_OAUTH_SERVER_URL}/setup-appflyte-user`, reqObj, {
             headers: { Authorization: `Bearer ${JwtToken}` }
         });
         return response;

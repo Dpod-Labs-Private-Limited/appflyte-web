@@ -39,7 +39,7 @@ function ViewProjects() {
     const dispatch = useDispatch()
     const { projectBalance } = useCredit()
     const { selectedOrganization, setSelectedProject, setSelectedWorkspace,
-        selectedWorkspace, setPermissionStatus, isOrganizationOwner, authData } = useAppContext();
+        selectedWorkspace, setPermissionStatus, isOrganizationOwner, authData, updateAuthData, initialAuthData } = useAppContext();
     const [currentspace, setCurrentSpace] = useState(null)
 
     const all_projects = useSelector(state => state.all_data.projects)
@@ -176,7 +176,7 @@ function ViewProjects() {
 
     const handleProjectSelection = async (item) => {
         setSelectedProject(item)
-        await handleSidebarConfig(selectedWorkspace, item, navigate)
+        await handleSidebarConfig(selectedWorkspace, item, navigate, authData, updateAuthData, initialAuthData)
     }
 
     const handleSpaceNavigation = () => {
