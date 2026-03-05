@@ -17,6 +17,7 @@ import { useAppContext } from '../../context/AppContext';
 import { fetchOrganizationId, fetchOwnerByOrganization } from '../../utils/GetAccountDetails';
 import getAppflyteEnginesData from '../../utils/ApiFunctions/AppflyteEngines';
 import { getServicesByOrganization } from '../../utils/ApiFunctions/ServicesData';
+import { UTIL_CONFIG } from '../../utils';
 
 function Organizations() {
 
@@ -26,7 +27,7 @@ function Organizations() {
     const dispatch = useDispatch();
     const intl = useIntl();
     const mainStyles = getMainStyles(theme);
-    const { setSelectedOrganization, setSelectedService, setSelectedWorkspace, setSelectedProject, authData } = useAppContext();
+    const { setSelectedOrganization, setSelectedService, setSelectedWorkspace, setSelectedProject, authData, updateAuthData, initialAuthData } = useAppContext();
     const all_organizations = useSelector(state => state.all_data.organizations);
     const all_engines = useSelector(state => state.all_data.appflyte_engines);
 
@@ -104,14 +105,14 @@ function Organizations() {
 
             const engine_id = filtered_engine?.payload?.__auto_id__ ?? null;
             const service_name = filtered_engine?.payload?.configuration?.engine_name ?? null;
+            const isOwner = await fetchOwnerByOrganization(organization_id);
+            const { user_type, request_type, billing_period_type } = authData;
 
-            // const userAuthType = authData?.user_auth_type ?? null;
-            // const creditBundleId = authData?.credit_bundle_id ?? null;
-            // const is_owner = await fetchOwnerByOrganization(organization_id)
-            // if (userAuthType === "external_ameya_stripe" && creditBundleId && is_owner) {
-            //     navigate("/user/billing")
-            //     return
-            // }
+            if (user_type === UTIL_CONFIG.EXT_USER_TYPE && request_type === UTIL_CONFIG.STRIPE_REQUEST && billing_period_type && isOwner) {
+                return navigate("/user/billing");
+            }
+
+            updateAuthData(initialAuthData);
 
             const response = await getServicesByOrganization(organization_id);
             if (!response) {

@@ -31,8 +31,9 @@ function HomeLayout() {
             const externalUserType = queryParams.get("user_type");
             const externalRequestType = queryParams.get("request_type");
             const serviceType = queryParams.get("service_type");
-            const creditBundleId = queryParams.get("credit_bundle_id");
+            const billingPeriodType = queryParams.get("billing_period_type");
             const isSupportedService = Boolean(serviceType && UTIL_CONFIG.SUPPORTED_SERVICES.includes(serviceType));
+            const isSupportedBillingPeriod = Boolean(billingPeriodType && UTIL_CONFIG.SUPPORTED_BILLING_PERIODS.includes(billingPeriodType));
 
             if (externalUserType === UTIL_CONFIG.EXT_USER_TYPE) {
 
@@ -42,11 +43,11 @@ function HomeLayout() {
                         request_type: UTIL_CONFIG.USER_REQUEST,
                         collection_service_type: serviceType
                     });
-                } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && creditBundleId) {
+                } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && isSupportedBillingPeriod) {
                     updateAuthData({
                         user_type: UTIL_CONFIG.EXT_USER_TYPE,
                         request_type: UTIL_CONFIG.STRIPE_REQUEST,
-                        credit_bundle_id: creditBundleId
+                        billing_period_type: billingPeriodType
                     });
                 } else {
                     updateAuthData(initialAuthData);

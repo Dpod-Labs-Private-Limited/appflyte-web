@@ -16,6 +16,7 @@ import GeneralTable from '../../components/GeneralTable'
 import { useCredit } from '../../context/CreditContext';
 import { getStyles } from './styles';
 import { Refresh } from '@mui/icons-material';
+import { UTIL_CONFIG } from '../../utils';
 
 function Payment() {
 
@@ -29,6 +30,8 @@ function Payment() {
     const { selectedOrganization, authData, initialAuthData, updateAuthData } = useAppContext();
     const { apiBalance, projectBalance } = useCredit();
 
+    const [selected, setSelected] = useState("month");
+
     useEffect(() => {
         fetchAll()
         //eslint-disable-next-line
@@ -38,16 +41,13 @@ function Payment() {
         setDataLoading(true)
         try {
 
-            const bundle_data = await fetchCreditBundless()
-            const userAuthType = authData?.user_auth_type ?? null;
-            const creditBundleId = authData?.credit_bundle_id ?? null;
-
-            if (creditBundleId && userAuthType) {
-                updateAuthData(initialAuthData);
-                const filtered_bundle = (bundle_data || [])?.find(item => item?.payload?.__auto_id__ === creditBundleId)
-                handleContinue(filtered_bundle)
+            const billingPeriodType = authData?.billing_period_type ?? null;
+            const isSupportedBillingPeriod = Boolean(billingPeriodType && UTIL_CONFIG.SUPPORTED_BILLING_PERIODS.includes(billingPeriodType));
+            if (isSupportedBillingPeriod) {
+                billingPeriodType === "monthly" ? setSelected("month") : setSelected("year")
+                updateAuthData(initialAuthData)
             }
-
+            await fetchCreditBundless()
         } catch (error) {
             console.log(error)
         } finally {
@@ -107,7 +107,8 @@ function Payment() {
                     success_url: `${process.env.REACT_APP_AMEYA_WEB_URL}/user/billing`,
                     cancel_url: `${process.env.REACT_APP_AMEYA_WEB_URL}/user/billing`,
                     user_id,
-                    email_id
+                    email_id,
+                    plan_period: selected
                 };
                 const response = await AppflyteTransactionApi.createSession(sessionReqObj);
 
@@ -129,37 +130,47 @@ function Payment() {
 
     const activeLevel = Number(creditBundlesData.find(p => p.payload.active_plan)?.payload?.level || 0);
 
-    const columns = [
+    const baseColumns = [
         {
             id: 'payload.display_name',
-            label: 'Bundle',
+            label: 'Plan',
             sortable: false,
             renderCell: (row) => (<Typography sx={{ fontWeight: 600 }}>{row?.payload?.display_name}</Typography>)
         },
         {
-            id: 'payload.projects',
+            id: 'payload.features.projects',
             label: 'Projects',
             sortable: false,
-            renderCell: (row) => row?.payload?.projects
+            renderCell: (row) => row?.payload?.features?.projects
         },
         {
-            id: 'payload.api_calls',
+            id: 'payload.features.api_calls',
             label: 'API Requests/mo',
             sortable: false,
-            renderCell: (row) => formatCompact(Number(row?.payload?.api_calls || 0))
+            renderCell: (row) => formatCompact(Number(row?.payload?.features?.api_calls || 0))
         },
         {
-            id: 'payload.price_in_dollar',
-            label: 'Price',
+            id: 'price',
+            label: selected === "year" ? 'Price (Yearly)' : 'Price',
             sortable: false,
-            renderCell: (row) => (
-                <Typography sx={{ fontWeight: 600 }}>
-                    {new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                    }).format(row?.payload?.price_in_dollar ?? 0)}
-                </Typography>
-            )
+            renderCell: (row) => {
+                const pricing = row?.payload?.pricing?.[
+                    selected === "month" ? "monthly" : "yearly"
+                ];
+
+                if (!pricing) return "—";
+
+                const total = Number(pricing.billing_total || 0);
+
+                return (
+                    <Typography sx={{ fontWeight: 600 }}>
+                        {new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: pricing.currency || 'USD',
+                        }).format(total)}
+                    </Typography>
+                );
+            }
         },
         {
             id: '',
@@ -195,6 +206,35 @@ function Payment() {
         }).format(value);
     };
 
+    if (selected === "year") {
+        baseColumns.splice(4, 0, {
+            id: 'monthly_equivalent',
+            label: 'Monthly Equivalent',
+            sortable: false,
+            renderCell: (row) => {
+                const yearly = row?.payload?.pricing?.yearly;
+                if (!yearly) return "—";
+
+                return (
+                    <Typography>
+                        {new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: yearly.currency || 'USD',
+                        }).format(Number(yearly.price_per_month))}
+                        /mo
+                    </Typography>
+                );
+            }
+        });
+    }
+
+    const columns = baseColumns;
+
+    const filteredBundles = creditBundlesData.filter(bundle => {
+        const pricing = bundle?.payload?.pricing || {};
+        return pricing[selected === "month" ? "monthly" : "yearly"];
+    });
+
     return (<Box mt={5}>
 
         {(paymentLoading || dataLoading) && <LoadBar />}
@@ -226,11 +266,52 @@ function Payment() {
             </Box>
         }
 
-        <Box marginTop={loading ? '40px' : '5px'}>
+        <Box marginTop={loading ? '40px' : '5px'} display={'flex'} justifyContent={'center'}>
+            <div style={styles.wrapper}>
+                <div
+                    style={{
+                        ...styles.slider,
+                        transform: selected === "year"
+                            ? "translateX(100%)"
+                            : "translateX(0%)",
+                    }}
+                />
+
+                <button
+                    style={{
+                        ...styles.button,
+                        color: selected === "month" ? "#fff" : "#333",
+                    }}
+                    onClick={() => setSelected("month")}
+                >
+                    Month
+                </button>
+
+                <button
+                    style={{
+                        ...styles.button,
+                        color: selected === "year" ? "#fff" : "#333",
+                    }}
+                    onClick={() => setSelected("year")}
+                >
+                    Year&nbsp;&nbsp;
+                    <span
+                        style={{
+                            fontSize: '10px', padding: '5px', color: '#0ce04c',
+                            backgroundColor: '#ffffff', borderRadius: '10px'
+                        }}
+                    >
+                        Save 20%
+                    </span>
+                </button>
+            </div>
+        </Box>
+
+        <Box marginTop={'10px'} >
             <GeneralTable
                 columns={columns}
                 loading={loading || dataLoading}
-                data={creditBundlesData}
+                data={filteredBundles}
             />
         </Box>
 

@@ -49,5 +49,33 @@ export const getStyles = (theme) => ({
         fontWeight: '600',
         color: '#FFFFFF',
         textTransform: 'none'
+    },
+    wrapper: {
+        position: "relative",
+        display: "flex",
+        width: "220px",
+        background: "#e5e7eb",
+        borderRadius: "999px",
+        padding: "2px",          
+        height: "32px",         
+    },
+    slider: {
+        position: "absolute",
+        top: 2,
+        left: 2,
+        width: "calc(50% - 2px)",
+        height: "calc(100% - 4px)",
+        background: "#2563eb",
+        borderRadius: "999px",
+        transition: "0.25s ease",
+    },
+    button: {
+        flex: 1,
+        background: "transparent",
+        border: "none",
+        zIndex: 1,
+        fontSize: "13px",
+        fontWeight: "600",
+        cursor: "pointer",
     }
 })

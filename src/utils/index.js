@@ -68,6 +68,7 @@ export const UTIL_CONFIG = {
     STRIPE_REQUEST: "external_stripe",
     USER_REQUEST: "external_user",
     SUPPORTED_SERVICES: ["ddl", "dml"],
+    SUPPORTED_BILLING_PERIODS: ["monthly", "yearly"],
     DDL_SERVICE: "ddl",
     DML_SERVICE: "dml",
 

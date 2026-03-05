@@ -80,9 +80,9 @@ function MainHome() {
 
                         const requestType = authData?.request_type ?? null;
                         const userType = authData?.user_type ?? null;
-                        const creditBundleId = authData?.credit_bundle_id ?? null;
+                        const billingPeriodType = authData?.billing_period_type ?? null;
 
-                        if (userType === UTIL_CONFIG.EXT_USER_TYPE && requestType === UTIL_CONFIG.STRIPE_REQUEST && creditBundleId && is_owner) {
+                        if (userType === UTIL_CONFIG.EXT_USER_TYPE && requestType === UTIL_CONFIG.STRIPE_REQUEST && billingPeriodType && is_owner) {
                             navigate("/user/billing")
                             return
                         }

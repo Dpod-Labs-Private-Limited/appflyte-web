@@ -10,7 +10,6 @@ const fetchOrganizationId = () => {
         const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         return decrypted;
     } catch (error) {
-        console.log(error)
         return null
     }
 }

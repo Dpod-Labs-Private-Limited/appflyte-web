@@ -399,7 +399,7 @@ function UserSetup() {
         }
 
         const isOwner = await fetchOwnerByOrganization(setupDetails.organization_id);
-        const { user_type, request_type, collection_service_type, credit_bundle_id } = authData;
+        const { user_type, request_type, collection_service_type, billing_period_type } = authData;
 
         const isSupportedService = collection_service_type && UTIL_CONFIG.SUPPORTED_SERVICES.includes(collection_service_type);
 
@@ -419,7 +419,7 @@ function UserSetup() {
             return homeNavigation();
         }
 
-        if (user_type === UTIL_CONFIG.EXT_USER_TYPE && request_type === UTIL_CONFIG.STRIPE_REQUEST && credit_bundle_id && isOwner) {
+        if (user_type === UTIL_CONFIG.EXT_USER_TYPE && request_type === UTIL_CONFIG.STRIPE_REQUEST && billing_period_type && isOwner) {
             return navigate("/user/billing");
         }
 

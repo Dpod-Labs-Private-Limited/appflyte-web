@@ -109,8 +109,9 @@ function Authentication() {
                     const externalUserType = externalParamsObj.get("user_type");
                     const externalRequestType = externalParamsObj.get("request_type");
                     const serviceType = externalParamsObj.get("service_type");
-                    const creditBundleId = externalParamsObj.get("credit_bundle_id");
+                    const billingPeriodType = externalParamsObj.get("billing_period_type");
                     const isSupportedService = Boolean(serviceType && UTIL_CONFIG.SUPPORTED_SERVICES.includes(serviceType));
+                    const isSupportedBillingPeriod = Boolean(billingPeriodType && UTIL_CONFIG.SUPPORTED_BILLING_PERIODS.includes(billingPeriodType));
 
                     if (externalUserType === UTIL_CONFIG.EXT_USER_TYPE) {
 
@@ -121,11 +122,11 @@ function Authentication() {
                                 collection_service_type: serviceType,
                                 organization_id: organizationId
                             });
-                        } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && creditBundleId) {
+                        } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && isSupportedBillingPeriod) {
                             updateAuthData({
                                 user_type: UTIL_CONFIG.EXT_USER_TYPE,
                                 request_type: UTIL_CONFIG.STRIPE_REQUEST,
-                                credit_bundle_id: creditBundleId,
+                                billing_period_type: billingPeriodType,
                                 organization_id: organizationId
                             });
                         } else {
@@ -165,85 +166,6 @@ function Authentication() {
             localStorage.clear()
         }
     };
-
-    // const postLogin = async (authResponse) => {
-    //     try {
-
-    //         const dpodToken = authResponse?.token;
-    //         const refreshToken = authResponse?.refresh_token;
-
-    //         const isExternal = authResponse?.is_external ?? false;
-    //         const authRequestType = authResponse?.request_type ?? null;
-    //         const userAuthType = authResponse?.user_auth_type ?? null;
-    //         const organizationId = authResponse?.organization_id ?? null;
-
-    //         const userFileId = authResponse?.file_id ?? null;
-    //         const documentType = authResponse?.document_type ?? null;
-    //         const creditBundleId = authResponse?.credit_bundle_id ?? null;
-
-    //         const decoded_dpod_token = jwtDecode(dpodToken);
-    //         const app_subscribed = decoded_dpod_token?.app_subscribed ?? [];
-    //         const user_name = decoded_dpod_token?.user_name;
-
-    //         if (app_subscribed.length > 0 && app_subscribed.includes(appName)) {
-
-    //             localStorage.setItem('dpod-token', JSON.stringify(dpodToken));
-    //             localStorage.setItem('refresh-token', JSON.stringify(refreshToken));
-    //             localStorage.setItem('UserName', JSON.stringify(user_name));
-
-    //             const isExternalUser = isExternal === "True";
-    //             const isSignin = authRequestType === "signin";
-    //             const isSignup = authRequestType === "signup";
-    //             const hasFileData = userFileId && documentType;
-
-    //             if (isExternalUser && hasFileData) {
-
-    //                 if (isSignin) {
-    //                     updateAuthData({
-    //                         request_type: "ext_user_signin",
-    //                         user_auth_type: userAuthType,
-    //                         file_id: userFileId,
-    //                         document_type: documentType
-    //                     });
-
-    //                     navigate("/home");
-    //                     return;
-    //                 }
-
-    //                 if (isSignup && organizationId) {
-    //                     updateAuthData({
-    //                         request_type: "ext_user_signup",
-    //                         user_auth_type: userAuthType,
-    //                         organization_id: organizationId,
-    //                         file_id: userFileId,
-    //                         document_type: documentType
-    //                     });
-
-    //                     navigate("/onboarding", { state: { from: "login" } });
-    //                     return;
-    //                 }
-    //             }
-
-    //             updateAuthData({
-    //                 request_type: "direct_user",
-    //                 user_auth_type: userAuthType,
-    //                 credit_bundle_id: creditBundleId
-    //             });
-
-    //             navigate("/home");
-
-    //         } else {
-    //             tostAlert("You do not have access to this application.", "error");
-    //             localStorage.clear();
-    //         }
-    //     } catch (error) {
-    //         console.error('Error decoding Token:', error);
-    //         if (location.pathname !== '/invite-login' && location.pathname !== '/root-user') {
-    //             navigate('/login');
-    //         }
-    //         localStorage.clear()
-    //     }
-    // };
 
     return (
         <Box sx={styles.mainContainer}>

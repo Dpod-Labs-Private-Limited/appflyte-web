@@ -74,8 +74,8 @@ export const CreditProvider = ({ children }) => {
                     const data = snapshot.data();
 
                     const project_used = toNumber(data?.project_used ?? 0);
-                    const project_limlt = toNumber(data?.project_limlt ?? 0);
-                    const project_balance = project_limlt - project_used
+                    const project_limit = toNumber(data?.project_limit ?? 0);
+                    const project_balance = project_limit - project_used
 
                     const api_calls_used = toNumber(data?.api_calls_used ?? 0);
                     const api_limit = toNumber(data?.api_limit ?? 0);

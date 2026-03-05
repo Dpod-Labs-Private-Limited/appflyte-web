@@ -107,7 +107,7 @@ export function AppProvider({ children }) {
         service_id: null,
         workspace_id: null,
         project_id: null,
-        credit_bundle_id: null,
+        billing_period_type: null,
         collection_service_type: null
     };
 
