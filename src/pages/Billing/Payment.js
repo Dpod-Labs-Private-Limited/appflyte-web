@@ -104,8 +104,8 @@ function Payment() {
                 const sessionReqObj = {
                     ...reqObj,
                     schema_id: schema_id,
-                    success_url: `${process.env.REACT_APP_AMEYA_WEB_URL}/user/billing`,
-                    cancel_url: `${process.env.REACT_APP_AMEYA_WEB_URL}/user/billing`,
+                    success_url: `${process.env.REACT_APP_APPFLYTE_WEB_URL}/user/billing`,
+                    cancel_url: `${process.env.REACT_APP_APPFLYTE_WEB_URL}/user/billing`,
                     user_id,
                     email_id,
                     plan_period: selected

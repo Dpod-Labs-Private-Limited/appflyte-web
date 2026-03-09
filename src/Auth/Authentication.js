@@ -262,18 +262,18 @@ function Authentication() {
                             )}
                         </Box>
 
-                        <Typography
+                        {/* <Typography
                             sx={styles.linkText}
                             onClick={() => navigate('/root-user')}
                         >
                             Sign in to root user account
-                        </Typography>
+                        </Typography> */}
 
-                        <Box marginTop="20px" textAlign="center">
+                        <Box marginTop="10px" textAlign="center">
                             <Typography sx={{ fontSize: '13px', fontWeight: 400 }}>
                                 By continuing, you are indicating that you accept our{" "}
                                 <Link
-                                    href={`${process.env.REACT_APP_AMEYA_WEBSITE_URL}/terms`}
+                                    href={`${process.env.REACT_APP_APPFLYTE_WEBSITE_URL}/terms-of-service`}
                                     underline="always"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -282,7 +282,7 @@ function Authentication() {
                                 </Link>{" "}
                                 and{" "}
                                 <Link
-                                    href={`${process.env.REACT_APP_AMEYA_WEBSITE_URL}/privacy`}
+                                    href={`${process.env.REACT_APP_APPFLYTE_WEBSITE_URL}/privacy-policy`}
                                     underline="always"
                                     target="_blank"
                                     rel="noopener noreferrer"
