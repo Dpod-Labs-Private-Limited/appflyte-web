@@ -1,8 +1,9 @@
 services:
-  appflyte-web-service-test:
+  appflyte-web-servic-test-78:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: appflyte-web-servic-test-78
     ports:
       - "3007:3000"
     env_file:

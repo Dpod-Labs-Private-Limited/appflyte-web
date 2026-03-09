@@ -1,0 +1,17 @@
+cat .trivyignore
+# False positives - regenerate-unicode-properties@10.2.2 misidentified as minimatch
+CVE-2026-27903
+CVE-2026-27904
+# False positive - protobufjs@7.5.4 misidentified as tar
+CVE-2026-29786
+# OS-level - no fix available in Debian 12
+CVE-2026-0861
+CVE-2023-45853
+# webpack-dev-server@4.x CVEs - cannot upgrade to v5, incompatible with react-scripts@5
+CVE-2025-30359
+CVE-2025-30360
+# postcss@7.x CVE - cannot upgrade to v8, incompatible with react-scripts@5 dependency chain
+CVE-2023-44270
+# webpack-dev-server@4.x CVEs - cannot upgrade to v5, incompatible with react-scripts@5
+CVE-2025-30359
+CVE-2025-30360
