@@ -37,10 +37,6 @@ export function CollectionTypeAdd() {
   const { selectedProject } = useAppContext();
   const { tostAlert, selectedUser, location, navigate, collectionTypeList, fieldSetListPublished, fetchCollectionTypes, fieldSetList } = useOutletContext();
 
-  useEffect(() => {
-    console.log("location", location)
-  }, [location])
-
   const [loading, SetLoading] = useState(false)
   const [open, setOpen] = useState(false);
   const [editRowData, setEditRowData] = useState()
@@ -103,8 +99,6 @@ export function CollectionTypeAdd() {
         const existingFieldsList = []
         const fieldsList = []
         const fieldNames = []
-
-        console.log("res.data", res.data)
 
         res.data.fields.forEach((field, index) => {
           if (field.entity_name === "__auto_id__")
@@ -198,12 +192,21 @@ export function CollectionTypeAdd() {
 
   const handleTypeNameChange = (event) => {
     setSaveFlag(true)
-    setCollectionTypeName(event.target.value)
-    const singularIdText = event.target.value.trim().replaceAll(" ", "-").toLowerCase()
-    const pluralIdText = event.target.value.trim().replaceAll(" ", "-").toLowerCase() + "s"
-    setCollectionSingularId(singularIdText)
-    setCollectionPluralId(pluralIdText)
+
+    const value = event.target.value
+    setCollectionTypeName(value)
+
+    const baseText = value.trim().replaceAll(" ", "-").toLowerCase()
+
+    if (baseText === "") {
+      setCollectionSingularId("")
+      setCollectionPluralId("")
+    } else {
+      setCollectionSingularId(baseText)
+      setCollectionPluralId(baseText + "s")
+    }
   }
+
   const handleSingularIdChange = (event) => {
     setSaveFlag(true)
     setCollectionSingularId(event.target.value)
@@ -599,7 +602,8 @@ export function CollectionTypeAdd() {
   };
 
   const handleClipboardCopy = (apiID) => {
-    const finalUrl = window.__ENV__?.REACT_APP_COLLECTION_API_BASE_URL ? window.__ENV__.REACT_APP_COLLECTION_API_BASE_URL : process.env.REACT_APP_COLLECTION_API_BASE_URL + selectedUser.root_account_id + "/api/collection/" + location.state?.collTypeObj.account_id + "/user/private/cm/v" + location.state?.collTypeObj.latest_published_version + "/" + apiID
+    const schemaId = selectedProject.payload.__auto_id__;
+    const finalUrl = `${process.env.REACT_APP_APPFLYTE_BACKEND_URL}/appflyte/${selectedUser.root_account_id}/api/collection/user/public/cm/v${location.state?.collTypeObj.latest_published_version}/${process.env.REACT_APP_APPFLYTE_COLLECTIONS_SCHEMA_ID}/${schemaId}/${apiID}`;
     const el = document.createElement('textarea'); // Create a <textarea> element
     el.value = finalUrl;  // Set its value to the string that you want copied
     el.setAttribute('readonly', ''); // Make it readonly to be tamper-proof
@@ -811,7 +815,8 @@ export function CollectionTypeAdd() {
                     label={<FormattedMessage {...messages.reqAuthToken} />}
                   /> */}
                   </Box>
-                  <Box marginY="10px">
+
+                  {/* <Box marginY="10px">
                     <Typography sx={classes.smallBold}><FormattedMessage {...messages.manageAccess} /></Typography>
                     <RadioGroup aria-label="access" size="small" name="reqAuthToken" row value={reqAuthToken} disabled={savedCollTypeId != null} onChange={(e) => {
                       setSaveFlag(true)
@@ -820,7 +825,8 @@ export function CollectionTypeAdd() {
                       <FormControlLabel classes={{ label: classes.mediumLabel }} value={"public"} control={<Radio size="small" />} label={<FormattedMessage {...messages.public} />} />
                       <FormControlLabel classes={{ label: classes.mediumLabel }} value={"protected"} control={<Radio size="small" />} label={<FormattedMessage {...messages.protected} />} />
                     </RadioGroup>
-                  </Box>
+                  </Box> */}
+
                   {
                     location.state && location.state?.collTypeObj && location.state?.collTypeObj.latest_published_entity_id != null
                     &&
@@ -833,7 +839,7 @@ export function CollectionTypeAdd() {
                           </Box>
                           <Box sx={classes.apiUrlBox}>
                             <Typography noWrap sx={classes.apiLinkText}>
-                              {process.env.REACT_APP_COLLECTION_API_BASE_URL}{selectedUser?.root_account_id ?? ''}/api/collection/{location.state?.collTypeObj.account_id}/user/private/cm/v{location.state?.collTypeObj.latest_published_version}/{location.state?.collTypeObj.api_prural_id}
+                              {process.env.REACT_APP_APPFLYTE_BACKEND_URL}/appflyte/{selectedUser?.root_account_id ?? ''}/api/collection/{location.state?.collTypeObj.account_id}/user/private/cm/v{location.state?.collTypeObj.latest_published_version}/{location.state?.collTypeObj.api_prural_id}
                             </Typography>
                           </Box>
                           <Box
@@ -855,7 +861,7 @@ export function CollectionTypeAdd() {
                           </Box>
                           <Box sx={classes.apiUrlBox}>
                             <Typography noWrap sx={classes.apiLinkText}>
-                              {window.__ENV__?.REACT_APP_COLLECTION_API_BASE_URL ? window.__ENV__.REACT_APP_COLLECTION_API_BASE_URL : process.env.REACT_APP_COLLECTION_API_BASE_URL}{selectedUser?.root_account_id ?? ''}/api/collection/{location.state?.collTypeObj.account_id}/user/private/cm/v{location.state?.collTypeObj.latest_published_version}/{location.state?.collTypeObj.api_singular_id}/{"{id}"}
+                              {process.env.REACT_APP_APPFLYTE_BACKEND_URL}/appflyte/{selectedUser?.root_account_id ?? ''}/api/collection/{location.state?.collTypeObj.account_id}/user/private/cm/v{location.state?.collTypeObj.latest_published_version}/{location.state?.collTypeObj.api_singular_id}/{"{id}"}
                             </Typography>
                           </Box>
                           <Box

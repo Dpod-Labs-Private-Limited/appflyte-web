@@ -275,68 +275,71 @@ export function CollectionAdd(props) {
   }
 
   const validateUniqueness = (event, selectLang) => {
-    if (!event.target.value)
-      return
-    let searchArr = [...otherItemsList]
-    if (editObj)
-      searchArr = otherItemsList.filter(x => x.__auto_id__ !== editObj.__auto_id__)
-    let indx = -1
-    if (selectLang == null)
-      indx = searchArr.findIndex(x => x[event.target.name] === event.target.value)
-    else
-      indx = searchArr.findIndex(x => {
-        if (x[event.target.name] != null && [event.target.name] != "" && selectLang in x[event.target.name])
-          return x[event.target.name][selectLang] === event.target.value
-        return false
-      })
+    const { name, value } = event.target;
+
+    if (!value) return;
+
+    // Prepare search array
+    let searchArr = [...otherItemsList];
+    if (editObj) {
+      searchArr = otherItemsList.filter(
+        x => x.__auto_id__ !== editObj.__auto_id__
+      );
+    }
+
+    // Find duplicate index
+    const indx = searchArr.findIndex(x => {
+      if (!selectLang) {
+        return x[name] === value;
+      }
+
+      return (
+        x[name] &&
+        typeof x[name] === "object" &&
+        selectLang in x[name] &&
+        x[name][selectLang] === value
+      );
+    });
+
     if (indx > -1) {
-      setValidateTrigerred(true)
-      if (selectLang)
-        setFieldErrors(prev => {
-          if (prev[event.target.name] != null && prev[event.target.name] !== "")
-            return ({
-              ...prev,
-              [event.target.name]: {
-                ...prev[event.target.name],
-                [selectLang]: <FormattedMessage {...messages.fieldShoulfBeUnique} />
-              }
-            })
-          return ({
-            ...prev,
-            [event.target.name]: {
-              [selectLang]: <FormattedMessage {...messages.fieldShoulfBeUnique} />
-            }
-          })
-        })
-      else
+      setValidateTrigerred(true);
+
+      if (selectLang) {
         setFieldErrors(prev => ({
           ...prev,
-          [event.target.name]: <FormattedMessage {...messages.fieldShoulfBeUnique} />
-        }))
-    }
-    else {
+          [name]: {
+            ...(prev[name] || {}),
+            [selectLang]: <FormattedMessage {...messages.fieldShoulfBeUnique} />
+          }
+        }));
+      } else {
+        setFieldErrors(prev => ({
+          ...prev,
+          [name]: <FormattedMessage {...messages.fieldShoulfBeUnique} />
+        }));
+      }
+    } else {
       if (selectLang) {
         setFieldErrors(prev => {
-          const currErr = prev[event.target.name]
-          if (currErr && typeof currErr === "object") {
-            delete currErr[selectLang]
-            if (Object.keys(currErr).length === 0)
-              currErr = null
-          }
-          return ({
+          const currErr = { ...(prev[name] || {}) };
+
+          delete currErr[selectLang];
+
+          return {
             ...prev,
-            [event.target.name]: currErr
-          })
-        })
-      }
-      else {
+            [name]: Object.keys(currErr).length ? currErr : null
+          };
+        });
+      } else {
         setFieldErrors(prev => ({
           ...prev,
-          [event.target.name]: null
-        }))
+          [name]: null
+        }));
       }
     }
-  }
+  };
+
+
 
   return (
     <Box width="100%">

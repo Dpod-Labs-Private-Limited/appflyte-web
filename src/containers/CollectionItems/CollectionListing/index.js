@@ -265,9 +265,6 @@ export function CollectionListing(props) {
       }
       while (lastKey !== null);
 
-      console.log("dataTemp", dataTemp)
-      console.log("dataTempDraft", dataTempDraft)
-
       setState(prev => ({
         columns: [...prev.columns],
         data: [...dataTemp]

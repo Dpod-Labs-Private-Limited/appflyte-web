@@ -31,9 +31,6 @@ function CollectionItem(props) {
   const { entity, validateUniqueness, validateTriggered, fieldErrors, setFieldErrors, selectedLanguage, fieldValues,
     setFieldValues, entityExtraData, languageList, editVal, setSelectedLanguage, isLocalEnable } = props
 
-
-  console.log("entity", entity)
-
   const classes = styles;
 
   const [checkedList, setCheckedList] = useState([])
