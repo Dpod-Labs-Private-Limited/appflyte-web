@@ -196,8 +196,8 @@ export function CollectionTypeAdd() {
     const value = event.target.value
     setCollectionTypeName(value)
 
-    const baseText = value.trim().replaceAll(" ", "-").toLowerCase()
-
+    // const baseText = value.trim().replaceAll(" ", "_").toLowerCase()
+    const baseText = value.trim().replace(/\s+/g, "_").toLowerCase()
     if (baseText === "") {
       setCollectionSingularId("")
       setCollectionPluralId("")
@@ -933,7 +933,7 @@ export function CollectionTypeAdd() {
                       <Button
                         disableElevation
                         variant='outlined'
-                        color='secondary'
+                        // color='secondary'
                         size="small"
                         sx={classes.confBtn}
                         onClick={() => {
@@ -1023,7 +1023,7 @@ export function CollectionTypeAdd() {
                           actions={
                             [
                               {
-                                icon: <DeleteOutline />,
+                                icon: <DeleteOutline sx={{ color: '#C30E2E', height: '18px', width: '18px' }} />,
                                 tooltip: 'Delete',
                                 onClick: (event, rowData) => {
                                   setSaveFlag(true)

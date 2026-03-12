@@ -14,7 +14,7 @@ import styles from './styles';
 import messages from './messages';
 import { useFormik } from 'formik';
 import { TextFieldOverridden as TextField } from '../TextFieldOverridden';
-import { AddCircle, DeleteOutline }  from '@mui/icons-material';
+import { AddCircle, DeleteOutline } from '@mui/icons-material';
 import { validateLanguage, getEditLocalRows, getEditFieldProps, getLocationObject, getEditEnglishName } from '../../Api/Services/collection/collectionUtilityServices';
 import { SYSTEM_RESERVED_FIELD_NAMES } from '../../utils/constants';
 
@@ -191,8 +191,8 @@ function CollectionTypeAddPasswordField(props) {
             <Tabs
               value={tabValue}
               onChange={handleTabChange}
-              indicatorColor="secondary"
-              textColor="secondary"
+              // indicatorColor="secondary"
+              // textColor="secondary"
               aria-label="scrollable force tabs example"
               variant="scrollable"
               scrollButtons="off"

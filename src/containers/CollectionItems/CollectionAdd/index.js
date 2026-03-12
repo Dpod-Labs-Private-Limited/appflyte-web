@@ -26,7 +26,7 @@ import { useAppContext } from '../../../context/AppContext';
 
 export function CollectionAdd(props) {
 
-  const { selectedCollection, languageList, setListOrAdd, editObj, otherItemsList } = props
+  const { selectedCollection, languageList, setListOrAdd, editObj, otherItemsList, listOrAdd } = props
   const { selectedProject } = useAppContext();
 
   const classes = styles;
@@ -342,146 +342,183 @@ export function CollectionAdd(props) {
 
 
   return (
-    <Box width="100%">
-      <LoadingOverlay
-        active={loading}
-        horizontal
-        styles={{
-          wrapper: {
-            height: '100%',
-            width: '100%',
-          },
-          overlay: (base) => ({
-            ...base,
-            background: 'rgba(0, 0, 0, 0.2)',
-            zIndex: 1600,
-            height: '100%',
-            position: 'fixed'
-          }),
-        }}>
-        <Box sx={classes.breadButtonsBox}>
-          <Button
-            disableElevation
-            size="small"
-            variant="contained"
-            sx={classes.saveBtn}
-            onClick={editObj ? modifyCollection.bind(this, false) : saveCollectionItem.bind(this, false)}
-          >
-            <FormattedMessage {...messages.save} />
-          </Button>
-          {
-            editObj
-            &&
-            <Button
-              disableElevation
-              size="small"
-              variant="contained"
-              sx={classes.publishBtn}
-              onClick={publishCollectionItem}
-            >
-              <FormattedMessage {...messages.publish} />
-            </Button>
-          }
-        </Box>
+    <Box width="100%" height="100%" overflow="auto">
 
-        <Box display="flex" width="100%" pt={2} justifyContent="center">
-          <Box display="flex" flexDirection="column" justifyContent="center" width="85%" maxWidth="960px">
-            {
-              selectedCollection && selectedCollection.enable_localization
-                ?
-                <Box display="flex" alignItems="center" width="100%">
-                  <LanguageOutlined />
-                  <Box width="150px" marginLeft="10px">
-                    <TextField
-                      variant="filled"
-                      label=""
-                      margin="normal"
-                      name="language"
-                      fullWidth
+      {
+        selectedCollection
+          ?
+          <Box>
+            <LoadingOverlay
+              active={loading}
+              horizontal
+              styles={{
+                wrapper: {
+                  height: '100%',
+                  width: '100%',
+                },
+                overlay: (base) => ({
+                  ...base,
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  zIndex: 1600,
+                  height: '100%',
+                  position: 'fixed'
+                }),
+              }}>
+
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} >
+
+                <Box display="flex" gap="10px">
+                  <Typography sx={classes.breadCrumbBold} onClick={() => { setListOrAdd('list') }}>
+                    {selectedCollection.entity_name}
+                  </Typography>
+                  <Typography sx={classes.breadCrumbNormal}>
+                    {listOrAdd === 'add' ? (editObj ? ' >  Modify Item' : ' >  New Item') : ''}
+                  </Typography>
+                </Box>
+
+                <Box sx={classes.breadButtonsBox}>
+
+                  <Button
+                    disableElevation
+                    variant='outlined'
+                    size="small"
+                    sx={classes.cancelBtn}
+                    onClick={() => { setListOrAdd('list') }}
+                  >
+                    <FormattedMessage {...messages.cancel} />
+                  </Button>
+
+                  <Button
+                    disableElevation
+                    size="small"
+                    variant="contained"
+                    sx={classes.saveBtn}
+                    onClick={editObj ? modifyCollection.bind(this, false) : saveCollectionItem.bind(this, false)}
+                  >
+                    <FormattedMessage {...messages.save} />
+                  </Button>
+                  {
+                    editObj
+                    &&
+                    <Button
+                      disableElevation
                       size="small"
-                      select
-                      id="language"
-                      onChange={handleLanguageChange}
-                      value={selectedLanguage}
+                      variant="contained"
+                      sx={classes.publishBtn}
+                      onClick={publishCollectionItem}
                     >
-                      {
-                        languageList.map(lang => <MenuItem value={lang.value}>{lang.name}</MenuItem>)
-                      }
-                    </TextField>
-                  </Box>
-                </Box>
-                :
-                ''
-            }
-            {
-              editObj && editObj.item_meta_details
-                ?
-                <Box>
-                  <Box display="flex" alignItems="center" width="100%" marginLeft="10px" marginBottom="10px">
-                    <Typography sx={classes.smallBold}><FormattedMessage {...messages.status} /></Typography>
-                    &nbsp;
-                    &nbsp;
-                    <Typography sx={classes.smallLight}>{editObj.item_meta_details.entity_status}</Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" width="100%" marginLeft="10px">
-                    <Typography sx={classes.smallBold}><FormattedMessage {...messages.currentVersion} /></Typography>
-                    &nbsp;
-                    &nbsp;
-                    <Typography sx={classes.smallLight}>{parseInt(editObj.item_meta_details.payload_version) + 1}</Typography>
-                  </Box>
-                </Box>
-                :
-                ''
-            }
-            <Paper sx={classes.paper} elevation={0}>
-              {
-                fieldMap && fieldSetFetchingDone && selectedCollection?.display_view_config?.edit?.default_view?.rows
-                  ?
-                  selectedCollection.display_view_config.edit.default_view.rows.map((row, rowIndex) =>
-                    <Box display="flex" width="100%" maxWidth="960px" key={"outer_view_row_key_" + rowIndex}>
-                      {
-                        row.sections && row.sections.length
-                          ?
-                          row.sections.map((col, colIndex) =>
-                            <Box display="flex" width="100%" marginX="10px" key={"inner_view_col_key_" + rowIndex + "_" + colIndex}>
-                              {
-                                fieldMap && fieldMap[col.field_path_pattern] && col.field_path_pattern !== "$.__auto_id__"
-                                  ?
-                                  <CollectionItem
-                                    entity={fieldMap[col.field_path_pattern]}
-                                    validateUniqueness={validateUniqueness}
-                                    validateTriggered={validateTriggered}
-                                    fieldErrors={fieldErrors}
-                                    setFieldErrors={setFieldErrors}
-                                    selectedLanguage={selectedLanguage}
-                                    fieldValues={fieldValues}
-                                    setFieldValues={setFieldValues}
-                                    entityExtraData={fieldSetMap[col.field_path_pattern] ?? null}
-                                    selectedUser={props.selectedUser}
-                                    editVal={editObj && fieldMap[col.field_path_pattern] ? editObj[fieldMap[col.field_path_pattern].field_name] : null}
-                                    languageList={languageList}
-                                    setSelectedLanguage={setSelectedLanguage}
-                                    isLocalEnable={selectedCollection && selectedCollection.enable_localization}
-                                  />
-                                  :
-                                  ''
-                              }
-                            </Box>
-                          )
-                          :
-                          ''
-                      }
-                    </Box>
-                  )
-                  :
-                  ''
-              }
-            </Paper>
-          </Box>
-        </Box>
+                      <FormattedMessage {...messages.publish} />
+                    </Button>
+                  }
 
-      </LoadingOverlay>
-      {/* </form> */}
+                </Box>
+
+              </Box>
+
+              <Box display="flex" width="100%" pt={2} justifyContent="center">
+                <Box display="flex" flexDirection="column" justifyContent="center" width="85%" maxWidth="960px">
+                  {
+                    selectedCollection && selectedCollection.enable_localization
+                      ?
+                      <Box display="flex" alignItems="center" width="100%">
+                        <LanguageOutlined />
+                        <Box width="150px" marginLeft="10px">
+                          <TextField
+                            variant="filled"
+                            label=""
+                            margin="normal"
+                            name="language"
+                            fullWidth
+                            size="small"
+                            select
+                            id="language"
+                            onChange={handleLanguageChange}
+                            value={selectedLanguage}
+                          >
+                            {
+                              languageList.map(lang => <MenuItem value={lang.value}>{lang.name}</MenuItem>)
+                            }
+                          </TextField>
+                        </Box>
+                      </Box>
+                      :
+                      ''
+                  }
+                  {
+                    editObj && editObj.item_meta_details
+                      ?
+                      <Box>
+                        <Box display="flex" alignItems="center" width="100%" marginLeft="10px" marginBottom="10px">
+                          <Typography sx={classes.smallBold}><FormattedMessage {...messages.status} /></Typography>
+                          &nbsp;
+                          &nbsp;
+                          <Typography sx={classes.smallLight}>{editObj.item_meta_details.entity_status}</Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" width="100%" marginLeft="10px">
+                          <Typography sx={classes.smallBold}><FormattedMessage {...messages.currentVersion} /></Typography>
+                          &nbsp;
+                          &nbsp;
+                          <Typography sx={classes.smallLight}>{parseInt(editObj.item_meta_details.payload_version) + 1}</Typography>
+                        </Box>
+                      </Box>
+                      :
+                      ''
+                  }
+                  <Paper sx={classes.paper} elevation={0}>
+                    {
+                      fieldMap && fieldSetFetchingDone && selectedCollection?.display_view_config?.edit?.default_view?.rows
+                        ?
+                        selectedCollection.display_view_config.edit.default_view.rows.map((row, rowIndex) =>
+                          <Box display="flex" width="100%" maxWidth="960px" key={"outer_view_row_key_" + rowIndex}>
+                            {
+                              row.sections && row.sections.length
+                                ?
+                                row.sections.map((col, colIndex) =>
+                                  <Box display="flex" width="100%" marginX="10px" key={"inner_view_col_key_" + rowIndex + "_" + colIndex}>
+                                    {
+                                      fieldMap && fieldMap[col.field_path_pattern] && col.field_path_pattern !== "$.__auto_id__"
+                                        ?
+                                        <CollectionItem
+                                          entity={fieldMap[col.field_path_pattern]}
+                                          validateUniqueness={validateUniqueness}
+                                          validateTriggered={validateTriggered}
+                                          fieldErrors={fieldErrors}
+                                          setFieldErrors={setFieldErrors}
+                                          selectedLanguage={selectedLanguage}
+                                          fieldValues={fieldValues}
+                                          setFieldValues={setFieldValues}
+                                          entityExtraData={fieldSetMap[col.field_path_pattern] ?? null}
+                                          selectedUser={props.selectedUser}
+                                          editVal={editObj && fieldMap[col.field_path_pattern] ? editObj[fieldMap[col.field_path_pattern].field_name] : null}
+                                          languageList={languageList}
+                                          setSelectedLanguage={setSelectedLanguage}
+                                          isLocalEnable={selectedCollection && selectedCollection.enable_localization}
+                                        />
+                                        :
+                                        ''
+                                    }
+                                  </Box>
+                                )
+                                :
+                                ''
+                            }
+                          </Box>
+                        )
+                        :
+                        ''
+                    }
+                  </Paper>
+                </Box>
+              </Box>
+            </LoadingOverlay>
+          </Box>
+          :
+          <Box display="flex" width="100%" pt={5} justifyContent="center">
+            <Box display="flex" width="100%" height="200px" justifyContent="center" alignItems="center">
+              <FormattedMessage {...messages.noCollection} />
+            </Box>
+          </Box>
+      }
     </Box>
   );
 }

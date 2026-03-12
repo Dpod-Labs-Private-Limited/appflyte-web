@@ -1,20 +1,26 @@
 const styles = {
   breadButtonsBox: {
-    height: 56,
     zIndex: 1100,
-    marginTop: '15px',
     display: 'flex',
-    justifyContent: 'end',
     alignItems: 'center',
-    gap: '10px'
+    gap: '10px',
   },
   publishBtn: {
     textTransform: 'capitalize',
     width: '100px',
     height: '35px',
-    backgroundColor: '#DEDEDE',
-    color: "#000000",
+    backgroundColor: '#000000',
+    color: "#ffffff",
     borderRadius: "20px"
+  },
+  cancelBtn: {
+    textTransform: 'capitalize',
+    width: '100px',
+    height: '35px',
+    backgroundColor: '#DEDEDE',
+    borderRadius: "20px",
+    borderColor: '#ffffff',
+    color: '#000000'
   },
   saveBtn: {
     textTransform: 'capitalize',
@@ -73,6 +79,19 @@ const styles = {
   paper: {
     padding: '25px',
     backgroundColor: '#FFFFFF'
-  }
+  },
+  breadCrumbBold: {
+    fontSize: 15,
+    fontWeight: 600,
+    textTransform: 'capitalize',
+    cursor: 'pointer',
+    '&:hover': {
+      textDecoration: "underline"
+    }
+  },
+  breadCrumbNormal: {
+    fontSize: 15,
+    fontWeight: 400,
+  },
 }
 export default styles;

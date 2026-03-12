@@ -230,8 +230,8 @@ function CollectionTypeAddTextField(props) {
             <Tabs
               value={tabValue}
               onChange={handleTabChange}
-              indicatorColor="secondary"
-              textColor="secondary"
+              // indicatorColor="secondary"
+              // textColor="secondary"
               aria-label="scrollable force tabs example"
               variant="scrollable"
               scrollButtons="off"

@@ -1,9 +1,21 @@
 const styles = {
+  saveDraftBtn: {
+    textTransform: 'capitalize',
+    height: '35px',
+    width: '100px',
+    backgroundColor: "#0B51C5",
+    borderRadius: '20px'
+  },
   breadButtonsBox: {
     height: 56,
     zIndex: 1100,
     position: "fixed",
     left: 'calc(100vw - 210px)',
+  },
+  breadCrumbBold: {
+    fontSize: 15,
+    fontWeight: 600,
+    textTransform: 'capitalize'
   },
   searchBar: {
     backgroundColor: '#EBEFF3'
@@ -39,7 +51,7 @@ const styles = {
     fontSize: 14,
     fontWeight: 400,
     marginLeft: '5px',
-    color:(theme) => theme.palette.secondary.main
+    color: '#C30E2E'
   },
   mediaBox: {
     display: 'flex',

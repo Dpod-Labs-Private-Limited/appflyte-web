@@ -1,6 +1,6 @@
 const styles = {
   cancelBtn: {
-    backgroundColor: 'white',
+    backgroundColor: '#404040',
     borderColor: 'black',
     border: '1px solid',
     height: '26px',
@@ -11,6 +11,7 @@ const styles = {
     height: '26px',
     marginRight: '15px',
     textTransform: 'capitalize',
+    backgroundColor: '#0B51C5',
   },
   addObjectiveHeading: {
     fontSize: '18',
@@ -22,7 +23,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     height: '35px',
-    width:"100%",
+    width: "100%",
     padding: '10px',
     borderRadius: 5,
     backgroundColor: '#DEDEDE',
@@ -52,7 +53,7 @@ const styles = {
   errorLabel: {
     fontSize: 12,
     color: 'red',
-    marginBottom:'5px'
+    marginBottom: '5px'
   },
   tab: {
     fontSize: 15,

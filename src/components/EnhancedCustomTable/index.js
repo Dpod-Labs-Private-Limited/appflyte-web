@@ -16,6 +16,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
+import moment from 'moment';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -40,7 +41,7 @@ function EnhancedTableHead({ columns, order, orderBy, numSelected, rowCount, onS
 
   return (
     <TableHead>
-      <TableRow sx={{ backgroundColor: 'primary.main' }}>
+      <TableRow sx={{ bgcolor: '#000000' }}>
         {showCheckbox && (
           <TableCell padding="checkbox">
             <Checkbox
@@ -79,7 +80,7 @@ function EnhancedTableHead({ columns, order, orderBy, numSelected, rowCount, onS
         ))}
         {actions.length > 0 && (
           <TableCell align="right">
-            <Typography variant="body1" component="div">
+            <Typography sx={{ color: '#ffffff' }} component="div">
               Actions
             </Typography>
           </TableCell>
@@ -102,6 +103,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedCustomTable({ data = [], columns = [], onSelectionChange, onRowClick, showCheckbox = true, actions = [] }) {
+
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState(columns[0]?.field || '');
   const [selected, setSelected] = React.useState([]);
@@ -160,6 +162,30 @@ function EnhancedCustomTable({ data = [], columns = [], onSelectionChange, onRow
     [order, orderBy, page, rowsPerPage, data]
   );
 
+  const renderRowData = (column, row) => {
+    if (column?.render) {
+      return column.render(row)
+    } else {
+      if (column?.field_type === "bool") {
+        return row[column?.field] ? "True" : "False"
+      }
+
+      if (column?.field_type === "date") {
+        if (column?.field_sub_type === "dateTime") {
+          const formatted = moment(row[column?.field]).format("DD-MM-YYYY HH:mm");
+          return formatted
+        } else if (column?.field_sub_type === "date") {
+          const formatted = moment(row[column?.field]).format("DD-MM-YYYY");
+          return formatted
+        } else {
+          return row[column?.field]
+        }
+      } else {
+        return row[column?.field]
+      }
+    }
+  }
+
   const isRowSelected = (row) => selected.some((selectedRow) => JSON.stringify(selectedRow) === JSON.stringify(row));
 
   return (
@@ -182,7 +208,6 @@ function EnhancedCustomTable({ data = [], columns = [], onSelectionChange, onRow
               {visibleRows.map((row, index) => {
                 const isItemSelected = isRowSelected(row);
                 const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                   <TableRow
                     hover
@@ -207,7 +232,8 @@ function EnhancedCustomTable({ data = [], columns = [], onSelectionChange, onRow
                     )}
                     {columns.map((column) => (
                       <TableCell key={column.field} align={column.numeric ? 'right' : 'left'}>
-                        {column.render ? column.render(row) : row[column.field]}
+                        {renderRowData(column, row)}
+                        {/* {column.render ? column.render(row) : typeof row[column.field] === "boolean" ? row[column.field].toString() : row[column.field]} */}
                       </TableCell>
                     ))}
                     {actions.length > 0 && (

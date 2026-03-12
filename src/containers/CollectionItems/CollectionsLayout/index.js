@@ -147,68 +147,6 @@ export function CollectionsLayout() {
         <main style={styles.componentContainer}>
           <Box sx={styles.cardContainer}>
 
-            <Box
-              // sx={
-              //   open
-              //     ?
-              //     (listOrAdd === 'list' ? classes.breadButtonsBox : classes.breadButtonsBoxAdd)
-              //     :
-              //     (listOrAdd === 'list' ? classes.breadButtonsBoxClosed : classes.breadButtonsBoxClosedAdd)
-              // }
-
-              display="flex" alignItems="center" justifyContent="space-between"
-
-            >
-
-              <Box display="flex">
-                {
-                  selectedCollection && <Typography sx={classes.breadCrumbBold} onClick={() => { setListOrAdd('list') }}>
-                    {selectedCollection.entity_name}
-                  </Typography>
-                }
-                &nbsp;&nbsp;
-                {
-                  selectedCollection && <Typography sx={classes.breadCrumbNormal}>
-                    {listOrAdd === 'add' ? (editObj ? ' >  Modify Item' : ' >  New Item') : ''}
-                  </Typography>
-                }
-              </Box>
-              {
-                selectedCollection
-                  ?
-                  <Box>
-                    {
-                      listOrAdd === 'list'
-                        ?
-                        <Button
-                          disableElevation
-                          size="small"
-                          variant="contained"
-                          sx={classes.saveDraftBtn}
-                          onClick={() => {
-                            setListOrAdd('add')
-                          }}>
-                          <FormattedMessage {...messages.addItem} />
-                        </Button>
-                        :
-                        <Box display="flex">
-                          <Button
-                            disableElevation
-                            variant='outlined'
-                            size="small"
-                            sx={classes.cancelBtn}
-                            onClick={() => { setListOrAdd('list') }}
-                          >
-                            <FormattedMessage {...messages.cancel} />
-                          </Button>
-                        </Box>
-                    }
-                  </Box>
-                  :
-                  ''
-              }
-            </Box>
-
             <Box display="flex" width="100%" justifyContent="center">
               {
                 listOrAdd === 'list'
@@ -233,6 +171,7 @@ export function CollectionsLayout() {
                     tostAlert={tostAlert}
                     editObj={editObj}
                     otherItemsList={otherItemsList}
+                    listOrAdd={listOrAdd}
                   />
               }
 

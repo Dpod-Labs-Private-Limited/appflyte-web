@@ -13,7 +13,7 @@ import { TextFieldOverridden as TextField } from '../../components/TextFieldOver
 import { PhotoCameraBack, ArrowCircleUp, ArrowCircleDown } from '../../icons/extraIcons';
 import { AddBox, CloseOutlined, DeleteOutline } from '@mui/icons-material';
 import { getCollectionLabel, getDefaultBooleanValue, getListValuesByLanguage, getMediaTypesForFileInput } from '../../Api/Services/collection/collectionUtilityServices';
-import { LocalizationProvider, DatePicker, TimePicker, DateTimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DateTimePicker, MobileDatePicker, MobileTimePicker, MobileDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import FieldSetRenderLayout from '../../components/FieldSetRenderLayout';
 import SearchAndAddFiles from '../../components/SearchAndAddFiles';
@@ -30,6 +30,10 @@ function CollectionItem(props) {
 
   const { entity, validateUniqueness, validateTriggered, fieldErrors, setFieldErrors, selectedLanguage, fieldValues,
     setFieldValues, entityExtraData, languageList, editVal, setSelectedLanguage, isLocalEnable } = props
+
+  useEffect(() => {
+    console.log("entity", entity)
+  }, [entity])
 
   const classes = styles;
 
@@ -566,128 +570,125 @@ function CollectionItem(props) {
   }
 
   switch (entity.field_type) {
+
     case 'list':
-      if (entity.field_sub_type === 'multi')
-        return (
-          <Box key={"collection_item_key_" + entity.field_definition_id}>
-            <Box display="flex">
-              <Typography sx={classes.fieldSetText}>
-                {getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+      if (entity.field_sub_type === 'multi') {
+        return (<Box key={"collection_item_key_" + entity.field_definition_id}>
+          <Box display="flex">
+            <Typography sx={classes.fieldSetText}>
+              {getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+            </Typography>
+          </Box>
+          <Box id={entity.field_definition_id} sx={classes.multiSelectCustomRoot}>
+            <Box key={"key_value_list_PLEASE_SELECT"} display="flex" justifyContent="center" sx={classes.multiSelectCustomItem}>
+              <Typography sx={classes.menuText}>
+                -- Please Select --
               </Typography>
             </Box>
-            <Box id={entity.field_definition_id} sx={classes.multiSelectCustomRoot}>
-              <Box key={"key_value_list_PLEASE_SELECT"} display="flex" justifyContent="center" sx={classes.multiSelectCustomItem}>
-                <Typography sx={classes.menuText}>
-                  -- Please Select --
-                </Typography>
-              </Box>
-              {
-                getListValuesByLanguage(entity.settings.field_values, selectedLanguage).map((item, index) =>
-                  <Box
-                    key={"key_value_list_" + index}
-                    sx={isMultiItemSelected("__index__" + index, entity.field_name) ? classes.multiSelectCustomItemSelected : classes.multiSelectCustomItem}
-                    onClick={() => {
-                      handleMultiSelectSelected({
-                        target: {
-                          name: entity.field_name,
-                          value: "__index__" + index
-                        }
-                      })
-                    }}
-                  >
-                    <Typography sx={classes.menuText}>
-                      {item}
-                    </Typography>
-                  </Box>
-                )
-              }
-            </Box>
             {
-              validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage] ? (
-                <FormLabel sx={classes.errorLabel}>
-                  {fieldErrors[entity.field_name][selectedLanguage]}
-                </FormLabel>
+              getListValuesByLanguage(entity.settings.field_values, selectedLanguage).map((item, index) =>
+                <Box
+                  key={"key_value_list_" + index}
+                  sx={isMultiItemSelected("__index__" + index, entity.field_name) ? classes.multiSelectCustomItemSelected : classes.multiSelectCustomItem}
+                  onClick={() => {
+                    handleMultiSelectSelected({
+                      target: {
+                        name: entity.field_name,
+                        value: "__index__" + index
+                      }
+                    })
+                  }}
+                >
+                  <Typography sx={classes.menuText}>
+                    {item}
+                  </Typography>
+                </Box>
               )
-                :
-                ''
             }
           </Box>
-        )
-      else
-        return (
+          {
+            validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage] ? (
+              <FormLabel sx={classes.errorLabel}>
+                {fieldErrors[entity.field_name][selectedLanguage]}
+              </FormLabel>
+            )
+              :
+              ''
+          }
+        </Box>)
+      } else {
+        return (<TextField
+          variant="filled"
+          label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+          error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+          helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+          margin="normal"
+          name={entity.field_name}
+          defaultValue={entity.settings.default_value && !isNaN(entity.settings.default_value) ? getListValuesByLanguage(entity.settings.field_values, selectedLanguage)[entity.settings.default_value] : ''}
+          fullWidth
+          size="small"
+          select
+          id={entity.field_definition_id}
+          key={"collection_item_key_" + entity.field_definition_id}
+          onChange={handleTextValueChange}
+          value={fieldValues && fieldValues[entity.field_name] ? fieldValues[entity.field_name] : ''}
+        >
+          {
+            getListValuesByLanguage(entity.settings.field_values, selectedLanguage).map((item, index) =>
+              <MenuItem key={"key_value_list_" + index} value={"__index__" + index}>{item}</MenuItem>
+            )
+          }
+        </TextField>)
+      }
+
+    case 'text':
+      if (entity.field_sub_type === 'long') {
+        return (<Box width="100%">
+          {
+            isLocalEnable
+              ?
+              <Box display="flex" width="100%" flexWrap="wrap">
+                {
+                  languageList.map(lang =>
+                    <Box
+                      sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
+                      onClick={handleLanguageChange.bind(this, lang.value)}
+                    >
+                      {lang.name}
+                    </Box>
+                  )
+                }
+              </Box>
+              :
+              ''
+          }
           <TextField
             variant="filled"
             label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-            error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
-            helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+            error={validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage]}
+            helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage] ? fieldErrors[entity.field_name][selectedLanguage] : ''}
             margin="normal"
             name={entity.field_name}
-            defaultValue={entity.settings.default_value && !isNaN(entity.settings.default_value) ? getListValuesByLanguage(entity.settings.field_values, selectedLanguage)[entity.settings.default_value] : ''}
             fullWidth
+            multiline
+            rowsMax={6}
+            rows={4}
             size="small"
-            select
             id={entity.field_definition_id}
             key={"collection_item_key_" + entity.field_definition_id}
-            onChange={handleTextValueChange}
-            value={fieldValues && fieldValues[entity.field_name] ? fieldValues[entity.field_name] : ''}
-          >
-            {
-              getListValuesByLanguage(entity.settings.field_values, selectedLanguage).map((item, index) =>
-                <MenuItem key={"key_value_list_" + index} value={"__index__" + index}>{item}</MenuItem>
-              )
-            }
-          </TextField>
-        )
-    case 'text':
-      if (entity.field_sub_type === 'long')
-        return (
-          <Box width="100%">
-            {
-              isLocalEnable
-                ?
-                <Box display="flex" width="100%" flexWrap="wrap">
-                  {
-                    languageList.map(lang =>
-                      <Box
-                        sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
-                        onClick={handleLanguageChange.bind(this, lang.value)}
-                      >
-                        {lang.name}
-                      </Box>
-                    )
-                  }
-                </Box>
-                :
-                ''
-            }
-            <TextField
-              variant="filled"
-              label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-              error={validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage]}
-              helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage] ? fieldErrors[entity.field_name][selectedLanguage] : ''}
-              margin="normal"
-              name={entity.field_name}
-              fullWidth
-              multiline
-              rowsMax={6}
-              rows={4}
-              size="small"
-              id={entity.field_definition_id}
-              key={"collection_item_key_" + entity.field_definition_id}
-              defaultValue={getCollectionLabel('', entity.settings.default_value, selectedLanguage)}
-              onChange={handleTextValueChangeMultiLanguage}
-              inputProps={{ maxLength: entity.settings.max_length ?? 999, minLength: entity.settings.min_length ?? 0 }}
-              onBlur={entity.settings?.is_unique ?
-                (e) => {
-                  validateUniqueness(e, selectedLanguage)
-                }
-                : null}
-              value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name][selectedLanguage] ? fieldValues[entity.field_name][selectedLanguage] : ''}
-            />
-          </Box>
-        )
-      return (
-        <Box width="100%">
+            defaultValue={getCollectionLabel('', entity.settings.default_value, selectedLanguage)}
+            onChange={handleTextValueChangeMultiLanguage}
+            inputProps={{ maxLength: entity.settings.max_length ?? 999, minLength: entity.settings.min_length ?? 0 }}
+            onBlur={entity.settings?.is_unique ?
+              (e) => {
+                validateUniqueness(e, selectedLanguage)
+              }
+              : null}
+            value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name][selectedLanguage] ? fieldValues[entity.field_name][selectedLanguage] : ''}
+          />
+        </Box>)
+      } else {
+        return (<Box width="100%">
           {
             isLocalEnable
               ?
@@ -727,297 +728,290 @@ function CollectionItem(props) {
               : null}
             value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name][selectedLanguage] ? fieldValues[entity.field_name][selectedLanguage] : ''}
           />
-        </Box>
-      )
+        </Box>)
+      }
+
     case 'number':
-      return (
-        <TextField
-          variant="filled"
-          label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-          error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
-          helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
-          margin="normal"
-          name={entity.field_name}
-          fullWidth
-          size="small"
-          id={entity.field_definition_id}
-          key={"collection_item_key_" + entity.field_definition_id}
-          type="Number"
-          defaultValue={entity.settings.default_value}
-          onChange={handleTextValueChange}
-          onBlur={entity.settings?.is_unique ? validateUniqueness : null}
-          inputProps={{ max: entity.settings.max_value ?? 999, min: entity.settings.min_value ?? 0, step: entity.settings.number_format === "integer" ? 1 : 0.1 }}
-          value={fieldValues ? fieldValues[entity.field_name] : ''}
-        />
-      )
+      return (<TextField
+        variant="filled"
+        label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+        error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+        helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+        margin="normal"
+        name={entity.field_name}
+        fullWidth
+        size="small"
+        id={entity.field_definition_id}
+        key={"collection_item_key_" + entity.field_definition_id}
+        type="Number"
+        defaultValue={entity.settings.default_value}
+        onChange={handleTextValueChange}
+        onBlur={entity.settings?.is_unique ? validateUniqueness : null}
+        inputProps={{ max: entity.settings.max_value ?? 999, min: entity.settings.min_value ?? 0, step: entity.settings.number_format === "integer" ? 1 : 0.1 }}
+        value={fieldValues ? fieldValues[entity.field_name] : ''}
+      />)
+
     case 'password':
-      return (
-        <TextField
-          variant="filled"
-          label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-          error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
-          helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
-          margin="normal"
-          name={entity.field_name}
-          fullWidth
-          id={entity.field_definition_id}
-          key={"collection_item_key_" + entity.field_definition_id}
-          type="password"
-          size="small"
-          defaultValue={entity.settings.default_value}
-          onChange={handleTextValueChange}
-          onBlur={entity.settings?.is_unique ? validateUniqueness : null}
-          inputProps={{ maxLength: entity.settings.max_length ?? 999, minLength: entity.settings.min_length ?? 0 }}
-          value={fieldValues ? fieldValues[entity.field_name] : ''}
-        />
-      )
+      return (<TextField
+        variant="filled"
+        label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+        error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+        helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+        margin="normal"
+        name={entity.field_name}
+        fullWidth
+        id={entity.field_definition_id}
+        key={"collection_item_key_" + entity.field_definition_id}
+        type="password"
+        size="small"
+        defaultValue={entity.settings.default_value}
+        onChange={handleTextValueChange}
+        onBlur={entity.settings?.is_unique ? validateUniqueness : null}
+        inputProps={{ maxLength: entity.settings.max_length ?? 999, minLength: entity.settings.min_length ?? 0 }}
+        value={fieldValues ? fieldValues[entity.field_name] : ''}
+      />)
+
     case 'email':
-      return (
-        <TextField
-          variant="filled"
-          label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-          error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
-          helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
-          margin="normal"
-          name={entity.field_name}
-          fullWidth
-          id={entity.field_definition_id}
-          key={"collection_item_key_" + entity.field_definition_id}
-          type="email"
-          size="small"
-          defaultValue={entity.settings.default_value}
-          onChange={handleTextValueChange}
-          onBlur={entity.settings?.is_unique ? validateUniqueness : null}
-          inputProps={{ maxLength: entity.settings.max_length ?? 999, minLength: entity.settings.min_length ?? 0 }}
-          value={fieldValues ? fieldValues[entity.field_name] : ''}
-        />
-      )
+      return (<TextField
+        variant="filled"
+        label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+        error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+        helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+        margin="normal"
+        name={entity.field_name}
+        fullWidth
+        id={entity.field_definition_id}
+        key={"collection_item_key_" + entity.field_definition_id}
+        type="email"
+        size="small"
+        defaultValue={entity.settings.default_value}
+        onChange={handleTextValueChange}
+        onBlur={entity.settings?.is_unique ? validateUniqueness : null}
+        inputProps={{ maxLength: entity.settings.max_length ?? 999, minLength: entity.settings.min_length ?? 0 }}
+        value={fieldValues ? fieldValues[entity.field_name] : ''}
+      />)
+
     case 'date':
       switch (entity.field_sub_type) {
         case 'date':
         case 'Date':
-          return (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-                value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).toDate() : new Date()}
-                onChange={(date) => {
-                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
-                  validateSingleField(entity, date)
-                }}
-                format="dd MMM yyyy"
-                slotProps={{
-                  textField: {
-                    id: entity.field_definition_id,
-                    key: "collection_item_key_" + entity.field_definition_id,
-                    name: entity.field_name,
-                    fullWidth: true,
-                    size: "small",
-                    margin: "normal",
-                    variant: "filled",
-                    error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
-                    helperText: validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : '',
-                  }
-                }}
-              />
-            </LocalizationProvider>
-          )
+          return (<LocalizationProvider dateAdapter={AdapterDateFns}>
+            <MobileDatePicker
+              label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+              value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).toDate() : null}
+              onChange={(date) => {
+                setFieldValues(prev => ({
+                  ...prev,
+                  [entity.field_name]: moment(date).utc().toISOString()
+                }))
+                validateSingleField(entity, date)
+              }}
+              format="dd MMM yyyy"
+              slotProps={{
+                textField: {
+                  id: entity.field_definition_id,
+                  key: "collection_item_key_" + entity.field_definition_id,
+                  name: entity.field_name,
+                  fullWidth: true,
+                  size: "small",
+                  margin: "normal",
+                  variant: "filled"
+                }
+              }}
+            />
+          </LocalizationProvider>)
         case 'time':
         case 'Time':
-          return (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <TimePicker
-                label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-                value={fieldValues && fieldValues[entity.field_name] ? moment(fieldValues[entity.field_name], "HH:mm").toDate() : new Date()}
-                onChange={(date) => {
-                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
-                  validateSingleField(entity, date)
-                }}
-                slotProps={{
-                  textField: {
-                    id: entity.field_definition_id,
-                    key: "collection_item_key_" + entity.field_definition_id,
-                    name: entity.field_name,
-                    fullWidth: true,
-                    size: "small",
-                    margin: "normal",
-                    variant: "filled",
-                    error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
-                    helperText: validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : '',
-                  }
-                }}
-              />
-            </LocalizationProvider>
-          )
-        default:
-          return (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DateTimePicker
-                label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-                value={fieldValues && fieldValues[entity.field_name] ? moment.utc(fieldValues[entity.field_name]).local().toDate() : new Date()}
-                onChange={(date) => {
-                  setFieldValues(prevValue => ({ ...prevValue, [entity.field_name]: moment(date).utc().toISOString() }))
-                  validateSingleField(entity, date)
-                }}
-                format="dd MMM yyyy h:mm a"
-                slotProps={{
-                  textField: {
-                    id: entity.field_definition_id,
-                    key: "collection_item_key_" + entity.field_definition_id,
-                    name: entity.field_name,
-                    fullWidth: true,
-                    size: "small",
-                    margin: "normal",
-                    variant: "filled",
-                    error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
-                    helperText: validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : '',
-                  }
-                }}
-              />
-            </LocalizationProvider>
-          )
-      }
-      break;
-    case 'rich_text':
-      return (
-        <Box width="100%">
-          {
-            isLocalEnable
-              ?
-              <Box display="flex" width="100%" flexWrap="wrap">
-                {
-                  languageList.map(lang =>
-                    <Box
-                      sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
-                      onClick={handleLanguageChange.bind(this, lang.value)}
-                    >
-                      {lang.name}
-                    </Box>
-                  )
+          return (<LocalizationProvider dateAdapter={AdapterDateFns}>
+            <MobileTimePicker
+              ampm={true}
+              views={['hours', 'minutes']}
+              format="hh:mm a"
+              timeSteps={{ minutes: 1 }}
+              label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+              value={
+                fieldValues && fieldValues[entity.field_name]
+                  ? moment(fieldValues[entity.field_name], "hh:mm a").toDate()
+                  : null
+              }
+              onChange={(date) => {
+                setFieldValues(prevValue => ({
+                  ...prevValue,
+                  [entity.field_name]: moment(date).format("hh:mm a")
+                }))
+                validateSingleField(entity, date)
+              }}
+              slotProps={{
+                textField: {
+                  id: entity.field_definition_id,
+                  key: "collection_item_key_" + entity.field_definition_id,
+                  name: entity.field_name,
+                  fullWidth: true,
+                  size: "small",
+                  margin: "normal",
+                  variant: "filled",
+                  error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
+                  helperText:
+                    validateTriggered && fieldErrors && fieldErrors[entity.field_name]
+                      ? fieldErrors[entity.field_name]
+                      : '',
                 }
-              </Box>
-              :
-              ''
-          }
-          <ReactQuill
-            theme="snow"
-            placeholder={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-            name={entity.field_name}
-            id={entity.field_definition_id}
-            key={"collection_item_key_" + entity.field_definition_id}
-            fullWidth
-            onBlur={
-              (range, user, content) => {
-                if (entity.settings?.is_unique)
-                  validateUniqueness(
-                    {
-                      target: {
-                        name: entity.field_name,
-                        value: content.getHTML(),
-                      },
-                    },
-                    selectedLanguage
-                  )
-              }
-            }
-            style={{
-              height: '150px',
-              width: '100%',
-              paddingBottom: '40px',
-              marginTop: '10px',
-              borderRadius: '5px',
-              backgroundColor: '#F5F5F5'
-            }}
-            modules={{
-              toolbar: [['bold', 'italic', 'underline', 'strike'], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'image'], [{ 'color': [] }, { 'background': [] }], [{ 'font': [] }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'align': ['', 'right', 'center', 'justify'] }]]
-            }}
-            value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name][selectedLanguage] ? fieldValues[entity.field_name][selectedLanguage] : ''}
-            onChange={(value, delta, source, editor) => {
-              if (source === 'user') {
-                handleTextValueChangeMultiLanguage({
-                  target: {
-                    name: entity.field_name,
-                    value: value,
-                    actualValue: editor.getText()
-                  }
-                });
-              }
-            }}
-          />
-          {
-            validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage] ? (
-              <FormLabel sx={classes.errorLabel}>
-                {fieldErrors[entity.field_name][selectedLanguage]}
-              </FormLabel>
-            )
-              :
-              ''
-          }
-        </Box>
-      )
-    case 'media':
-      return (
-        <Box my="10px">
-          <Drawer anchor={'right'} open={openFileDrawer} onClose={handleCloseFileDrawer}>
-            <SearchAndAddFiles
-              handleClose={handleCloseFileDrawer}
-              handleDone={handleFileSelected}
-              selectedUser={props.selectedUser}
-              selectionLimit={entity.field_sub_type === "single" ? 1 : null}
-              fileTypeLimit={
-                entity.settings.media_type === 'images'
-                  ?
-                  [FILE_TYPE_IMAGE]
-                  :
-                  entity.settings.media_type === 'videos'
-                    ?
-                    [FILE_TYPE_VIDEO]
-                    :
-                    entity.settings.media_type === 'files'
-                      ?
-                      [FILE_TYPE_DOCUMENT]
-                      :
-                      null
-              }
+              }}
             />
-          </Drawer>
-          <Box display="flex" width="100%" flexWrap="wrap">
-            {
-              fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length && fieldValues[entity.field_name].length > 0
-                ?
-                <Box display="flex" width="100%" maxWidth="960px" flexWrap="wrap">
+          </LocalizationProvider>)
+        default:
+          return (<LocalizationProvider dateAdapter={AdapterDateFns}>
+            <MobileDateTimePicker
+              label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+              value={
+                fieldValues && fieldValues[entity.field_name]
+                  ? moment.utc(fieldValues[entity.field_name]).local().toDate()
+                  : new Date()
+              }
+              onChange={(date) => {
+                setFieldValues(prevValue => ({
+                  ...prevValue,
+                  [entity.field_name]: moment(date).utc().toISOString()
+                }))
+                validateSingleField(entity, date)
+              }}
+              format="dd MMM yyyy h:mm a"
+              slotProps={{
+                textField: {
+                  id: entity.field_definition_id,
+                  key: "collection_item_key_" + entity.field_definition_id,
+                  name: entity.field_name,
+                  fullWidth: true,
+                  size: "small",
+                  margin: "normal",
+                  variant: "filled",
+                  error: validateTriggered && fieldErrors && fieldErrors[entity.field_name],
+                  helperText:
+                    validateTriggered && fieldErrors && fieldErrors[entity.field_name]
+                      ? fieldErrors[entity.field_name]
+                      : '',
+                }
+              }}
+            />
+          </LocalizationProvider>)
+      }
+
+    case 'rich_text':
+      return (<Box width="100%">
+        {
+          isLocalEnable
+            ?
+            <Box display="flex" width="100%" flexWrap="wrap">
+              {
+                languageList.map(lang =>
+                  <Box
+                    sx={lang.value === selectedLanguage ? classes.languageChipCoxSelected : classes.languageChipCox}
+                    onClick={handleLanguageChange.bind(this, lang.value)}
+                  >
+                    {lang.name}
+                  </Box>
+                )
+              }
+            </Box>
+            :
+            ''
+        }
+        <ReactQuill
+          theme="snow"
+          placeholder={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+          name={entity.field_name}
+          id={entity.field_definition_id}
+          key={"collection_item_key_" + entity.field_definition_id}
+          fullWidth
+          onBlur={
+            (range, user, content) => {
+              if (entity.settings?.is_unique)
+                validateUniqueness(
                   {
-                    fieldValues[entity.field_name].map((item, index) => {
-                      if (item.file_type === FILE_TYPE_IMAGE || item.file_type === FILE_TYPE_VIDEO)
-                        return (
-                          <Box display="flex" marginTop="20px" marginLeft="-20px" marginRight="10px" key={"collection_item_key_media_" + index + "_" + entity.field_definition_id}>
-                            <ImageComponent
-                              image={item.thumbnail_url}
-                              isWide={true}
-                              onSelect={null}
-                              onRemove={() => {
-                                setFieldValues(prevValue => {
-                                  const tmpArr = prevValue[entity.field_name].filter(x => x.file_id !== item.file_id)
-                                  validateSingleField(entity, tmpArr)
-                                  return ({
-                                    ...prevValue,
-                                    [entity.field_name]: tmpArr
-                                  })
-                                })
-                              }}
-                            />
-                          </Box>
-                        )
-                      else
-                        return (
-                          < Box
-                            sx={classes.photoSelector}
-                            key={"collection_item_key_media_" + index + "_" + entity.field_definition_id}
-                            marginTop="20px"
-                            marginRight="10px"
-                            maxWidth="250px"
-                            overflow="hidden"
-                            onClick={() => {
+                    target: {
+                      name: entity.field_name,
+                      value: content.getHTML(),
+                    },
+                  },
+                  selectedLanguage
+                )
+            }
+          }
+          style={{
+            height: '150px',
+            width: '100%',
+            paddingBottom: '40px',
+            marginTop: '10px',
+            borderRadius: '5px',
+            backgroundColor: '#F5F5F5'
+          }}
+          modules={{
+            toolbar: [['bold', 'italic', 'underline', 'strike'], [{ 'list': 'ordered' }, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], [{ 'font': [] }], [{ 'size': ['small', false, 'large', 'huge'] }], [{ 'align': ['', 'right', 'center', 'justify'] }]]
+          }}
+          value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name][selectedLanguage] ? fieldValues[entity.field_name][selectedLanguage] : ''}
+          onChange={(value, delta, source, editor) => {
+            if (source === 'user') {
+              handleTextValueChangeMultiLanguage({
+                target: {
+                  name: entity.field_name,
+                  value: value,
+                  actualValue: editor.getText()
+                }
+              });
+            }
+          }}
+        />
+        {
+          validateTriggered && fieldErrors && fieldErrors[entity.field_name] && fieldErrors[entity.field_name][selectedLanguage] ? (
+            <FormLabel sx={classes.errorLabel}>
+              {fieldErrors[entity.field_name][selectedLanguage]}
+            </FormLabel>
+          )
+            :
+            ''
+        }
+      </Box>)
+
+    case 'media':
+      return (<Box my="10px">
+        <Drawer anchor={'right'} open={openFileDrawer} onClose={handleCloseFileDrawer}>
+          <SearchAndAddFiles
+            handleClose={handleCloseFileDrawer}
+            handleDone={handleFileSelected}
+            selectedUser={props.selectedUser}
+            selectionLimit={entity.field_sub_type === "single" ? 1 : null}
+            fileTypeLimit={
+              entity.settings.media_type === 'images'
+                ?
+                [FILE_TYPE_IMAGE]
+                :
+                entity.settings.media_type === 'videos'
+                  ?
+                  [FILE_TYPE_VIDEO]
+                  :
+                  entity.settings.media_type === 'files'
+                    ?
+                    [FILE_TYPE_DOCUMENT]
+                    :
+                    null
+            }
+          />
+        </Drawer>
+        <Box display="flex" width="100%" flexWrap="wrap">
+          {
+            fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length && fieldValues[entity.field_name].length > 0
+              ?
+              <Box display="flex" width="100%" maxWidth="960px" flexWrap="wrap">
+                {
+                  fieldValues[entity.field_name].map((item, index) => {
+                    if (item.file_type === FILE_TYPE_IMAGE || item.file_type === FILE_TYPE_VIDEO)
+                      return (
+                        <Box display="flex" marginTop="20px" marginLeft="-20px" marginRight="10px" key={"collection_item_key_media_" + index + "_" + entity.field_definition_id}>
+                          <ImageComponent
+                            image={item.thumbnail_url}
+                            isWide={true}
+                            onSelect={null}
+                            onRemove={() => {
                               setFieldValues(prevValue => {
                                 const tmpArr = prevValue[entity.field_name].filter(x => x.file_id !== item.file_id)
                                 validateSingleField(entity, tmpArr)
@@ -1027,257 +1021,273 @@ function CollectionItem(props) {
                                 })
                               })
                             }}
-                          >
-                            <DeleteOutline color="secondary" sx={classes.photoIcon} />
-                            <Typography sx={classes.photoWarning} noWrap>{item.file_name}</Typography>
-                          </Box>
-                        )
-                    })
-                  }
-                  {
-                    entity.field_sub_type !== "single"
-                      ?
-                      <Box sx={classes.photoSelector} marginTop="20px" onClick={handleOpenFileDrawer}>
-                        <PhotoCameraBack color="secondary" sx={classes.photoIcon} />
-                        <Typography sx={classes.photoWarning}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
-                      </Box>
-                      :
-                      ''
-                  }
-                </Box>
-                :
-                <Box sx={classes.photoSelector} onClick={handleOpenFileDrawer}>
-                  <PhotoCameraBack color="secondary" sx={classes.photoIcon} />
-                  <Typography sx={classes.photoWarning}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
-                </Box>
-            }
-          </Box>
-          {
-            validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
-              <FormLabel sx={classes.errorLabel}>
-                {fieldErrors[entity.field_name]}
-              </FormLabel>
-            )
-              :
-              ''
-          }
-        </Box >
-      )
-    case 'bool':
-      return (
-        <Box marginY="20px">
-          <Typography sx={classes.radioLabelText}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
-          <RadioGroup
-            aria-label={entity.field_name}
-            name={entity.field_name}
-            error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
-            helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
-            id={entity.field_definition_id}
-            key={"collection_item_key_" + entity.field_definition_id}
-            row
-            size="small"
-            value={fieldValues && fieldValues[entity.field_name] != null ? fieldValues[entity.field_name].toString() : getDefaultBooleanValue(entity.settings.default_value)}
-            color="secondary"
-            onChange={handleBoolValueChange}>
-            <FormControlLabel classes={{ label: classes.mediumLabel }} value='true' control={<Radio size='small' />} label={<FormattedMessage {...messages.true} />} />
-            <FormControlLabel classes={{ label: classes.mediumLabel }} value='false' control={<Radio size='small' />} label={<FormattedMessage {...messages.false} />} />
-          </RadioGroup>
-          {
-            validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
-              <FormLabel sx={classes.errorLabel}>
-                {fieldErrors[entity.field_name]}
-              </FormLabel>
-            )
-              :
-              ''
-          }
-        </Box>
-      )
-    case 'relation':
-      if (entity.relation_type === "MANY")
-        return (
-          <Box py="15px" width="100%">
-            <Autocomplete
-              id={entity.field_definition_id}
-              key={"collection_item_key_" + entity.field_definition_id}
-              options={relationLookUpList}
-              name={entity.field_name}
-              size='small'
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => <TextField {...params} size="small" margin="normal" label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")} variant="filled" />}
-              onChange={handleMultiSelectChange}
-            />
-            {
-              validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
-                <FormLabel sx={classes.errorLabel}>
-                  {fieldErrors[entity.field_name]}
-                </FormLabel>
-              )
-                :
-                ''
-            }
-            <Box my="15px" display="flex" width="100%" flexWrap="wrap">
-              {
-                fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length
-                && fieldValues[entity.field_name].map((item, index) =>
-                  <Box p='5px'><Chip key={"tag_key_" + index} label={item} color="secondary" onDelete={deleteSelectedRelationItem.bind(this, index)} /></Box>
-                )
-              }
-            </Box>
-          </Box>
-        )
-      else
-        return (
-          <Box display="flex" alignItems="center" py="15px" width="100%">
-            <TextField
-              variant="filled"
-              label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
-              margin="normal"
-              name={entity.field_name}
-              fullWidth
-              error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
-              helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
-              size="small"
-              select
-              id={entity.field_definition_id}
-              key={"collection_item_key_" + entity.field_definition_id}
-              onChange={(event) => { handleMultiSelectChange(null, event.target.value) }}
-              value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length ? fieldValues[entity.field_name][0] : ''}
-            >
-              {
-                relationLookUpList.map((item, index) =>
-                  <MenuItem key={"key_value_list_" + index} value={item.__auto_id__}>{item.name}</MenuItem>
-                )
-              }
-            </TextField>
-            <CloseOutlined sx={classes.closeIcon} onClick={clearRelationItem} />
-          </Box>
-        )
-
-    case 'component':
-      if (entity.field_sub_type === "single")
-        return (
-          <Box width="100%">
-            {
-              entityExtraData
-                ?
-                <Box sx={classes.fieldSetSingleBoxContainer}>
-                  <Box display="flex" justifyContent="space-between" alignItems="center" marginY="10px">
-                    <Box marginX="10px">
-                      {
-                        checkedList[0]
-                          ?
-                          <ArrowCircleUp sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, 0)} />
-                          :
-                          <ArrowCircleDown sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, 0)} />
-                      }
-                    </Box>
-                    <Box width="100%">
-                      <Typography sx={classes.fieldSetText}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
-                    </Box>
-                  </Box>
-                  <Collapse in={checkedList[0]}>
-                    <FieldSetRenderLayout
-                      selectedFieldSet={entityExtraData}
-                      selectedFieldSetName={entity.field_name}
-                      languageList={languageList}
-                      selectedLanguage={selectedLanguage}
-                      selectedUser={props.selectedUser}
-                      selectedFieldSetIndex={0}
-                      setParentFieldValues={setFieldValues}
-                      editObj={editVal && editVal.length ? editVal[0] : editVal}
-                      otherItemsList={fieldValues[entity.field_name]}
-                      setParentFieldErrors={setFieldErrors}
-                      validateTriggered={validateTriggered}
-                      setSelectedLanguage={setSelectedLanguage}
-                      isLocalEnable={isLocalEnable}
-                    />
-                  </Collapse>
-                  {
-                    validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
-                      <FormLabel sx={classes.errorLabel}>
-                        {fieldErrors[entity.field_name]}
-                      </FormLabel>
-                    )
-                      :
-                      ''
-                  }
-                </Box>
-                :
-                'Loading Field Set'
-            }
-          </Box>
-        )
-      else
-        return (
-          <Box width="100%">
-            {
-              entityExtraData
-                ?
-                <Box sx={classes.fieldSetSingleBoxContainer}>
-                  <Box sx={classes.fieldSetSingleBox}>
-                    <Box display="flex" width="100%" flexWrap="wrap" overflow="auto" height="100%">
-                      <Typography sx={classes.fieldSetText}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
-                    </Box>
-                    <AddBox color='secondary' sx={classes.addIcon} onClick={addFieldSetItem} />
-                  </Box>
-                  {
-                    fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length
-                      ?
-                      fieldValues[entity.field_name].map((subItem, index) =>
-                        <Box key={"field_value_sub_key_" + index} width="100%">
-                          <Box display="flex" justifyContent="space-between" alignItems="center" marginY="10px">
-                            <Box marginX="10px">
-                              {
-                                checkedList[index]
-                                  ?
-                                  <ArrowCircleUp sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, index)} />
-                                  :
-                                  <ArrowCircleDown sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, index)} />
-                              }
-                            </Box>
-                            <Box width="100%">
-                              <Typography sx={classes.componentTitle}>{entity.field_name}&nbsp;({index + 1})</Typography>
-                            </Box>
-                            <DeleteOutline color='secondary' sx={classes.addIcon} onClick={removeFieldSetItem.bind(this, index)} />
-                          </Box>
-                          <Collapse key={"local_row_collapse_key_" + index} in={checkedList[index]}>
-                            <FieldSetRenderLayout
-                              selectedFieldSet={entityExtraData}
-                              selectedFieldSetName={entity.field_name}
-                              selectedFieldSetIndex={index}
-                              languageList={languageList}
-                              selectedLanguage={selectedLanguage}
-                              selectedUser={props.selectedUser}
-                              setParentFieldValues={setFieldValues}
-                              editObj={editVal && editVal.length ? editVal[index] : editVal}
-                              otherItemsList={fieldValues[entity.field_name]}
-                              setParentFieldErrors={setFieldErrors}
-                              validateTriggered={validateTriggered}
-                              setSelectedLanguage={setSelectedLanguage}
-                              isLocalEnable={isLocalEnable}
-                            />
-                          </Collapse>
+                          />
                         </Box>
                       )
-                      :
-                      ''
-                  }
-                  {
-                    validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
-                      <FormLabel sx={classes.errorLabel}>
-                        {fieldErrors[entity.field_name]}
-                      </FormLabel>
-                    )
-                      :
-                      ''
-                  }
-                </Box>
-                :
-                'Loading Field Set'
+                    else
+                      return (
+                        < Box
+                          sx={classes.photoSelector}
+                          key={"collection_item_key_media_" + index + "_" + entity.field_definition_id}
+                          marginTop="20px"
+                          marginRight="10px"
+                          maxWidth="250px"
+                          overflow="hidden"
+                          onClick={() => {
+                            setFieldValues(prevValue => {
+                              const tmpArr = prevValue[entity.field_name].filter(x => x.file_id !== item.file_id)
+                              validateSingleField(entity, tmpArr)
+                              return ({
+                                ...prevValue,
+                                [entity.field_name]: tmpArr
+                              })
+                            })
+                          }}
+                        >
+                          <DeleteOutline color="secondary" sx={classes.photoIcon} />
+                          <Typography sx={classes.photoWarning} noWrap>{item.file_name}</Typography>
+                        </Box>
+                      )
+                  })
+                }
+                {
+                  entity.field_sub_type !== "single"
+                    ?
+                    <Box sx={classes.photoSelector} marginTop="20px" onClick={handleOpenFileDrawer}>
+                      <PhotoCameraBack color="secondary" sx={classes.photoIcon} />
+                      <Typography sx={classes.photoWarning}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
+                    </Box>
+                    :
+                    ''
+                }
+              </Box>
+              :
+              <Box sx={classes.photoSelector} onClick={handleOpenFileDrawer}>
+                <PhotoCameraBack color="secondary" sx={classes.photoIcon} />
+                <Typography sx={classes.photoWarning}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
+              </Box>
+          }
+        </Box>
+        {
+          validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
+            <FormLabel sx={classes.errorLabel}>
+              {fieldErrors[entity.field_name]}
+            </FormLabel>
+          )
+            :
+            ''
+        }
+      </Box >)
+
+    case 'bool':
+      return (<Box marginY="20px">
+        <Typography sx={classes.radioLabelText}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
+        <RadioGroup
+          aria-label={entity.field_name}
+          name={entity.field_name}
+          error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+          helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+          id={entity.field_definition_id}
+          key={"collection_item_key_" + entity.field_definition_id}
+          row
+          size="small"
+          value={fieldValues && fieldValues[entity.field_name] != null ? fieldValues[entity.field_name].toString() : getDefaultBooleanValue(entity.settings.default_value)}
+          color="secondary"
+          onChange={handleBoolValueChange}>
+          <FormControlLabel classes={{ label: classes.mediumLabel }} value='true' control={<Radio size='small' />} label={<FormattedMessage {...messages.true} />} />
+          <FormControlLabel classes={{ label: classes.mediumLabel }} value='false' control={<Radio size='small' />} label={<FormattedMessage {...messages.false} />} />
+        </RadioGroup>
+        {
+          validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
+            <FormLabel sx={classes.errorLabel}>
+              {fieldErrors[entity.field_name]}
+            </FormLabel>
+          )
+            :
+            ''
+        }
+      </Box>)
+
+    case 'relation':
+      if (entity.relation_type === "MANY") {
+        return (<Box py="15px" width="100%">
+          <Autocomplete
+            id={entity.field_definition_id}
+            key={"collection_item_key_" + entity.field_definition_id}
+            options={relationLookUpList}
+            name={entity.field_name}
+            size='small'
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => <TextField {...params} size="small" margin="normal" label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")} variant="filled" />}
+            onChange={handleMultiSelectChange}
+          />
+          {
+            validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
+              <FormLabel sx={classes.errorLabel}>
+                {fieldErrors[entity.field_name]}
+              </FormLabel>
+            )
+              :
+              ''
+          }
+          <Box my="15px" display="flex" width="100%" flexWrap="wrap">
+            {
+              fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length
+              && fieldValues[entity.field_name].map((item, index) =>
+                <Box p='5px'><Chip key={"tag_key_" + index} label={item} color="secondary" onDelete={deleteSelectedRelationItem.bind(this, index)} /></Box>
+              )
             }
           </Box>
-        )
+        </Box>)
+      }
+      else {
+        return (<Box display="flex" alignItems="center" py="15px" width="100%">
+          <TextField
+            variant="filled"
+            label={getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}
+            margin="normal"
+            name={entity.field_name}
+            fullWidth
+            error={validateTriggered && fieldErrors && fieldErrors[entity.field_name]}
+            helperText={validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? fieldErrors[entity.field_name] : ''}
+            size="small"
+            select
+            id={entity.field_definition_id}
+            key={"collection_item_key_" + entity.field_definition_id}
+            onChange={(event) => { handleMultiSelectChange(null, event.target.value) }}
+            value={fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length ? fieldValues[entity.field_name][0] : ''}
+          >
+            {
+              relationLookUpList.map((item, index) =>
+                <MenuItem key={"key_value_list_" + index} value={item.__auto_id__}>{item.name}</MenuItem>
+              )
+            }
+          </TextField>
+          <CloseOutlined sx={classes.closeIcon} onClick={clearRelationItem} />
+        </Box>)
+      }
+
+    case 'component':
+      if (entity.field_sub_type === "single") {
+        return (<Box width="100%">
+          {
+            entityExtraData
+              ?
+              <Box sx={classes.fieldSetSingleBoxContainer}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" marginY="10px">
+                  <Box marginX="10px">
+                    {
+                      checkedList[0]
+                        ?
+                        <ArrowCircleUp sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, 0)} />
+                        :
+                        <ArrowCircleDown sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, 0)} />
+                    }
+                  </Box>
+                  <Box width="100%">
+                    <Typography sx={classes.fieldSetText}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
+                  </Box>
+                </Box>
+                <Collapse in={checkedList[0]}>
+                  <FieldSetRenderLayout
+                    selectedFieldSet={entityExtraData}
+                    selectedFieldSetName={entity.field_name}
+                    languageList={languageList}
+                    selectedLanguage={selectedLanguage}
+                    selectedUser={props.selectedUser}
+                    selectedFieldSetIndex={0}
+                    setParentFieldValues={setFieldValues}
+                    editObj={editVal && editVal.length ? editVal[0] : editVal}
+                    otherItemsList={fieldValues[entity.field_name]}
+                    setParentFieldErrors={setFieldErrors}
+                    validateTriggered={validateTriggered}
+                    setSelectedLanguage={setSelectedLanguage}
+                    isLocalEnable={isLocalEnable}
+                  />
+                </Collapse>
+                {
+                  validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
+                    <FormLabel sx={classes.errorLabel}>
+                      {fieldErrors[entity.field_name]}
+                    </FormLabel>
+                  )
+                    :
+                    ''
+                }
+              </Box>
+              :
+              'Loading Field Set'
+          }
+        </Box>)
+      } else {
+        return (<Box width="100%">
+          {
+            entityExtraData
+              ?
+              <Box sx={classes.fieldSetSingleBoxContainer}>
+                <Box sx={classes.fieldSetSingleBox}>
+                  <Box display="flex" width="100%" flexWrap="wrap" overflow="auto" height="100%">
+                    <Typography sx={classes.fieldSetText}>{getCollectionLabel(entity.field_name, entity.localized_texts, selectedLanguage) + (entity.settings.is_mandatory ? " *" : "")}</Typography>
+                  </Box>
+                  <AddBox color='secondary' sx={classes.addIcon} onClick={addFieldSetItem} />
+                </Box>
+                {
+                  fieldValues && fieldValues[entity.field_name] && fieldValues[entity.field_name].length
+                    ?
+                    fieldValues[entity.field_name].map((subItem, index) =>
+                      <Box key={"field_value_sub_key_" + index} width="100%">
+                        <Box display="flex" justifyContent="space-between" alignItems="center" marginY="10px">
+                          <Box marginX="10px">
+                            {
+                              checkedList[index]
+                                ?
+                                <ArrowCircleUp sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, index)} />
+                                :
+                                <ArrowCircleDown sx={classes.addCircleIcon} onClick={toggleCollapse.bind(this, index)} />
+                            }
+                          </Box>
+                          <Box width="100%">
+                            <Typography sx={classes.componentTitle}>{entity.field_name}&nbsp;({index + 1})</Typography>
+                          </Box>
+                          <DeleteOutline color='secondary' sx={classes.addIcon} onClick={removeFieldSetItem.bind(this, index)} />
+                        </Box>
+                        <Collapse key={"local_row_collapse_key_" + index} in={checkedList[index]}>
+                          <FieldSetRenderLayout
+                            selectedFieldSet={entityExtraData}
+                            selectedFieldSetName={entity.field_name}
+                            selectedFieldSetIndex={index}
+                            languageList={languageList}
+                            selectedLanguage={selectedLanguage}
+                            selectedUser={props.selectedUser}
+                            setParentFieldValues={setFieldValues}
+                            editObj={editVal && editVal.length ? editVal[index] : editVal}
+                            otherItemsList={fieldValues[entity.field_name]}
+                            setParentFieldErrors={setFieldErrors}
+                            validateTriggered={validateTriggered}
+                            setSelectedLanguage={setSelectedLanguage}
+                            isLocalEnable={isLocalEnable}
+                          />
+                        </Collapse>
+                      </Box>
+                    )
+                    :
+                    ''
+                }
+                {
+                  validateTriggered && fieldErrors && fieldErrors[entity.field_name] ? (
+                    <FormLabel sx={classes.errorLabel}>
+                      {fieldErrors[entity.field_name]}
+                    </FormLabel>
+                  )
+                    :
+                    ''
+                }
+              </Box>
+              :
+              'Loading Field Set'
+          }
+        </Box>)
+      }
   }
 }
 

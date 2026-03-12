@@ -13,6 +13,10 @@ export default defineMessages({
     id: `${scope}.createPlan`,
     defaultMessage: 'New Collection Type',
   },
+  addItem: {
+    id: `${scope}.addItem`,
+    defaultMessage: 'Add Item',
+  },
   collectionTypes: {
     id: `${scope}.collectionTypes`,
     defaultMessage: 'Collection Types',

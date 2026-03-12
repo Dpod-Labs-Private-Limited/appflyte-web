@@ -126,7 +126,8 @@ const styles = {
     height: '18px',
     width: '18px',
     marginRight: '15px',
-    cursor: 'pointer !important'
+    cursor: 'pointer !important',
+    color: '#C30E2E'
   },
   btnIcon: {
     height: '18px',
@@ -246,7 +247,8 @@ const styles = {
     height: '18px',
     width: '18px',
     margin: '3px',
-    cursor: 'pointer !important'
+    cursor: 'pointer !important',
+    color: '#C30E2E'
   },
   moveableBoxMoverIcon: {
     height: '18px',

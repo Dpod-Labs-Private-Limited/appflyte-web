@@ -41,7 +41,6 @@ export function CollectionTypeConfView() {
   };
 
   const [loading, SetLoading] = useState(false)
-  const [saveFlag, setSaveFlag] = useState(false)
   const [openAddFieldModal, setOpenAddFieldModal] = useState(false)
   const [anchorEditViewMenu, setAnchorEditViewMenu] = useState()
   const [modalMetaData, setModalMetaData] = useState(null)
@@ -119,7 +118,6 @@ export function CollectionTypeConfView() {
               return false
             return true
           })
-          console.log("2d array", editViewFieldsTmp)
           const linkField = res.data.link_fields && res.data.link_fields.length && res.data.link_fields.length > 0 && res.data.link_fields[0] !== "$.__auto_id__" ? res.data.link_fields[0] : ''
           setListViewFields(listViewFieldsTmp)
           setListViewFieldsIds(listViewFieldsIdTmp)
@@ -475,6 +473,7 @@ export function CollectionTypeConfView() {
               position: 'fixed'
             }),
           }}>
+
           <Modal
             open={openAddFieldModal}
             onClose={handleCloseFieldModal}
@@ -492,6 +491,7 @@ export function CollectionTypeConfView() {
               handleClose={handleCloseFieldModal}
             />
           </Modal>
+
           <Box display="flex" pt={5} justifyContent="center">
             <Box display="flex" flexDirection="column" justifyContent="center" width="85%" maxWidth="960px">
               {
@@ -502,7 +502,7 @@ export function CollectionTypeConfView() {
                       <Box display="flex" flexDirection="column">
                         <Box display="flex" width="100%" height="60px" justifyContent="space-between" alignItems="center" paddingX="25px">
                           <Typography sx={classes.addObjectiveHeading}><FormattedMessage {...messages.listView} /></Typography>
-                          <AddBox onClick={handleOpenFieldModal} color="secondary" />
+                          <AddBox onClick={handleOpenFieldModal} sx={{ color: "#0B51C5" }} />
                         </Box>
                         <DragDropContext onDragEnd={onDragEndList}>
                           <Droppable droppableId="droppable" direction="horizontal">
@@ -527,7 +527,7 @@ export function CollectionTypeConfView() {
                                               <Box width="100%"><Typography noWrap sx={classes.moveableBoxText}>{item.localized_texts && item.localized_texts.en ? item.localized_texts.en : item.fieldName}</Typography></Box>
                                               <Box display="flex">
                                                 {item.linkThisField ? <LinkOutlined color='primary' sx={classes.moveableBoxIcon} /> : ''}
-                                                <DeleteOutline color='secondary' sx={classes.moveableBoxIcon} onClick={removeListField.bind(this, index)} />
+                                                <DeleteOutline sx={classes.moveableBoxIcon} onClick={removeListField.bind(this, index)} />
                                               </Box>
                                             </Box>
                                           )
@@ -601,7 +601,7 @@ export function CollectionTypeConfView() {
                   </Menu>
                   <Box display="flex" width="100%" height="60px" justifyContent="space-between" alignItems="center" paddingX="25px">
                     <Typography sx={classes.addObjectiveHeading}><FormattedMessage {...messages.editView} /></Typography>
-                    <PlaylistAddOutlined onClick={handleOpenEditMenu} color="secondary" />
+                    <PlaylistAddOutlined onClick={handleOpenEditMenu} sx={{ color: "#0B51C5" }} />
                   </Box>
                   <DragDropContext onDragEnd={onDragEndEditParent}>
                     <Droppable droppableId="droppable2" direction="vertical">
@@ -689,6 +689,7 @@ export function CollectionTypeConfView() {
               </Paper>
             </Box>
           </Box >
+
         </LoadingOverlay >
 
       </Box>

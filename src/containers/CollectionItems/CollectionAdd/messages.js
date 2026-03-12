@@ -61,4 +61,8 @@ export default defineMessages({
     id: `${scope}.status`,
     defaultMessage: 'Status :',
   },
+  noCollection: {
+    id: `${scope}.noCollection`,
+    defaultMessage: 'No Collections',
+  },
 });

@@ -7,7 +7,7 @@ const relationBoxCommon = {
 }
 const styles = {
   cancelBtn: {
-    backgroundColor: 'white',
+    backgroundColor: '#404040',
     borderColor: 'black',
     border: '1px solid',
     height: '26px',
@@ -18,6 +18,7 @@ const styles = {
     height: '26px',
     marginRight: '15px',
     textTransform: 'capitalize',
+    backgroundColor: '#0B51C5',
   },
   addObjectiveHeading: {
     fontSize: '18',

@@ -1,12 +1,12 @@
-const styles = theme => ({
+const styles = {
   modal: {
     position: 'fixed',
-    width: '500px',
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
+    width: '600px',
+    // backgroundColor: theme.palette.background.paper,
+    // boxShadow: theme.shadows[5],
   },
   cancelBtn: {
-    backgroundColor: 'white',
+    backgroundColor: '#404040',
     borderColor: 'black',
     border: '1px solid',
     height: '26px',
@@ -15,11 +15,12 @@ const styles = theme => ({
   saveBtn: {
     height: '26px',
     textTransform: 'capitalize',
+    backgroundColor: '#0B51C5',
   },
   addObjectiveHeading: {
     fontSize: '18',
     color: '#0A51A0',
-    letterSpacing: 3
+    letterSpacing: 2
   },
   errorLabel: {
     fontSize: 12,
@@ -47,8 +48,9 @@ const styles = theme => ({
     height: '18px',
     width: '18px',
     margin: '3px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    color: '#C30E2E'
   },
-});
+};
 
 export default styles;

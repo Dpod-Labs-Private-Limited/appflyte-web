@@ -11,7 +11,7 @@ import styles from './styles';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 import { Autocomplete } from '@mui/material';
-import { DeleteOutline } from '@mui/icons-material';
+import { ConstructionOutlined, DeleteOutline } from '@mui/icons-material';
 import { COLLECTION_FIELD_NAME } from '../../utils/constants';
 
 function AddFieldToListView(props) {
@@ -21,9 +21,13 @@ function AddFieldToListView(props) {
   const classes = styles;
 
   const getFilteredFields = () => {
+
+    console.log("isForListView", isForListView)
+    console.log("fieldList", fieldList)
+
     if (isForListView) {
       return fieldList.filter(x => {
-        if (x.fieldType === COLLECTION_FIELD_NAME.COMPONENT || x.fieldType === COLLECTION_FIELD_NAME.RELATION)
+        if (x.fieldType === COLLECTION_FIELD_NAME.COMPONENT || x.fieldType === COLLECTION_FIELD_NAME.RELATION || x.fieldType === COLLECTION_FIELD_NAME.RICH_TEXT)
           return false
         else
           return !listViewFieldsIds.includes(x.id)
@@ -105,7 +109,7 @@ function AddFieldToListView(props) {
       minWidth: 420,
     }}>
       <Box px="20px" py="15px" display="flex" justifyContent="space-between" alignItems={'center'}>
-        <Box>
+        <Box mr={2}>
           <Typography sx={classes.addObjectiveHeading}>{isForListView ? <FormattedMessage {...messages.heading} /> : <FormattedMessage {...messages.heading2} />}</Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: "10px" }}>

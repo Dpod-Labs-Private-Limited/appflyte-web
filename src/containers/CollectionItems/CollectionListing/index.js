@@ -13,7 +13,7 @@ import styles from './styles'
 import './style.css';
 import messages from './messages';
 import { TextFieldOverriddenWhite as TextField } from '../../../components/TextFieldOverridden/index';
-import { Box, Typography, Paper, CircularProgress, MenuItem, CardMedia, Tabs, Tab, Divider } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, MenuItem, CardMedia, Tabs, Tab, Divider, Button } from '@mui/material';
 import { AddBox, ArrowDownward, ShareOutlined, LanguageOutlined, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, RefreshOutlined, DescriptionOutlined } from '@mui/icons-material';
 import { getCollectionLabel } from '../../../Api/Services/collection/collectionUtilityServices';
 import CollectionItemsService from '../../../Api/Services/collection/collectionItemsService';
@@ -28,20 +28,7 @@ export function CollectionListing(props) {
 
   const { selectedCollection, languageList, setEditObj, setListOrAdd, setOtherItemsList } = props
   const { selectedProject } = useAppContext();
-
   const classes = styles;
-
-  const tableIcons = {
-    Add: forwardRef((props, ref) => <AddBox sx={classes.actionIconAdd} {...props} ref={ref} />),
-    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Delete: forwardRef((props, ref) => <DeleteOutline sx={classes.actionIcon} {...props} ref={ref} />),
-    DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    Edit: forwardRef((props, ref) => <Edit sx={classes.actionIcon} {...props} ref={ref} />),
-    NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
-    SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
-  };
 
   function a11yProps(index) {
     return {
@@ -50,23 +37,14 @@ export function CollectionListing(props) {
     };
   }
 
-  const [state, setState] = useState({
-    columns: [],
-    data: [],
-  });
-
-  const [stateDraft, setStateDraft] = useState({
-    columns: [],
-    data: [],
-  });
-
   const [loading, SetLoading] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState("en")
   const [selectedLanguageDraft, setSelectedLanguageDraft] = useState("en")
-  const [fieldMap, setFieldMap] = useState()
   const [selectedCollectionId, setSelectedCollectionId] = useState([])
   const [selectedDraftCollectionId, setSelectedDraftCollectionId] = useState([])
   const [tabValue, setTabValue] = useState(0)
+  const [stateDraft, setStateDraft] = useState({ columns: [], data: [] });
+  const [state, setState] = useState({ columns: [], data: [] });
 
   useEffect(() => {
     if (selectedCollection) {
@@ -90,27 +68,34 @@ export function CollectionListing(props) {
   }
 
   const getListFields = () => {
-    if (!(selectedCollection.display_view_config?.list?.default_view?.fields))
+
+    if (!(selectedCollection.display_view_config?.list?.default_view?.fields)) {
       return []
-    if (
-      selectedCollection.display_view_config.list.default_view.fields == null ||
-      selectedCollection.display_view_config.list.default_view.fields.length === 0
-    )
+    }
+
+    if (selectedCollection.display_view_config.list.default_view.fields == null || selectedCollection.display_view_config.list.default_view.fields.length === 0) {
       return []
+    }
+
     const fieldMap = {}
     selectedCollection.fields_list.forEach(field => {
       fieldMap[field.field_path_pattern] = field
     })
+
     const retArr = []
     selectedCollection.display_view_config.list.default_view.fields.forEach(listField => {
-      if (!fieldMap[listField.field_path_pattern])
-        return
+
+      if (!fieldMap[listField.field_path_pattern]) { return }
+
       if (["rich_text", "relation", "component"].includes(fieldMap[listField.field_path_pattern].field_type))
         return
+
       if (fieldMap[listField.field_path_pattern].field_type === 'media')
         retArr.push({
           title: getCollectionLabel(fieldMap[listField.field_path_pattern].field_name, fieldMap[listField.field_path_pattern].localized_texts, selectedLanguage),
           field: fieldMap[listField.field_path_pattern].field_name,
+          field_type: fieldMap[listField.field_path_pattern].field_type,
+          field_sub_type: fieldMap[listField.field_path_pattern].field_sub_type,
           render: rowData => {
             return (
               <Box
@@ -144,6 +129,8 @@ export function CollectionListing(props) {
         retArr.push({
           title: getCollectionLabel(fieldMap[listField.field_path_pattern].field_name, fieldMap[listField.field_path_pattern].localized_texts, selectedLanguage),
           field: fieldMap[listField.field_path_pattern].field_name,
+          field_type: fieldMap[listField.field_path_pattern].field_type,
+          field_sub_type: fieldMap[listField.field_path_pattern].field_sub_type,
           render: rowData => {
             if (rowData[fieldMap[listField.field_path_pattern].field_name] != null && typeof rowData[fieldMap[listField.field_path_pattern].field_name] === "object") {
               if (typeof rowData[fieldMap[listField.field_path_pattern].field_name][selectedLanguage] === "object")
@@ -157,6 +144,8 @@ export function CollectionListing(props) {
         retArr.push({
           title: getCollectionLabel(fieldMap[listField.field_path_pattern].field_name, fieldMap[listField.field_path_pattern].localized_texts, selectedLanguage),
           field: fieldMap[listField.field_path_pattern].field_name,
+          field_type: fieldMap[listField.field_path_pattern].field_type,
+          field_sub_type: fieldMap[listField.field_path_pattern].field_sub_type,
           render: rowData => {
             if (rowData[fieldMap[listField.field_path_pattern].field_name] != null && typeof rowData[fieldMap[listField.field_path_pattern].field_name] === "string") {
               if (!(fieldMap[listField.field_path_pattern].settings.field_values[selectedLanguage]))
@@ -191,10 +180,11 @@ export function CollectionListing(props) {
       else
         retArr.push({
           title: getCollectionLabel(fieldMap[listField.field_path_pattern].field_name, fieldMap[listField.field_path_pattern].localized_texts, selectedLanguage),
-          field: fieldMap[listField.field_path_pattern].field_name
+          field: fieldMap[listField.field_path_pattern].field_name,
+          field_type: fieldMap[listField.field_path_pattern].field_type,
+          field_sub_type: fieldMap[listField.field_path_pattern].field_sub_type
         })
-    }
-    )
+    })
     setState(prev => ({
       columns: [...retArr],
       data: [...prev.data]
@@ -203,13 +193,10 @@ export function CollectionListing(props) {
       columns: [...retArr],
       data: [...prev.data]
     }))
-    setFieldMap(fieldMap)
   }
 
   const fetchCollectionItems = async () => {
     const accID = props.selectedUser.root_account_id
-    const subscriberId = props.selectedUser.subscriber_id
-    const subscriptionId = props.selectedUser.subscription_id
     const pluralId = selectedCollection.api_prural_id
     const version = selectedCollection.version
     const schemaId = selectedProject.payload.__auto_id__
@@ -269,6 +256,7 @@ export function CollectionListing(props) {
         columns: [...prev.columns],
         data: [...dataTemp]
       }))
+
       setStateDraft(prev => ({
         columns: [...prev.columns],
         data: [...dataTempDraft]
@@ -276,11 +264,11 @@ export function CollectionListing(props) {
       setOtherItemsList(dataTempOther)
     }
     catch (err) {
-      console.log("Error occured while fetching list of collection Items", err)
       setState(prev => ({
         columns: [...prev.columns],
         data: []
       }))
+
       setStateDraft(prev => ({
         columns: [...prev.columns],
         data: []
@@ -307,7 +295,6 @@ export function CollectionListing(props) {
     }
     else {
       setSelectedCollectionId(allSelectedData.map(item => item.__auto_id__))
-      console.log("selectedCollectionId", selectedCollectionId)
     }
   }
 
@@ -317,7 +304,6 @@ export function CollectionListing(props) {
     }
     else {
       setSelectedDraftCollectionId(allSelectedData.map(item => item.__auto_id__))
-      console.log("selectedDraftCollectionId", selectedDraftCollectionId)
     }
   }
 
@@ -327,8 +313,6 @@ export function CollectionListing(props) {
     SetLoading(true)
     topbar.show()
     const accID = props.selectedUser.root_account_id
-    const subscriberId = props.selectedUser.subscriber_id
-    const subscriptionId = props.selectedUser.subscription_id
     const singularId = selectedCollection.api_singular_id
     const version = selectedCollection.version
     const schemaId = selectedProject.payload.__auto_id__
@@ -336,7 +320,7 @@ export function CollectionListing(props) {
     let defError = ""
     for (const collId of selectedCollectionId) {
       try {
-        const res = await CollectionItemsService.deleteCollectionItem(accID, accID, singularId, version, schemaId, collId)
+        await CollectionItemsService.deleteCollectionItem(accID, accID, singularId, version, schemaId, collId)
       }
       catch (err) {
         console.log("Error while deleting an item", err)
@@ -360,8 +344,6 @@ export function CollectionListing(props) {
     SetLoading(true)
     topbar.show()
     const accID = props.selectedUser.root_account_id
-    const subscriberId = props.selectedUser.subscriber_id
-    const subscriptionId = props.selectedUser.subscription_id
     const singularId = selectedCollection.api_singular_id
     const version = selectedCollection.version
     const schemaId = selectedProject.payload.__auto_id__
@@ -369,7 +351,7 @@ export function CollectionListing(props) {
     let defError = ""
     for (const collId of selectedDraftCollectionId) {
       try {
-        const res = await CollectionItemsService.deleteCollectionItem(accID, accID, singularId, version, schemaId, collId)
+        await CollectionItemsService.deleteCollectionItem(accID, accID, singularId, version, schemaId, collId)
       }
       catch (err) {
         console.log("Error while deleting an item", err)
@@ -393,236 +375,194 @@ export function CollectionListing(props) {
       {
         selectedCollection
           ?
-          <Box display="flex" width="100%" pt={5} justifyContent="center">
-            <Box width="95%" maxWidth="960px">
-              <LoadingOverlay
-                active={loading}
-                horizontal
-                styles={{
-                  wrapper: {
-                    height: '100%',
-                    width: '100%',
-                  },
-                  overlay: (base) => ({
-                    ...base,
-                    background: 'rgba(0, 0, 0, 0.2)',
-                    zIndex: 1600,
-                    height: '100%',
-                    position: 'fixed'
-                  }),
-                }}>
-                <Box>
-                  <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    indicatorColor="secondary"
-                    textColor="secondary"
-                    aria-label="scrollable force tabs example"
-                    variant="scrollable"
-                    scrollButtons="off"
+          <Box>
+
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: '5px' }} >
+              <Typography sx={classes.breadCrumbBold}>{selectedCollection.entity_name}</Typography>
+              <Button
+                disableElevation
+                size="small"
+                variant="contained"
+                sx={classes.saveDraftBtn}
+                onClick={() => {
+                  setListOrAdd('add')
+                }}
+              >
+                <FormattedMessage {...messages.addItem} />
+              </Button>
+            </Box>
+
+            <Box display="flex" width="100%" pt={2} justifyContent="center">
+              <Box width="95%" maxWidth="960px">
+                <LoadingOverlay
+                  active={loading}
+                  horizontal
+                  styles={{
+                    wrapper: {
+                      height: '100%',
+                      width: '100%',
+                    },
+                    overlay: (base) => ({
+                      ...base,
+                      background: 'rgba(0, 0, 0, 0.2)',
+                      zIndex: 1600,
+                      height: '100%',
+                      position: 'fixed'
+                    }),
+                  }}>
+                  <Box>
+                    <Tabs
+                      value={tabValue}
+                      onChange={handleTabChange}
+                      // indicatorColor="secondary"
+                      // textColor="secondary"
+                      aria-label="scrollable force tabs example"
+                      variant="scrollable"
+                      scrollButtons="off"
+                    >
+                      <Tab key={0} id={"tabInCollectionList_index_" + 0} classes={{ root: classes.tab }} label={<FormattedMessage {...messages.publishedTab} />}  {...a11yProps(0)} />
+                      <Tab key={1} id={"tabInCollectionList_index_" + 0} classes={{ root: classes.tab }} label={<FormattedMessage {...messages.draftTab} />}  {...a11yProps(1)} />
+                    </Tabs>
+                  </Box>
+                  <Divider width="100%" />
+                  <div
+                    role="tabpanel_in_collection_list_published"
+                    style={{ width: '100%' }}
+                    hidden={tabValue !== 0}
+                    id={`scrollable-force-tabpanel_in_collection_list_published`}
+                    aria-labelledby={`scrollable-force-tab_in_collection_list_published`}
+                    key={"tabpanel_in_collection_list_published"}
                   >
-                    <Tab key={0} id={"tabInCollectionList_index_" + 0} classes={{ root: classes.tab }} label={<FormattedMessage {...messages.publishedTab} />}  {...a11yProps(0)} />
-                    <Tab key={1} id={"tabInCollectionList_index_" + 0} classes={{ root: classes.tab }} label={<FormattedMessage {...messages.draftTab} />}  {...a11yProps(1)} />
-                  </Tabs>
-                </Box>
-                <Divider width="100%" />
-                <div
-                  role="tabpanel_in_collection_list_published"
-                  style={{ width: '100%' }}
-                  hidden={tabValue !== 0}
-                  id={`scrollable-force-tabpanel_in_collection_list_published`}
-                  aria-labelledby={`scrollable-force-tab_in_collection_list_published`}
-                  key={"tabpanel_in_collection_list_published"}
-                >
-                  <Box sx={classes.refreshBtnBox}>
-                    {
-                      selectedCollection && selectedCollection.enable_localization
-                        ?
-                        <Box display="flex" alignItems="center">
-                          <LanguageOutlined />
-                          <Box width="150px" marginLeft="10px">
-                            <TextField
-                              variant="filled"
-                              label=""
-                              margin="normal"
-                              name="language"
-                              fullWidth
-                              size="small"
-                              select
-                              id="language"
-                              onChange={handleLanguageChange}
-                              value={selectedLanguage}
-                            >
-                              {
-                                languageList.map(lang => <MenuItem value={lang.value}>{lang.name}</MenuItem>)
-                              }
-                            </TextField>
+                    <Box sx={classes.refreshBtnBox}>
+                      {
+                        selectedCollection && selectedCollection.enable_localization
+                          ?
+                          <Box display="flex" alignItems="center">
+                            <LanguageOutlined />
+                            <Box width="150px" marginLeft="10px">
+                              <TextField
+                                variant="filled"
+                                label=""
+                                margin="normal"
+                                name="language"
+                                fullWidth
+                                size="small"
+                                select
+                                id="language"
+                                onChange={handleLanguageChange}
+                                value={selectedLanguage}
+                              >
+                                {
+                                  languageList.map(lang => <MenuItem value={lang.value}>{lang.name}</MenuItem>)
+                                }
+                              </TextField>
+                            </Box>
                           </Box>
+                          :
+                          <Box></Box>
+                      }
+                      <Box display="flex" alignItems="center">
+
+                        <Box sx={classes.cloneBtn} onClick={deleteCollectionType}>
+                          <DeleteOutline sx={{ color: '#C30E2E', height: '20px', width: '20px' }} />
+                          <Typography sx={classes.deleteText}><FormattedMessage {...messages.delete} /></Typography>
                         </Box>
-                        :
-                        <Box></Box>
-                    }
-                    <Box display="flex" alignItems="center">
-                      {/* <Box sx={classes.cloneBtn} onClick={null}>
+                        <Box>
+                          {
+                            loading
+                              ?
+                              <CircularProgress size={20.5} sx={classes.loadingIcon} />
+                              :
+                              <RefreshOutlined sx={classes.refreshIcon} onClick={fetchCollectionItems} />
+                          }
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Box id="collectionListingTableDark">
+                      <EnhancedCustomTable
+                        columns={state.columns}
+                        data={state.data}
+                        onSelectionChange={handleSelectionChange}
+                        onRowClick={(rowData) => {
+                          setEditObj(rowData)
+                          setListOrAdd('add')
+                        }}
+                      >
+                      </EnhancedCustomTable>
+                    </Box>
+                  </div>
+
+                  <div
+                    role="tabpanel_in_collection_list_draft"
+                    style={{ width: '100%' }}
+                    hidden={tabValue !== 1}
+                    id={`scrollable-force-tabpanel_in_collection_list_draft`}
+                    aria-labelledby={`scrollable-force-tab_in_collection_list_draft`}
+                    key={"tabpanel_in_collection_list_draft"}
+                  >
+                    <Box sx={classes.refreshBtnBox}>
+                      {
+                        selectedCollection && selectedCollection.enable_localization
+                          ?
+                          <Box display="flex" alignItems="center">
+                            <LanguageOutlined />
+                            <Box width="150px" marginLeft="10px">
+                              <TextField
+                                variant="filled"
+                                label=""
+                                margin="normal"
+                                name="languageDraft"
+                                fullWidth
+                                size="small"
+                                select
+                                id="language"
+                                onChange={handleLanguageChangeDraft}
+                                value={selectedLanguageDraft}
+                              >
+                                {
+                                  languageList.map(lang => <MenuItem value={lang.value}>{lang.name}</MenuItem>)
+                                }
+                              </TextField>
+                            </Box>
+                          </Box>
+                          :
+                          <Box></Box>
+                      }
+                      <Box display="flex" alignItems="center">
+                        {/* <Box sx={classes.cloneBtn} onClick={null}>
                   <ShareOutlined color='secondary' />
                   <Typography sx={classes.deleteText}><FormattedMessage {...messages.share} /></Typography>
                 </Box> */}
-                      <Box sx={classes.cloneBtn} onClick={deleteCollectionType}>
-                        <DeleteOutline color='secondary' />
-                        <Typography sx={classes.deleteText}><FormattedMessage {...messages.delete} /></Typography>
-                      </Box>
-                      <Box>
-                        {
-                          loading
-                            ?
-                            <CircularProgress size={20.5} sx={classes.loadingIcon} />
-                            :
-                            <RefreshOutlined sx={classes.refreshIcon} onClick={fetchCollectionItems} />
-                        }
-                      </Box>
-                    </Box>
-                  </Box>
-                  <Box id="collectionListingTableDark">
-                    {/* <MaterialTable
-                      components={{
-                        Container: props => <Paper {...props} elevation={0} sx={classes.tableRootPaper} />
-                      }}
-                      icons={tableIcons}
-                      options={{
-                        toolbar: false,
-                        pageSize: 10,
-                        headerStyle: {
-                          backgroundColor: '#13171F',
-                          color: '#FFF',
-                          fontSize: 14,
-                          height: '40px'
-                        },
-                        showFirstLastPageButtons: false,
-                        selection: true,
-                        selectionProps: rowData => ({
-                          checked: selectedCollectionId.includes(rowData.__auto_id__),
-                          color: 'primary'
-                        })
-                      }}
-                      onSelectionChange={handleSelectionChange}
-                      columns={state.columns}
-                      data={state.data}
-                      onRowClick={(event, rowData,) => {
-                        setEditObj(rowData)
-                        setListOrAdd('add')
-                      }}
-                    /> */}
-                    <EnhancedCustomTable
-                      columns={state.columns}
-                      data={state.data}
-                      onSelectionChange={handleSelectionChange}
-                      onRowClick={(rowData) => {
-                        setEditObj(rowData)
-                        setListOrAdd('add')
-                      }}
-                    >
-                    </EnhancedCustomTable>
-                  </Box>
-                </div>
-                <div
-                  role="tabpanel_in_collection_list_draft"
-                  style={{ width: '100%' }}
-                  hidden={tabValue !== 1}
-                  id={`scrollable-force-tabpanel_in_collection_list_draft`}
-                  aria-labelledby={`scrollable-force-tab_in_collection_list_draft`}
-                  key={"tabpanel_in_collection_list_draft"}
-                >
-                  <Box sx={classes.refreshBtnBox}>
-                    {
-                      selectedCollection && selectedCollection.enable_localization
-                        ?
-                        <Box display="flex" alignItems="center">
-                          <LanguageOutlined />
-                          <Box width="150px" marginLeft="10px">
-                            <TextField
-                              variant="filled"
-                              label=""
-                              margin="normal"
-                              name="languageDraft"
-                              fullWidth
-                              size="small"
-                              select
-                              id="language"
-                              onChange={handleLanguageChangeDraft}
-                              value={selectedLanguageDraft}
-                            >
-                              {
-                                languageList.map(lang => <MenuItem value={lang.value}>{lang.name}</MenuItem>)
-                              }
-                            </TextField>
-                          </Box>
+                        <Box sx={classes.cloneBtn} onClick={deleteCollectionTypeDraft}>
+                          <DeleteOutline sx={{ color: '#C30E2E', height: '20px', width: '20px' }} />
+                          <Typography sx={classes.deleteText}><FormattedMessage {...messages.delete} /></Typography>
                         </Box>
-                        :
-                        <Box></Box>
-                    }
-                    <Box display="flex" alignItems="center">
-                      {/* <Box sx={classes.cloneBtn} onClick={null}>
-                  <ShareOutlined color='secondary' />
-                  <Typography sx={classes.deleteText}><FormattedMessage {...messages.share} /></Typography>
-                </Box> */}
-                      <Box sx={classes.cloneBtn} onClick={deleteCollectionTypeDraft}>
-                        <DeleteOutline color='secondary' />
-                        <Typography sx={classes.deleteText}><FormattedMessage {...messages.delete} /></Typography>
-                      </Box>
-                      <Box>
-                        {
-                          loading
-                            ?
-                            <CircularProgress size={20.5} sx={classes.loadingIcon} />
-                            :
-                            <RefreshOutlined sx={classes.refreshIcon} onClick={fetchCollectionItems} />
-                        }
+                        <Box>
+                          {
+                            loading
+                              ?
+                              <CircularProgress size={20.5} sx={classes.loadingIcon} />
+                              :
+                              <RefreshOutlined sx={classes.refreshIcon} onClick={fetchCollectionItems} />
+                          }
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
-                  <Box id="collectionListingTableDarkDraft">
-                    {/* <MaterialTable
-                      components={{
-                        Container: props => <Paper {...props} elevation={0} sx={classes.tableRootPaper} />
-                      }}
-                      icons={tableIcons}
-                      options={{
-                        toolbar: false,
-                        pageSize: 10,
-                        headerStyle: {
-                          backgroundColor: '#13171F',
-                          color: '#FFF',
-                          fontSize: 14,
-                          height: '40px'
-                        },
-                        showFirstLastPageButtons: false,
-                        selection: true,
-                        selectionProps: rowData => ({
-                          checked: selectedDraftCollectionId.includes(rowData.__auto_id__),
-                          color: 'primary'
-                        })
-                      }}
-                      onSelectionChange={handleSelectionChangeDraft}
-                      columns={stateDraft.columns}
-                      data={stateDraft.data}
-                      onRowClick={(event, rowData,) => {
-                        setEditObj(rowData)
-                        setListOrAdd('add')
-                      }}
-                    /> */}
-                    <EnhancedCustomTable
-                      columns={stateDraft.columns}
-                      data={stateDraft.data}
-                      onSelectionChange={handleSelectionChangeDraft}
-                      onRowClick={(rowData) => {
-                        setEditObj(rowData)
-                        setListOrAdd('add')
-                      }}
-                    >
-                    </EnhancedCustomTable>
-                  </Box>
-                </div>
-              </LoadingOverlay>
+                    <Box id="collectionListingTableDarkDraft">
+                      <EnhancedCustomTable
+                        columns={stateDraft.columns}
+                        data={stateDraft.data}
+                        onSelectionChange={handleSelectionChangeDraft}
+                        onRowClick={(rowData) => {
+                          setEditObj(rowData)
+                          setListOrAdd('add')
+                        }}
+                      >
+                      </EnhancedCustomTable>
+                    </Box>
+                  </div>
+                </LoadingOverlay>
+              </Box>
             </Box>
           </Box>
           :

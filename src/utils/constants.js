@@ -34,6 +34,7 @@ export const COLLECTION_FIELD_NAME = {
   COMPONENT: 'component',
   RELATION: 'relation',
   LIST: 'list',
+  RICH_TEXT: 'rich_text'
 }
 
 
