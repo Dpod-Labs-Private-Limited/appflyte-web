@@ -31,6 +31,7 @@ function HomeLayout() {
             const externalUserType = queryParams.get("user_type");
             const externalRequestType = queryParams.get("request_type");
             const serviceType = queryParams.get("service_type");
+            const serviceMessage = queryParams.get("service_message");
             const billingPeriodType = queryParams.get("billing_period_type");
             const isSupportedService = Boolean(serviceType && UTIL_CONFIG.SUPPORTED_SERVICES.includes(serviceType));
             const isSupportedBillingPeriod = Boolean(billingPeriodType && UTIL_CONFIG.SUPPORTED_BILLING_PERIODS.includes(billingPeriodType));
@@ -41,7 +42,8 @@ function HomeLayout() {
                     updateAuthData({
                         user_type: UTIL_CONFIG.EXT_USER_TYPE,
                         request_type: UTIL_CONFIG.USER_REQUEST,
-                        collection_service_type: serviceType
+                        collection_service_type: serviceType,
+                        service_message: serviceMessage
                     });
                 } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && isSupportedBillingPeriod) {
                     updateAuthData({

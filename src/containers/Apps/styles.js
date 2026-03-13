@@ -47,6 +47,14 @@ const getStyles = () => ({
         '@media (min-width: 900px)': {
             gridColumn: 'span 4',
         }
+    },
+    launchButton: {
+        backgroundColor: '#0B51C5',
+        textTransform: 'none',
+        fontSize: 13,
+        '&:hover': { backgroundColor: '#0842a0' },
+        width: '100px'
     }
+
 })
 export default getStyles;

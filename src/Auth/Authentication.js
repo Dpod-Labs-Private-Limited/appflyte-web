@@ -109,6 +109,7 @@ function Authentication() {
                     const externalUserType = externalParamsObj.get("user_type");
                     const externalRequestType = externalParamsObj.get("request_type");
                     const serviceType = externalParamsObj.get("service_type");
+                    const serviceMessage = externalParamsObj.get("service_message");
                     const billingPeriodType = externalParamsObj.get("billing_period_type");
                     const isSupportedService = Boolean(serviceType && UTIL_CONFIG.SUPPORTED_SERVICES.includes(serviceType));
                     const isSupportedBillingPeriod = Boolean(billingPeriodType && UTIL_CONFIG.SUPPORTED_BILLING_PERIODS.includes(billingPeriodType));
@@ -120,6 +121,7 @@ function Authentication() {
                                 user_type: UTIL_CONFIG.EXT_USER_TYPE,
                                 request_type: UTIL_CONFIG.USER_REQUEST,
                                 collection_service_type: serviceType,
+                                service_message: serviceMessage,
                                 organization_id: organizationId
                             });
                         } else if (externalRequestType === UTIL_CONFIG.STRIPE_REQUEST && isSupportedBillingPeriod) {

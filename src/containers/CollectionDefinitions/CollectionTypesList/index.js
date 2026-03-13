@@ -28,6 +28,7 @@ import getMainStyles from '../../../styles/getStyles';
 import LoadingOverlay from 'react-loading-overlay';
 import { useOutletContext } from 'react-router-dom';
 import Chatbot from '../../../components/Chatbot';
+import { useAppContext } from '../../../context/AppContext';
 
 
 function CollectionTypesList() {
@@ -36,6 +37,11 @@ function CollectionTypesList() {
 
   const { centralLoadingFlags, tostAlert, selectedUser, location, navigate, collectionTypeList, fetchCollectionTypes,
     fetchPublishedCollection, fieldSetList, fetchFieldSets, fetchPublishedFieldset } = useOutletContext();
+  // const { authData, updateAuthData, initialAuthData } = useAppContext();
+
+  // useEffect(() => {
+  //   console.log("authData", authData)
+  // }, [authData])
 
   function a11yProps(index) {
     return {

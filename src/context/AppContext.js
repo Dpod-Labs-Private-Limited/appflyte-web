@@ -108,7 +108,8 @@ export function AppProvider({ children }) {
         workspace_id: null,
         project_id: null,
         billing_period_type: null,
-        collection_service_type: null
+        collection_service_type: null,
+        service_message: null
     };
 
     const [authData, setAuthData] = useState(() => {
