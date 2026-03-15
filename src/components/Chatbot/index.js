@@ -1,42 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
-import { fetchSubscriberId, fetchSubscriptionId, fetchThirdPartyToken, fetchThirdPartyTokenProvider } from '../../utils/GetAccountDetails'
+import { useLocation } from 'react-router-dom';
+
+import { fetchSubscriberId, fetchSubscriptionId } from '../../utils/GetAccountDetails'
 import { useAppContext } from '../../context/AppContext';
 import FilesApi from '../../Api/Services/AppflyteBackend/FileServiceApi';
-import { getStyles } from './styles';
-import { useLocation } from 'react-router-dom';
-import { Box, Button } from '@mui/material';
 
-let s3_folder_name = process.env.REACT_APP_ANALYTICS_S3_BUCKET_FOLDER
-let s3_file_name = process.env.REACT_APP_ANALYTICS_S3_BUCKET_SCRIPT_FILE
+let s3_folder_name = process.env.REACT_APP_ANALYTICS_S3_BUCKET_FOLDER;
+let s3_file_name = process.env.REACT_APP_ANALYTICS_S3_BUCKET_SCRIPT_FILE;
 let bucket_name = process.env.REACT_APP_ANALYTICS_S3_BUCKET_NAME;
 
 function Chatbot({ chatbot_type }) {
 
-    const theme = useTheme();
-    const styles = getStyles(theme);
     const location = useLocation();
 
-    const { selectedProject, selectedOrganization } = useAppContext();
+    const { selectedProject, selectedOrganization, authData, initialAuthData, updateAuthData } = useAppContext();
     const [chatbotData, setChatbotData] = useState({ chatbotStatus: false, chatbotUrl: null, chatBotType: null });
 
     useEffect(() => {
-        const getChatBot = async () => {
-            try {
-                const subscriber_id = await fetchSubscriberId();
-                const subscription_id = await fetchSubscriptionId();
-                const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null;
-                const project_id = selectedProject?.payload?.__auto_id__ ?? null;
-                const app_id = chatbot_type === "appflyte_ddl" ? organization_id : project_id;
-                const check_url = `${s3_folder_name}/${s3_file_name}/${subscriber_id}/${subscription_id}/${project_id}/${app_id}.js`;
-                await checkAnalyticsChatbot(check_url);
-            } catch (error) {
-                console.error("Chatbot init error:", error);
-            }
-        };
         getChatBot();
         //eslint-disable-next-line
-    }, []);
+    }, [selectedOrganization, selectedProject]);
+
+    const getChatBot = async () => {
+        try {
+            const subscriber_id = await fetchSubscriberId();
+            const subscription_id = await fetchSubscriptionId();
+            const organization_id = selectedOrganization?.payload?.__auto_id__ ?? null;
+            const project_id = selectedProject?.payload?.__auto_id__ ?? null;
+            const app_id = chatbot_type === "appflyte_ddl" ? organization_id : project_id;
+            const check_url = `${s3_folder_name}/${s3_file_name}/${subscriber_id}/${subscription_id}/${project_id}/${app_id}.js`;
+            await checkAnalyticsChatbot(check_url);
+        } catch (error) {
+            console.error("Chatbot init error:", error);
+            updateAuthData(initialAuthData)
+        }
+    };
 
     const checkAnalyticsChatbot = async (check_url) => {
         try {
@@ -88,8 +86,10 @@ function Chatbot({ chatbot_type }) {
 
         } catch (error) {
             console.error("checkAnalyticsChatbot error:", error);
+            updateAuthData(initialAuthData)
         }
     };
+
 
     useEffect(() => {
         if (!chatbotData?.chatbotStatus || !chatbotData?.chatbotUrl) return;
@@ -98,11 +98,23 @@ function Chatbot({ chatbot_type }) {
         const existing = document.getElementById(scriptId);
         if (existing) existing.remove();
 
+        if (authData.service_message) {
+            window.__chatbotCallbacks = {
+                extraConfig: {
+                    "DEFAULT_MESSAGE": {
+                        "status": true,
+                        "message": authData.service_message
+                    },
+                }
+            };
+        }
+
         const script = document.createElement("script");
         script.id = scriptId;
         script.src = chatbotData.chatbotUrl;
         script.async = true;
         document.body.appendChild(script);
+        updateAuthData(initialAuthData)
 
         return () => {
             console.log("Cleanup — removing chatbot iframe + globals");
@@ -110,6 +122,7 @@ function Chatbot({ chatbot_type }) {
             try {
                 window.AmeayaChatBot?.("destroy");
                 if (window.AmeayaChatBot) delete window.AmeayaChatBot;
+                if (window.__chatbotCallbacks) delete window.__chatbotCallbacks;
             } catch { }
 
             ["ameya-simple-chatbot-iframe", "ameya-chatbot-iframe"].forEach(id => {
@@ -117,6 +130,7 @@ function Chatbot({ chatbot_type }) {
                 if (iframe) iframe.remove();
             });
 
+            if (window.__chatbotCallbacks) delete window.__chatbotCallbacks;
             if (window.toggleChatbot) delete window.toggleChatbot;
 
             const oldScript = document.getElementById(scriptId);
@@ -124,49 +138,7 @@ function Chatbot({ chatbot_type }) {
         };
     }, [chatbotData, location.pathname]);
 
-
-    const handleLaunch = async () => {
-        try {
-            const third_party_token = await fetchThirdPartyToken();
-            const token_provider = await fetchThirdPartyTokenProvider();
-
-            if (!third_party_token || !token_provider) {
-                console.warn("Missing chatbot auth credentials");
-                return;
-            }
-
-            const params = {
-                token_provider,
-                third_party_token
-            };
-
-            if (window.toggleChatbot) {
-                window.toggleChatbot(params);
-            } else {
-                console.warn("Chatbot script not loaded yet");
-            }
-
-        } catch (error) {
-            console.error("Chatbot launch error:", error);
-        }
-    };
-
-    return (
-        <div>
-            {(chatbotData.chatbotStatus && chatbotData.chatBotType === "advanced_bot" && chatbotData.chatbotUrl) &&
-                <Box sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000 }}>
-                    <Button
-                        id="chatBotButton"
-                        variant="contained"
-                        sx={styles.chatbotBtn}
-                        onClick={handleLaunch}
-                    >
-                        💬
-                    </Button>
-                </Box>
-            }
-        </div>
-    )
+    return (<></>)
 }
 
 export default Chatbot;

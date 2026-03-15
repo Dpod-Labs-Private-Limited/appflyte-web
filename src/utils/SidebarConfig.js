@@ -11,12 +11,10 @@ export const handleSidebarConfig = async (selectedWorkspace, selectedProject, na
 
     if (user_type === UTIL_CONFIG.EXT_USER_TYPE && request_type === UTIL_CONFIG.USER_REQUEST && isSupportedService) {
         if (collection_service_type === UTIL_CONFIG.DDL_SERVICE) {
-            updateAuthData(initialAuthData)
             path = 'collection_types'
         }
 
         if (collection_service_type === UTIL_CONFIG.DML_SERVICE) {
-            updateAuthData(initialAuthData)
             path = 'collections'
         }
     }

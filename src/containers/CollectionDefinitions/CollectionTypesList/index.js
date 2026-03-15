@@ -37,11 +37,6 @@ function CollectionTypesList() {
 
   const { centralLoadingFlags, tostAlert, selectedUser, location, navigate, collectionTypeList, fetchCollectionTypes,
     fetchPublishedCollection, fieldSetList, fetchFieldSets, fetchPublishedFieldset } = useOutletContext();
-  // const { authData, updateAuthData, initialAuthData } = useAppContext();
-
-  // useEffect(() => {
-  //   console.log("authData", authData)
-  // }, [authData])
 
   function a11yProps(index) {
     return {
